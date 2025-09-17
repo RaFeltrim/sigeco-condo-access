@@ -15,9 +15,15 @@ import {
   Eye,
   UserCheck,
   TrendingUp,
-  Activity
+  Activity,
+  Package,
+  Lock
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import RelatoriosPage from "./RelatoriosPage";
+import SegurancaPage from "./SegurancaPage";
+import ControleInsumosPage from "./ControleInsumosPage";
+import SuporteAvancadoPage from "./SuporteAvancadoPage";
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -27,7 +33,9 @@ const AdminDashboard = () => {
     { id: "overview", label: "Visão Geral", icon: BarChart3 },
     { id: "residents", label: "Gerenciamento de Moradores", icon: Users },
     { id: "reports", label: "Relatórios", icon: FileText },
-    { id: "support", label: "Suporte", icon: Phone },
+    { id: "insumos", label: "Controle de Insumos", icon: Package },
+    { id: "security", label: "Backup e Segurança", icon: Lock },
+    { id: "support", label: "Suporte Avançado", icon: Phone },
   ];
 
   const stats = [
@@ -220,65 +228,13 @@ const AdminDashboard = () => {
             </div>
           )}
 
-          {activeSection === "reports" && (
-            <div className="space-y-6">
-              <h1 className="text-3xl font-bold text-primary">Relatórios</h1>
-              <Card className="shadow-lg border-0 bg-card/95 backdrop-blur">
-                <CardContent className="p-8 text-center">
-                  <FileText className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-                  <p className="text-lg text-muted-foreground">
-                    Funcionalidade em desenvolvimento
-                  </p>
-                </CardContent>
-              </Card>
-            </div>
-          )}
+          {activeSection === "reports" && <RelatoriosPage />}
 
-          {activeSection === "support" && (
-            <div className="space-y-6">
-              <h1 className="text-3xl font-bold text-primary">Suporte</h1>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <Card className="shadow-lg border-0 bg-card/95 backdrop-blur">
-                  <CardHeader>
-                    <CardTitle className="text-primary">Contato Técnico</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
-                      <p className="text-sm text-muted-foreground">
-                        Para suporte técnico e emergências
-                      </p>
-                      <Button className="w-full bg-accent hover:bg-accent-dark text-accent-foreground">
-                        <Phone className="h-4 w-4 mr-2" />
-                        (11) 9999-9999
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-                
-                <Card className="shadow-lg border-0 bg-card/95 backdrop-blur">
-                  <CardHeader>
-                    <CardTitle className="text-primary">Status do Sistema</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-3">
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm">Servidor Principal</span>
-                        <Badge className="bg-success">Online</Badge>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm">Backup Automático</span>
-                        <Badge className="bg-success">Ativo</Badge>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm">Última Atualização</span>
-                        <span className="text-sm text-muted-foreground">Hoje, 06:00</span>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-            </div>
-          )}
+          {activeSection === "insumos" && <ControleInsumosPage />}
+
+          {activeSection === "security" && <SegurancaPage />}
+
+          {activeSection === "support" && <SuporteAvancadoPage />}
         </div>
       </div>
     </div>
