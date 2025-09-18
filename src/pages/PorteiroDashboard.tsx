@@ -6,32 +6,61 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Logo } from "@/components/Logo";
-import { UserPlus, Search, Clock, User, FileText, LogOut, Phone } from "lucide-react";
+import NotificationSystem from "@/components/NotificationSystem";
+import { UserPlus, Search, Clock, User, FileText, LogOut, Phone, UserMinus, TrendingUp, Users, Eye } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 
 const PorteiroDashboard = () => {
   const [visitante, setVisitante] = useState({ nome: "", documento: "", destino: "", motivo: "" });
   const [busca, setBusca] = useState("");
+  const [registros, setRegistros] = useState([
+    { id: 1, nome: "João Silva", documento: "123.456.789-00", destino: "Apto 101", hora: "14:30", status: "Ativo", entrada: new Date() },
+    { id: 2, nome: "Maria Santos", documento: "987.654.321-00", destino: "Apto 205", hora: "13:15", status: "Saiu", entrada: new Date(), saida: new Date() },
+    { id: 3, nome: "Carlos Lima", documento: "456.789.123-00", destino: "Apto 304", hora: "12:45", status: "Ativo", entrada: new Date() },
+    { id: 4, nome: "Ana Costa", documento: "321.654.987-00", destino: "Apto 102", hora: "11:20", status: "Saiu", entrada: new Date(), saida: new Date() },
+  ]);
+  const [visitantesSemana] = useState(284);
+  const [visitantesHoje] = useState(47);
   const { toast } = useToast();
   const navigate = useNavigate();
-
-  const registrosRecentes = [
-    { id: 1, nome: "João Silva", documento: "123.456.789-00", destino: "Apto 101", hora: "14:30", status: "Ativo" },
-    { id: 2, nome: "Maria Santos", documento: "987.654.321-00", destino: "Apto 205", hora: "13:15", status: "Saiu" },
-    { id: 3, nome: "Carlos Lima", documento: "456.789.123-00", destino: "Apto 304", hora: "12:45", status: "Ativo" },
-    { id: 4, nome: "Ana Costa", documento: "321.654.987-00", destino: "Apto 102", hora: "11:20", status: "Saiu" },
-  ];
 
   const handleCadastro = (e: React.FormEvent) => {
     e.preventDefault();
     if (visitante.nome && visitante.documento && visitante.destino) {
+      const novoRegistro = {
+        id: registros.length + 1,
+        nome: visitante.nome,
+        documento: visitante.documento,
+        destino: visitante.destino,
+        hora: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
+        status: "Ativo",
+        entrada: new Date(),
+        motivo: visitante.motivo
+      };
+      
+      setRegistros([novoRegistro, ...registros]);
+      
       toast({
         title: "Entrada registrada com sucesso",
         description: `Visitante ${visitante.nome} autorizado para ${visitante.destino}`,
       });
       setVisitante({ nome: "", documento: "", destino: "", motivo: "" });
     }
+  };
+
+  const handleRegistrarSaida = (id: number) => {
+    setRegistros(registros.map(registro => 
+      registro.id === id 
+        ? { ...registro, status: "Saiu", saida: new Date() }
+        : registro
+    ));
+    
+    const visitante = registros.find(r => r.id === id);
+    toast({
+      title: "Saída registrada",
+      description: `${visitante?.nome} finalizou a visita`,
+    });
   };
 
   const handleLogout = () => {
@@ -45,6 +74,7 @@ const PorteiroDashboard = () => {
         <div className="flex items-center justify-between p-4 max-w-7xl mx-auto">
           <Logo />
           <div className="flex items-center gap-4">
+            <NotificationSystem />
             <div className="text-right">
               <p className="font-semibold text-primary">Porteiro</p>
               <p className="text-sm text-muted-foreground">Portaria Principal</p>
@@ -63,6 +93,54 @@ const PorteiroDashboard = () => {
       </div>
 
       <div className="p-6 max-w-7xl mx-auto">
+        {/* Estatísticas Rápidas */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+          <Card className="shadow-lg border-0 bg-card/95 backdrop-blur">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-muted-foreground mb-1">Visitantes Hoje</p>
+                  <p className="text-3xl font-bold text-primary">{visitantesHoje}</p>
+                  <p className="text-xs text-success mt-1">+12% vs. ontem</p>
+                </div>
+                <div className="bg-primary/10 p-3 rounded-xl">
+                  <Eye className="h-6 w-6 text-primary" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="shadow-lg border-0 bg-card/95 backdrop-blur">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-muted-foreground mb-1">Ativos Agora</p>
+                  <p className="text-3xl font-bold text-accent">{registros.filter(r => r.status === "Ativo").length}</p>
+                  <p className="text-xs text-muted-foreground mt-1">Visitantes no prédio</p>
+                </div>
+                <div className="bg-accent/10 p-3 rounded-xl">
+                  <Users className="h-6 w-6 text-accent" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="shadow-lg border-0 bg-card/95 backdrop-blur">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-muted-foreground mb-1">Total Semana</p>
+                  <p className="text-3xl font-bold text-success">{visitantesSemana}</p>
+                  <p className="text-xs text-success mt-1">+8% vs. anterior</p>
+                </div>
+                <div className="bg-success/10 p-3 rounded-xl">
+                  <TrendingUp className="h-6 w-6 text-success" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Coluna Esquerda - Cadastro de Visitante */}
           <Card className="shadow-lg border-0 bg-card/95 backdrop-blur">
@@ -167,8 +245,8 @@ const PorteiroDashboard = () => {
                 <CardDescription>Últimas entradas registradas hoje</CardDescription>
               </CardHeader>
               <CardContent className="p-0">
-                <div className="space-y-1">
-                  {registrosRecentes.map((registro) => (
+                <div className="space-y-1 max-h-96 overflow-y-auto">
+                  {registros.slice(0, 10).map((registro) => (
                     <div
                       key={registro.id}
                       className="flex items-center justify-between p-4 hover:bg-muted/50 border-b border-border last:border-0"
@@ -182,14 +260,27 @@ const PorteiroDashboard = () => {
                           <p className="text-xs text-muted-foreground">{registro.destino}</p>
                         </div>
                       </div>
-                      <div className="text-right">
-                        <Badge
-                          variant={registro.status === "Ativo" ? "default" : "secondary"}
-                          className={registro.status === "Ativo" ? "bg-success" : ""}
-                        >
-                          {registro.status}
-                        </Badge>
-                        <p className="text-xs text-muted-foreground mt-1">{registro.hora}</p>
+                      <div className="flex items-center gap-3">
+                        {registro.status === "Ativo" && (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleRegistrarSaida(registro.id)}
+                            className="border-destructive text-destructive hover:bg-destructive hover:text-destructive-foreground"
+                          >
+                            <UserMinus className="h-3 w-3 mr-1" />
+                            Saída
+                          </Button>
+                        )}
+                        <div className="text-right">
+                          <Badge
+                            variant={registro.status === "Ativo" ? "default" : "secondary"}
+                            className={registro.status === "Ativo" ? "bg-success" : ""}
+                          >
+                            {registro.status}
+                          </Badge>
+                          <p className="text-xs text-muted-foreground mt-1">{registro.hora}</p>
+                        </div>
                       </div>
                     </div>
                   ))}

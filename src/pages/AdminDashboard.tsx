@@ -3,6 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Logo } from "@/components/Logo";
+import NotificationSystem from "@/components/NotificationSystem";
 import { 
   BarChart3, 
   Users, 
@@ -17,13 +18,16 @@ import {
   TrendingUp,
   Activity,
   Package,
-  Lock
+  Lock,
+  Calendar as CalendarIcon
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import RelatoriosPage from "./RelatoriosPage";
 import SegurancaPage from "./SegurancaPage";
 import ControleInsumosPage from "./ControleInsumosPage";
 import SuporteAvancadoPage from "./SuporteAvancadoPage";
+import GerenciamentoMoradoresPage from "./GerenciamentoMoradoresPage";
+import AgendamentoPage from "./AgendamentoPage";
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -32,6 +36,7 @@ const AdminDashboard = () => {
   const menuItems = [
     { id: "overview", label: "Visão Geral", icon: BarChart3 },
     { id: "residents", label: "Gerenciamento de Moradores", icon: Users },
+    { id: "agendamento", label: "Agendamento de Visitas", icon: CalendarIcon },
     { id: "reports", label: "Relatórios", icon: FileText },
     { id: "insumos", label: "Controle de Insumos", icon: Package },
     { id: "security", label: "Backup e Segurança", icon: Lock },
@@ -62,6 +67,7 @@ const AdminDashboard = () => {
         <div className="flex items-center justify-between p-4 max-w-7xl mx-auto">
           <Logo />
           <div className="flex items-center gap-4">
+            <NotificationSystem />
             <div className="text-right">
               <p className="font-semibold text-primary">Administrador</p>
               <p className="text-sm text-muted-foreground">Painel de Controle</p>
@@ -214,19 +220,9 @@ const AdminDashboard = () => {
             </div>
           )}
 
-          {activeSection === "residents" && (
-            <div className="space-y-6">
-              <h1 className="text-3xl font-bold text-primary">Gerenciamento de Moradores</h1>
-              <Card className="shadow-lg border-0 bg-card/95 backdrop-blur">
-                <CardContent className="p-8 text-center">
-                  <Users className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-                  <p className="text-lg text-muted-foreground">
-                    Funcionalidade em desenvolvimento
-                  </p>
-                </CardContent>
-              </Card>
-            </div>
-          )}
+          {activeSection === "residents" && <GerenciamentoMoradoresPage />}
+          
+          {activeSection === "agendamento" && <AgendamentoPage />}
 
           {activeSection === "reports" && <RelatoriosPage />}
 
