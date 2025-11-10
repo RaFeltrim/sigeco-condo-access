@@ -87,6 +87,6 @@ export function testLoggingService() {
 
 // Auto-run if in browser
 if (typeof window !== 'undefined') {
-  (window as any).testLoggingService = testLoggingService;
+  (window as { testLoggingService?: typeof testLoggingService }).testLoggingService = testLoggingService;
   console.log('LoggingService test available. Run: testLoggingService()');
 }

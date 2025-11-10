@@ -221,7 +221,7 @@ async function main(): Promise<void> {
 
       // Display progress for each agent
       const agentNames = orchestrator.getAgentNames();
-      const agentResults: Record<string, any> = {};
+      const agentResults: Record<string, { passed: boolean; duration?: number; error?: string }> = {};
       let currentAgent = 0;
 
       for (const agentName of agentNames) {

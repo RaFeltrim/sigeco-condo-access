@@ -76,7 +76,7 @@ function trackReportGeneration(
   format: 'pdf' | 'excel',
   recordCount: number,
   generationTime: number,
-  filters: any
+  filters: Record<string, unknown>
 ) {
   AnalyticsService.track('report_generated', {
     format,
@@ -177,8 +177,8 @@ class GoogleAnalyticsProvider extends BaseAnalyticsProvider {
   async track(event: AnalyticsEvent): Promise<boolean> {
     return this.safeTrack(async () => {
       // Check if GA is loaded
-      if (typeof window !== 'undefined' && (window as any).gtag) {
-        (window as any).gtag('event', event.name, event.properties);
+      if (typeof window !== 'undefined' && (window as { gtag?: (event: string, name: string, properties?: unknown) => void }).gtag) {
+        (window as { gtag: (event: string, name: string, properties?: unknown) => void }).gtag('event', event.name, event.properties);
       } else {
         throw new Error('Google Analytics not loaded');
       }
@@ -187,7 +187,7 @@ class GoogleAnalyticsProvider extends BaseAnalyticsProvider {
 
   isBlocked(): boolean {
     // Check if GA is blocked by adblockers
-    return typeof window === 'undefined' || typeof (window as any).gtag === 'undefined';
+    return typeof window === 'undefined' || typeof (window as { gtag?: unknown }).gtag === 'undefined';
   }
 }
 
@@ -261,7 +261,7 @@ function manageQueue() {
 // 8. INTEGRATION WITH ERROR BOUNDARY
 // ============================================================================
 
-function trackErrorBoundaryError(error: Error, errorInfo: any) {
+function trackErrorBoundaryError(error: Error, errorInfo: { componentStack: string }) {
   AnalyticsService.track('react_error_boundary', {
     error: error.message,
     stack: error.stack,
@@ -294,7 +294,7 @@ function setupPageViewTracking() {
 // 10. FEATURE USAGE TRACKING
 // ============================================================================
 
-function trackFeatureUsage(featureName: string, action: string, metadata?: any) {
+function trackFeatureUsage(featureName: string, action: string, metadata?: Record<string, unknown>) {
   AnalyticsService.track('feature_used', {
     feature: featureName,
     action,

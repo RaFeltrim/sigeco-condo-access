@@ -7,7 +7,7 @@ import { RealtimeLogger } from '../../src/lib/validation-agents/RealtimeLogger';
 
 describe('RealtimeLogger', () => {
   let logger: RealtimeLogger;
-  let consoleLogSpy: any;
+  let consoleLogSpy: ReturnType<typeof vi.spyOn>;
 
   beforeEach(() => {
     logger = new RealtimeLogger({ verbose: false, enableColors: false });

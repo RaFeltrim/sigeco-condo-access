@@ -12,7 +12,7 @@ import { LoggingService } from '@/lib/logging';
 export interface AnalyticsEvent {
   id: string;
   name: string;
-  properties?: Record<string, any>;
+  properties?: Record<string, unknown>;
   timestamp: Date;
   sent: boolean;
   retryCount: number;
@@ -129,10 +129,10 @@ export class LocalStorageAnalyticsProvider extends BaseAnalyticsProvider {
     return false;
   }
 
-  private getStoredEvents(): any[] {
+  private getStoredEvents(): Array<Record<string, unknown>> {
     try {
       const stored = localStorage.getItem(this.STORAGE_KEY);
-      return stored ? JSON.parse(stored) : [];
+      return stored ? JSON.parse(stored) as Array<Record<string, unknown>> : [];
     } catch {
       return [];
     }
@@ -228,7 +228,7 @@ class AnalyticsServiceClass {
   /**
    * Track an analytics event
    */
-  track(eventName: string, properties?: Record<string, any>): void {
+  track(eventName: string, properties?: Record<string, unknown>): void {
     const event: AnalyticsEvent = {
       id: this.generateEventId(),
       name: eventName,
@@ -450,8 +450,11 @@ class AnalyticsServiceClass {
     try {
       const stored = localStorage.getItem(STORAGE_KEY_QUEUE);
       if (stored) {
-        const parsed = JSON.parse(stored);
-        this.queue = parsed.map((q: any) => ({
+        const parsed = JSON.parse(stored) as Array<{
+          event: Omit<AnalyticsEvent, 'timestamp'> & { timestamp: string };
+          nextRetry: string;
+        }>;
+        this.queue = parsed.map((q) => ({
           event: {
             ...q.event,
             timestamp: new Date(q.event.timestamp),
@@ -519,8 +522,8 @@ class AnalyticsServiceClass {
    * Sanitize event properties (remove sensitive data)
    */
   private sanitizeProperties(
-    properties?: Record<string, any>
-  ): Record<string, any> | undefined {
+    properties?: Record<string, unknown>
+  ): Record<string, unknown> | undefined {
     if (!properties) return undefined;
 
     const sanitized = { ...properties };
