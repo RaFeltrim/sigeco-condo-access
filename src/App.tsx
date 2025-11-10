@@ -12,6 +12,12 @@ import Index from "./pages/Index";
 import Login from "./pages/Login";
 import PorteiroDashboard from "./pages/PorteiroDashboard";
 import AdminDashboard from "./pages/AdminDashboard";
+import AgendamentoPage from "./pages/AgendamentoPage";
+import ControleInsumosPage from "./pages/ControleInsumosPage";
+import GerenciamentoMoradoresPage from "./pages/GerenciamentoMoradoresPage";
+import RelatoriosPage from "./pages/RelatoriosPage";
+import SegurancaPage from "./pages/SegurancaPage";
+import SuporteAvancadoPage from "./pages/SuporteAvancadoPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -27,6 +33,12 @@ const AppContent = () => {
         <Route path="/login" element={<Login />} />
         <Route path="/porteiro-dashboard" element={<PorteiroDashboard />} />
         <Route path="/admin-dashboard" element={<AdminDashboard />} />
+        <Route path="/agendamento" element={<AgendamentoPage />} />
+        <Route path="/controle-insumos" element={<ControleInsumosPage />} />
+        <Route path="/gerenciamento-moradores" element={<GerenciamentoMoradoresPage />} />
+        <Route path="/relatorios" element={<RelatoriosPage />} />
+        <Route path="/seguranca" element={<SegurancaPage />} />
+        <Route path="/suporte-avancado" element={<SuporteAvancadoPage />} />
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
         <Route path="*" element={<NotFound />} />
       </Routes>
