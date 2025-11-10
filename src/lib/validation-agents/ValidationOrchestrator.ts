@@ -185,7 +185,7 @@ export class ValidationOrchestrator {
     executionTime: number
   ): ValidationSummary {
     const criticalFailures: TestResult[] = [];
-    const moduleStatus: Record<ModuleName, 'passed' | 'failed' | 'partial'> = {} as any;
+    const moduleStatus = {} as Record<ModuleName, 'passed' | 'failed' | 'partial'>;
 
     // Critical test IDs that should block deployment
     const CRITICAL_TESTS = ['REL-001', 'BCK-001', 'DSB-003'];

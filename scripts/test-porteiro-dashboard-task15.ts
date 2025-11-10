@@ -69,9 +69,10 @@ class Task11Validator {
           cwd: this.projectRoot,
           stdio: 'pipe'
         });
-      } catch (error: any) {
+      } catch (error) {
         // Capture output even if exit code is non-zero
-        output = error.stdout || error.stderr || '';
+        const execError = error as { stdout?: string; stderr?: string };
+        output = execError.stdout || execError.stderr || '';
       }
 
       const hasComponentAnalyzer = output.includes('ComponentAnalyzer');
@@ -247,9 +248,10 @@ class Task11Validator {
           cwd: this.projectRoot,
           stdio: 'pipe'
         });
-      } catch (error: any) {
+      } catch (error) {
         // Capture output even if exit code is non-zero
-        output = error.stdout || error.stderr || '';
+        const execError = error as { stdout?: string; stderr?: string };
+        output = execError.stdout || execError.stderr || '';
       }
 
       const hasStartMessage = output.includes('MVP Verifier - Starting Analysis');
@@ -304,8 +306,9 @@ class Task11Validator {
           cwd: this.projectRoot,
           stdio: 'pipe'
         });
-      } catch (error: any) {
-        exitCode1 = error.status || 1;
+      } catch (error) {
+        const execError = error as { status?: number };
+        exitCode1 = execError.status || 1;
       }
 
       // Test with high threshold (should fail)
@@ -316,8 +319,9 @@ class Task11Validator {
           cwd: this.projectRoot,
           stdio: 'pipe'
         });
-      } catch (error: any) {
-        exitCode2 = error.status || 1;
+      } catch (error) {
+        const execError = error as { status?: number };
+        exitCode2 = execError.status || 1;
       }
 
       const lowThresholdPassed = exitCode1 === 0;
@@ -375,7 +379,7 @@ class Task11Validator {
           cwd: this.projectRoot,
           stdio: 'pipe'
         });
-      } catch (error: any) {
+      } catch (error) {
         // Ignore exit code, just check if file was created
       }
 
@@ -389,8 +393,9 @@ class Task11Validator {
           cwd: this.projectRoot,
           stdio: 'pipe'
         });
-      } catch (error: any) {
-        verboseOutput = error.stdout || error.stderr || '';
+      } catch (error) {
+        const execError = error as { stdout?: string; stderr?: string };
+        verboseOutput = execError.stdout || execError.stderr || '';
       }
 
       const hasVerboseInfo = verboseOutput.includes('Project Path:') && 

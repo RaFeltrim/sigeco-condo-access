@@ -42,10 +42,10 @@ export interface TestResult {
   error?: string;
   
   /** Expected value for comparison tests */
-  expectedValue?: any;
+  expectedValue?: unknown;
   
   /** Actual value received during test */
-  actualValue?: any;
+  actualValue?: unknown;
   
   /** Path to screenshot captured during test */
   screenshot?: string;

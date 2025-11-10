@@ -12,7 +12,7 @@ export interface LogEntry {
   timestamp: Date;
   level: LogLevel;
   message: string;
-  context?: Record<string, any>;
+  context?: Record<string, unknown>;
   stack?: string;
   userAgent: string;
 }
@@ -37,21 +37,21 @@ class LoggingServiceClass {
   /**
    * Registra um erro no sistema
    */
-  error(message: string, error?: Error, context?: Record<string, any>): void {
+  error(message: string, error?: Error, context?: Record<string, unknown>): void {
     this.log('error', message, context, error?.stack);
   }
 
   /**
    * Registra um warning no sistema
    */
-  warning(message: string, context?: Record<string, any>): void {
+  warning(message: string, context?: Record<string, unknown>): void {
     this.log('warning', message, context);
   }
 
   /**
    * Registra uma informação no sistema
    */
-  info(message: string, context?: Record<string, any>): void {
+  info(message: string, context?: Record<string, unknown>): void {
     this.log('info', message, context);
   }
 
@@ -61,7 +61,7 @@ class LoggingServiceClass {
   private log(
     level: LogLevel,
     message: string,
-    context?: Record<string, any>,
+    context?: Record<string, unknown>,
     stack?: string
   ): void {
     const entry: LogEntry = {
@@ -167,8 +167,8 @@ class LoggingServiceClass {
     try {
       const stored = localStorage.getItem(STORAGE_KEY);
       if (stored) {
-        const parsed = JSON.parse(stored);
-        this.logs = parsed.map((log: any) => ({
+        const parsed = JSON.parse(stored) as Array<Omit<LogEntry, 'timestamp'> & { timestamp: string }>;
+        this.logs = parsed.map((log) => ({
           ...log,
           timestamp: new Date(log.timestamp),
         }));
@@ -205,8 +205,8 @@ class LoggingServiceClass {
    * Sanitiza contexto removendo informações sensíveis
    */
   private sanitizeContext(
-    context?: Record<string, any>
-  ): Record<string, any> | undefined {
+    context?: Record<string, unknown>
+  ): Record<string, unknown> | undefined {
     if (!context) return undefined;
 
     const sanitized = { ...context };

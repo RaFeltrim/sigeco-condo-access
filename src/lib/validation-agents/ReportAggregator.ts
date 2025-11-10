@@ -112,7 +112,7 @@ export class ReportAggregator {
     executionTime: number,
   ): ValidationSummary {
     const criticalFailures = this.identifyCriticalFailures(agentResults);
-    const moduleStatus: Record<ModuleName, 'passed' | 'failed' | 'partial'> = {} as any;
+    const moduleStatus = {} as Record<ModuleName, 'passed' | 'failed' | 'partial'>;
 
     // Analyze each agent result
     for (const result of Object.values(agentResults)) {
