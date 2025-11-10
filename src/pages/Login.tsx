@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Logo } from "@/components/Logo";
 import { Lock, User } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { AnalyticsService } from "@/services/AnalyticsService";
 
 const Login = () => {
   const [credentials, setCredentials] = useState({ username: "", password: "" });
@@ -21,6 +22,14 @@ const Login = () => {
     // Simulate login process
     setTimeout(() => {
       if (credentials.username && credentials.password) {
+        const userType = credentials.username === "admin" ? "admin" : "porteiro";
+        
+        // Track successful login
+        AnalyticsService.track('user_login', {
+          userType,
+          timestamp: new Date().toISOString()
+        });
+        
         if (credentials.username === "admin") {
           navigate("/admin-dashboard");
         } else {
@@ -31,6 +40,12 @@ const Login = () => {
           description: `Bem-vindo(a), ${credentials.username}!`,
         });
       } else {
+        // Track failed login
+        AnalyticsService.track('login_failed', {
+          reason: 'missing_credentials',
+          timestamp: new Date().toISOString()
+        });
+        
         toast({
           title: "Erro no login",
           description: "Usuário e senha são obrigatórios.",

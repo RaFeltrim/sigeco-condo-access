@@ -47,6 +47,18 @@ export const NotificationSystem = () => {
 
   const unreadCount = notifications.filter(n => !n.read).length;
 
+  // Handle keyboard navigation for closing panel
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (isOpen && e.key === 'Escape') {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen]);
+
   useEffect(() => {
     // Simular novas notificações
     const interval = setInterval(() => {
@@ -134,20 +146,41 @@ export const NotificationSystem = () => {
         size="sm"
         onClick={() => setIsOpen(!isOpen)}
         className="relative"
+        aria-label={`Notificações${unreadCount > 0 ? `, ${unreadCount} não ${unreadCount === 1 ? 'lida' : 'lidas'}` : ''}`}
+        aria-expanded={isOpen}
+        aria-haspopup="dialog"
+        aria-controls="notification-panel"
       >
-        <Bell className="h-4 w-4" />
+        <Bell className="h-4 w-4" aria-hidden="true" />
         {unreadCount > 0 && (
-          <Badge className="absolute -top-2 -right-2 h-5 w-5 p-0 flex items-center justify-center bg-destructive">
+          <Badge 
+            className="absolute -top-2 -right-2 h-5 w-5 p-0 flex items-center justify-center bg-destructive"
+            aria-label={`${unreadCount} notificações não lidas`}
+          >
             {unreadCount > 9 ? "9+" : unreadCount}
           </Badge>
         )}
       </Button>
 
       {isOpen && (
-        <Card className="absolute right-0 top-12 w-80 max-h-96 overflow-hidden shadow-lg border-0 bg-card/95 backdrop-blur z-50">
+        <>
+          {/* Backdrop overlay to close on outside click */}
+          <div 
+            className="fixed inset-0 z-[9998]" 
+            onClick={() => setIsOpen(false)}
+            aria-hidden="true"
+          />
+          
+          <Card 
+            id="notification-panel"
+            className="fixed right-4 top-16 w-80 max-h-96 overflow-hidden shadow-lg border-0 bg-card/95 backdrop-blur z-[9999]"
+            role="dialog"
+            aria-label="Painel de notificações"
+            aria-modal="false"
+          >
           <div className="p-4 border-b border-border">
             <div className="flex items-center justify-between">
-              <h3 className="font-semibold text-primary">Notificações</h3>
+              <h3 className="font-semibold text-primary" id="notification-title">Notificações</h3>
               <div className="flex gap-2">
                 {unreadCount > 0 && (
                   <Button
@@ -155,6 +188,7 @@ export const NotificationSystem = () => {
                     variant="ghost"
                     onClick={markAllAsRead}
                     className="text-xs"
+                    aria-label="Marcar todas as notificações como lidas"
                   >
                     Marcar todas
                   </Button>
@@ -163,17 +197,24 @@ export const NotificationSystem = () => {
                   size="sm"
                   variant="ghost"
                   onClick={() => setIsOpen(false)}
+                  aria-label="Fechar painel de notificações"
                 >
-                  <X className="h-4 w-4" />
+                  <X className="h-4 w-4" aria-hidden="true" />
                 </Button>
               </div>
             </div>
           </div>
 
-          <div className="max-h-80 overflow-y-auto">
+          <div 
+            className="max-h-80 overflow-y-auto"
+            role="list"
+            aria-label="Lista de notificações"
+            aria-live="polite"
+            aria-atomic="false"
+          >
             {notifications.length === 0 ? (
-              <div className="p-6 text-center text-muted-foreground">
-                <Bell className="h-8 w-8 mx-auto mb-2 opacity-50" />
+              <div className="p-6 text-center text-muted-foreground" role="status">
+                <Bell className="h-8 w-8 mx-auto mb-2 opacity-50" aria-hidden="true" />
                 <p>Nenhuma notificação</p>
               </div>
             ) : (
@@ -185,10 +226,19 @@ export const NotificationSystem = () => {
                       getTypeColor(notification.type)
                     } ${!notification.read ? "bg-primary/5" : ""}`}
                     onClick={() => markAsRead(notification.id)}
+                    role="listitem"
+                    tabIndex={0}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        markAsRead(notification.id);
+                      }
+                    }}
+                    aria-label={`${notification.type === 'warning' ? 'Aviso' : notification.type === 'success' ? 'Sucesso' : notification.type === 'error' ? 'Erro' : 'Informação'}: ${notification.title}. ${notification.message}. ${notification.timestamp.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}. ${!notification.read ? 'Não lida' : 'Lida'}`}
                   >
                     <div className="flex items-start justify-between gap-2">
                       <div className="flex items-start gap-2 flex-1">
-                        {getIcon(notification.type)}
+                        <span aria-hidden="true">{getIcon(notification.type)}</span>
                         <div className="flex-1">
                           <p className={`text-sm font-medium ${!notification.read ? "text-primary" : ""}`}>
                             {notification.title}
@@ -197,11 +247,13 @@ export const NotificationSystem = () => {
                             {notification.message}
                           </p>
                           <div className="flex items-center gap-1 mt-2 text-xs text-muted-foreground">
-                            <Clock className="h-3 w-3" />
-                            {notification.timestamp.toLocaleTimeString('pt-BR', { 
-                              hour: '2-digit', 
-                              minute: '2-digit' 
-                            })}
+                            <Clock className="h-3 w-3" aria-hidden="true" />
+                            <time dateTime={notification.timestamp.toISOString()}>
+                              {notification.timestamp.toLocaleTimeString('pt-BR', { 
+                                hour: '2-digit', 
+                                minute: '2-digit' 
+                              })}
+                            </time>
                           </div>
                         </div>
                       </div>
@@ -214,8 +266,9 @@ export const NotificationSystem = () => {
                           removeNotification(notification.id);
                         }}
                         className="h-6 w-6 p-0 hover:bg-destructive/10"
+                        aria-label={`Remover notificação: ${notification.title}`}
                       >
-                        <X className="h-3 w-3" />
+                        <X className="h-3 w-3" aria-hidden="true" />
                       </Button>
                     </div>
                   </div>
@@ -224,6 +277,7 @@ export const NotificationSystem = () => {
             )}
           </div>
         </Card>
+        </>
       )}
     </div>
   );

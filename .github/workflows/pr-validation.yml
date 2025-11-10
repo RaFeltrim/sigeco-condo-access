@@ -1,0 +1,82 @@
+name: PR Validation
+
+on:
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x]
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm ci
+    
+    - name: Run TypeScript type check
+      run: npm run type-check
+    
+    - name: Run ESLint
+      run: npm run lint
+    
+    - name: Build project
+      run: npm run build
+    
+    - name: Check build size
+      run: |
+        echo "Build completed successfully"
+        du -sh dist/
+        echo "Build artifacts:"
+        ls -lh dist/
+    
+  console-validation-reminder:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Console Validation Reminder
+      uses: actions/github-script@v7
+      with:
+        script: |
+          github.rest.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: `## ⚠️ Lembrete: Validação do Console
+
+            Antes de fazer merge deste PR, certifique-se de:
+
+            ### ✅ Checklist de Validação Manual
+
+            - [ ] Executar \`npm run dev\` localmente
+            - [ ] Abrir DevTools (F12) e verificar aba Console
+            - [ ] Verificar que não há erros críticos (vermelho)
+            - [ ] Verificar que não há warnings de CORS
+            - [ ] Navegar por todas as páginas afetadas
+            - [ ] Testar a funcionalidade implementada
+            - [ ] Verificar que Error Boundaries funcionam (se aplicável)
+
+            ### 📋 Definition of Done
+
+            Consulte [CONTRIBUTING.md](../blob/main/CONTRIBUTING.md) para o checklist completo.
+
+            **Erros NÃO aceitáveis:**
+            - ❌ Erros de CORS
+            - ❌ Erros de React (incluindo #418)
+            - ❌ Erros JavaScript não tratados
+            - ❌ Erros de recursos não encontrados (404)
+
+            ---
+            *Esta validação é crítica para manter a estabilidade do sistema.*`
+          })

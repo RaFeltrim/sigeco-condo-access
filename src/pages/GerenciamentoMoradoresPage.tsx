@@ -8,6 +8,9 @@ import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { MaskedInput } from "@/components/ui/masked-input";
+import { UnitCombobox } from "@/components/ui/unit-combobox";
 import { 
   Home, 
   Users, 
@@ -24,6 +27,7 @@ import {
   Plus
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { validatePhone, validateDocument } from "@/lib/utils/validation";
 
 const GerenciamentoMoradoresPage = () => {
   const [filtroUnidade, setFiltroUnidade] = useState("");
@@ -31,6 +35,12 @@ const GerenciamentoMoradoresPage = () => {
   const [novoMorador, setNovoMorador] = useState({
     nome: "", email: "", telefone: "", unidade: "", documento: "", tipo: ""
   });
+  const [formErrors, setFormErrors] = useState<{
+    telefone?: string;
+    documento?: string;
+  }>({});
+  const [moradorToDelete, setMoradorToDelete] = useState<typeof moradores[0] | null>(null);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   
   const { toast } = useToast();
 
@@ -100,13 +110,75 @@ const GerenciamentoMoradoresPage = () => {
 
   const handleCadastroMorador = (e: React.FormEvent) => {
     e.preventDefault();
-    if (novoMorador.nome && novoMorador.email && novoMorador.unidade) {
+    
+    // MRD-RBF-003: Validate phone and document
+    const errors: { telefone?: string; documento?: string } = {};
+    
+    // Validate phone if provided
+    if (novoMorador.telefone && !validatePhone(novoMorador.telefone)) {
+      errors.telefone = "Telefone inválido. Use o formato (11) 99999-9999";
+    }
+    
+    // Validate document (required)
+    if (!novoMorador.documento) {
+      errors.documento = "Documento é obrigatório";
+    } else {
+      const docValidation = validateDocument(novoMorador.documento);
+      if (!docValidation.isValid) {
+        errors.documento = docValidation.message || "Documento inválido";
+      }
+    }
+    
+    // If there are errors, show them and don't submit
+    if (Object.keys(errors).length > 0) {
+      setFormErrors(errors);
+      toast({
+        title: "Erro na validação",
+        description: "Por favor, corrija os erros no formulário",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    // Clear errors and proceed with submission
+    setFormErrors({});
+    
+    if (novoMorador.nome && novoMorador.email && novoMorador.unidade && novoMorador.tipo) {
       toast({
         title: "Morador cadastrado com sucesso",
         description: `${novoMorador.nome} foi adicionado à unidade ${novoMorador.unidade}`,
       });
       setNovoMorador({ nome: "", email: "", telefone: "", unidade: "", documento: "", tipo: "" });
+    } else {
+      toast({
+        title: "Campos obrigatórios faltando",
+        description: "Preencha todos os campos obrigatórios (*)",
+        variant: "destructive",
+      });
     }
+  };
+
+  // MRD-RBF-004: Handle delete with confirmation
+  const handleDeleteClick = (morador: typeof moradores[0]) => {
+    setMoradorToDelete(morador);
+    setShowDeleteDialog(true);
+  };
+  
+  const handleConfirmDelete = () => {
+    if (moradorToDelete) {
+      // Here you would call the API to delete the morador
+      toast({
+        title: "Morador excluído",
+        description: `${moradorToDelete.nome} foi removido do sistema`,
+      });
+      setShowDeleteDialog(false);
+      setMoradorToDelete(null);
+    }
+  };
+  
+  const handleCancelDelete = () => {
+    setShowDeleteDialog(false);
+    setMoradorToDelete(null);
   };
 
   const moradoresFiltrados = moradores.filter(morador => 
@@ -173,7 +245,7 @@ const GerenciamentoMoradoresPage = () => {
             
             <Dialog>
               <DialogTrigger asChild>
-                <Button className="bg-accent hover:bg-accent-dark text-accent-foreground">
+                <Button className="bg-accent hover:bg-accent-dark text-accent-foreground" data-testid="btn-novo-morador">
                   <Plus className="h-4 w-4 mr-2" />
                   Novo Morador
                 </Button>
@@ -185,10 +257,11 @@ const GerenciamentoMoradoresPage = () => {
                     Preencha os dados do novo morador
                   </DialogDescription>
                 </DialogHeader>
-                <form onSubmit={handleCadastroMorador} className="space-y-4">
+                <form onSubmit={handleCadastroMorador} className="space-y-4" data-testid="form-cadastro-morador">
                   <div className="space-y-2">
                     <Label>Nome Completo *</Label>
                     <Input
+                      data-testid="input-nome-morador"
                       placeholder="Digite o nome completo"
                       value={novoMorador.nome}
                       onChange={(e) => setNovoMorador({...novoMorador, nome: e.target.value})}
@@ -199,6 +272,7 @@ const GerenciamentoMoradoresPage = () => {
                   <div className="space-y-2">
                     <Label>Email *</Label>
                     <Input
+                      data-testid="input-email-morador"
                       type="email"
                       placeholder="email@exemplo.com"
                       value={novoMorador.email}
@@ -209,35 +283,46 @@ const GerenciamentoMoradoresPage = () => {
 
                   <div className="space-y-2">
                     <Label>Telefone</Label>
-                    <Input
+                    <MaskedInput
+                      data-testid="input-telefone-morador"
+                      mask="phone"
                       placeholder="(11) 99999-9999"
                       value={novoMorador.telefone}
-                      onChange={(e) => setNovoMorador({...novoMorador, telefone: e.target.value})}
+                      onChange={(value) => {
+                        setNovoMorador({...novoMorador, telefone: value});
+                        if (formErrors.telefone) {
+                          setFormErrors({...formErrors, telefone: undefined});
+                        }
+                      }}
+                      error={formErrors.telefone}
                     />
                   </div>
 
                   <div className="space-y-2">
                     <Label>Unidade *</Label>
-                    <Select onValueChange={(value) => setNovoMorador({...novoMorador, unidade: value})}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Selecione a unidade" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {unidades.filter(u => u.status === "Vago").map((unidade) => (
-                          <SelectItem key={unidade.numero} value={`Apto ${unidade.numero}`}>
-                            Apto {unidade.numero} - {unidade.tipo}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <UnitCombobox
+                      units={unidades.filter(u => u.status === "Vago")}
+                      value={novoMorador.unidade}
+                      onChange={(value) => setNovoMorador({...novoMorador, unidade: value})}
+                      placeholder="Buscar e selecionar unidade..."
+                      emptyMessage="Nenhuma unidade vaga encontrada"
+                    />
                   </div>
 
                   <div className="space-y-2">
-                    <Label>Documento</Label>
-                    <Input
+                    <Label>Documento *</Label>
+                    <MaskedInput
+                      mask="document"
                       placeholder="CPF ou RG"
                       value={novoMorador.documento}
-                      onChange={(e) => setNovoMorador({...novoMorador, documento: e.target.value})}
+                      onChange={(value) => {
+                        setNovoMorador({...novoMorador, documento: value});
+                        if (formErrors.documento) {
+                          setFormErrors({...formErrors, documento: undefined});
+                        }
+                      }}
+                      error={formErrors.documento}
+                      required
                     />
                   </div>
 
@@ -316,13 +401,19 @@ const GerenciamentoMoradoresPage = () => {
                       </TableCell>
                       <TableCell>
                         <div className="flex gap-2">
-                          <Button size="sm" variant="outline">
+                          <Button size="sm" variant="outline" aria-label={`Ver detalhes de ${morador.nome}`}>
                             <Eye className="h-3 w-3" />
                           </Button>
-                          <Button size="sm" variant="outline">
+                          <Button size="sm" variant="outline" aria-label={`Editar ${morador.nome}`}>
                             <Edit className="h-3 w-3" />
                           </Button>
-                          <Button size="sm" variant="outline" className="border-destructive text-destructive">
+                          <Button 
+                            size="sm" 
+                            variant="outline" 
+                            className="border-destructive text-destructive hover:bg-destructive hover:text-destructive-foreground"
+                            onClick={() => handleDeleteClick(morador)}
+                            aria-label={`Excluir ${morador.nome}`}
+                          >
                             <Trash2 className="h-3 w-3" />
                           </Button>
                         </div>
@@ -399,6 +490,32 @@ const GerenciamentoMoradoresPage = () => {
           </div>
         </TabsContent>
       </Tabs>
+      
+      {/* MRD-RBF-004: Delete Confirmation Dialog */}
+      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirmar Exclusão</AlertDialogTitle>
+            <AlertDialogDescription>
+              Tem certeza que deseja excluir <strong>{moradorToDelete?.nome}</strong>?
+              <br />
+              <br />
+              Esta ação não pode ser desfeita. Todos os dados do morador serão permanentemente removidos do sistema.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={handleCancelDelete}>
+              Cancelar
+            </AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={handleConfirmDelete}
+              className="bg-destructive hover:bg-destructive/90 text-destructive-foreground"
+            >
+              Confirmar Exclusão
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

@@ -1,0 +1,46 @@
+{
+  "funcionarios": [
+    {
+      "id": "1",
+      "nome": "Carlos Lima",
+      "documento": "321.654.987-00",
+      "funcao": "Porteiro",
+      "status": "Inativo",
+      "dataCadastro": "2024-01-10"
+    },
+    {
+      "id": "2",
+      "nome": "José Silva",
+      "documento": "789.456.123-00",
+      "funcao": "Zelador",
+      "status": "Ativo",
+      "dataCadastro": "2024-02-15"
+    },
+    {
+      "id": "3",
+      "nome": "Ana Paula",
+      "documento": "654.321.789-00",
+      "funcao": "Segurança",
+      "status": "Ativo",
+      "dataCadastro": "2024-03-20"
+    }
+  ],
+  "testScenarios": {
+    "createFuncionario": {
+      "nome": "Test Funcionario Validation",
+      "documento": "987.654.321-00",
+      "funcao": "Porteiro"
+    },
+    "inactiveFuncionario": {
+      "nome": "Carlos Lima",
+      "expectedStatus": "Inativo",
+      "requiresReactivation": true
+    },
+    "lifecycle": {
+      "nome": "Test Lifecycle Funcionario",
+      "documento": "111.222.333-44",
+      "funcao": "Zelador",
+      "transitions": ["Ativo", "Inativo", "Ativo"]
+    }
+  }
+}

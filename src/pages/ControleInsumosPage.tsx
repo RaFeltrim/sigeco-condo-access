@@ -31,6 +31,19 @@ const ControleInsumosPage = () => {
   const [novoPrestador, setNovoPrestador] = useState({
     nome: "", empresa: "", servico: "", documento: "", contato: "", observacoes: ""
   });
+  
+  // INS-RBF-003: Form validation errors
+  const [funcionarioErrors, setFuncionarioErrors] = useState<{
+    nome?: string;
+    documento?: string;
+    funcao?: string;
+  }>({});
+  
+  const [prestadorErrors, setPrestadorErrors] = useState<{
+    nome?: string;
+    empresa?: string;
+    servico?: string;
+  }>({});
 
   const { toast } = useToast();
 
@@ -99,24 +112,80 @@ const ControleInsumosPage = () => {
 
   const handleCadastroFuncionario = (e: React.FormEvent) => {
     e.preventDefault();
-    if (novoFuncionario.nome && novoFuncionario.documento && novoFuncionario.funcao) {
-      toast({
-        title: "Funcionário cadastrado",
-        description: `${novoFuncionario.nome} foi adicionado ao sistema`,
-      });
-      setNovoFuncionario({ nome: "", documento: "", funcao: "", contato: "", observacoes: "" });
+    
+    // INS-RBF-003: Validate required fields
+    const errors: { nome?: string; documento?: string; funcao?: string } = {};
+    
+    if (!novoFuncionario.nome || novoFuncionario.nome.trim() === "") {
+      errors.nome = "Nome é obrigatório";
     }
+    
+    if (!novoFuncionario.documento || novoFuncionario.documento.trim() === "") {
+      errors.documento = "Documento é obrigatório";
+    }
+    
+    if (!novoFuncionario.funcao || novoFuncionario.funcao.trim() === "") {
+      errors.funcao = "Função é obrigatória";
+    }
+    
+    // If there are errors, show them and don't submit
+    if (Object.keys(errors).length > 0) {
+      setFuncionarioErrors(errors);
+      toast({
+        title: "Campos obrigatórios faltando",
+        description: "Por favor, preencha todos os campos obrigatórios (*)",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    // Clear errors and proceed
+    setFuncionarioErrors({});
+    
+    toast({
+      title: "Funcionário cadastrado",
+      description: `${novoFuncionario.nome} foi adicionado ao sistema`,
+    });
+    setNovoFuncionario({ nome: "", documento: "", funcao: "", contato: "", observacoes: "" });
   };
 
   const handleCadastroPrestador = (e: React.FormEvent) => {
     e.preventDefault();
-    if (novoPrestador.nome && novoPrestador.empresa && novoPrestador.servico) {
-      toast({
-        title: "Prestador cadastrado",
-        description: `${novoPrestador.empresa} foi adicionada ao sistema`,
-      });
-      setNovoPrestador({ nome: "", empresa: "", servico: "", documento: "", contato: "", observacoes: "" });
+    
+    // INS-RBF-003: Validate required fields
+    const errors: { nome?: string; empresa?: string; servico?: string } = {};
+    
+    if (!novoPrestador.nome || novoPrestador.nome.trim() === "") {
+      errors.nome = "Nome do responsável é obrigatório";
     }
+    
+    if (!novoPrestador.empresa || novoPrestador.empresa.trim() === "") {
+      errors.empresa = "Nome da empresa é obrigatório";
+    }
+    
+    if (!novoPrestador.servico || novoPrestador.servico.trim() === "") {
+      errors.servico = "Tipo de serviço é obrigatório";
+    }
+    
+    // If there are errors, show them and don't submit
+    if (Object.keys(errors).length > 0) {
+      setPrestadorErrors(errors);
+      toast({
+        title: "Campos obrigatórios faltando",
+        description: "Por favor, preencha todos os campos obrigatórios (*)",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    // Clear errors and proceed
+    setPrestadorErrors({});
+    
+    toast({
+      title: "Prestador cadastrado",
+      description: `${novoPrestador.empresa} foi adicionada ao sistema`,
+    });
+    setNovoPrestador({ nome: "", empresa: "", servico: "", documento: "", contato: "", observacoes: "" });
   };
 
   return (
@@ -178,9 +247,18 @@ const ControleInsumosPage = () => {
                     <Input
                       placeholder="Digite o nome completo"
                       value={novoFuncionario.nome}
-                      onChange={(e) => setNovoFuncionario({...novoFuncionario, nome: e.target.value})}
+                      onChange={(e) => {
+                        setNovoFuncionario({...novoFuncionario, nome: e.target.value});
+                        if (funcionarioErrors.nome) {
+                          setFuncionarioErrors({...funcionarioErrors, nome: undefined});
+                        }
+                      }}
+                      className={funcionarioErrors.nome ? "border-destructive" : ""}
                       required
                     />
+                    {funcionarioErrors.nome && (
+                      <p className="text-sm text-destructive">{funcionarioErrors.nome}</p>
+                    )}
                   </div>
 
                   <div className="space-y-2">
@@ -188,15 +266,32 @@ const ControleInsumosPage = () => {
                     <Input
                       placeholder="CPF ou RG"
                       value={novoFuncionario.documento}
-                      onChange={(e) => setNovoFuncionario({...novoFuncionario, documento: e.target.value})}
+                      onChange={(e) => {
+                        setNovoFuncionario({...novoFuncionario, documento: e.target.value});
+                        if (funcionarioErrors.documento) {
+                          setFuncionarioErrors({...funcionarioErrors, documento: undefined});
+                        }
+                      }}
+                      className={funcionarioErrors.documento ? "border-destructive" : ""}
                       required
                     />
+                    {funcionarioErrors.documento && (
+                      <p className="text-sm text-destructive">{funcionarioErrors.documento}</p>
+                    )}
                   </div>
 
                   <div className="space-y-2">
                     <Label>Função *</Label>
-                    <Select onValueChange={(value) => setNovoFuncionario({...novoFuncionario, funcao: value})}>
-                      <SelectTrigger>
+                    <Select 
+                      value={novoFuncionario.funcao}
+                      onValueChange={(value) => {
+                        setNovoFuncionario({...novoFuncionario, funcao: value});
+                        if (funcionarioErrors.funcao) {
+                          setFuncionarioErrors({...funcionarioErrors, funcao: undefined});
+                        }
+                      }}
+                    >
+                      <SelectTrigger className={funcionarioErrors.funcao ? "border-destructive" : ""}>
                         <SelectValue placeholder="Selecione a função" />
                       </SelectTrigger>
                       <SelectContent>
@@ -207,6 +302,9 @@ const ControleInsumosPage = () => {
                         <SelectItem value="administracao">Administração</SelectItem>
                       </SelectContent>
                     </Select>
+                    {funcionarioErrors.funcao && (
+                      <p className="text-sm text-destructive">{funcionarioErrors.funcao}</p>
+                    )}
                   </div>
 
                   <div className="space-y-2">

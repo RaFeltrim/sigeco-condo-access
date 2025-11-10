@@ -128,3 +128,77 @@ All colors MUST be HSL.
     @apply bg-background text-foreground;
   }
 }
+
+/* Z-Index Hierarchy
+ * Consistent layering system for SIGECO components
+ * 
+ * z-10    - Base content (cards, forms)
+ * z-40    - Dropdowns, selects, popovers
+ * z-50    - Modals, dialogs
+ * z-100   - Toast notifications
+ * z-9999  - System notifications panel (highest priority)
+ */
+
+/* Accessibility Utilities */
+@layer utilities {
+  /* Screen reader only - visually hidden but accessible to screen readers */
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+  }
+
+  /* Remove sr-only when focused (for skip links) */
+  .sr-only:focus,
+  .sr-only:active {
+    position: static;
+    width: auto;
+    height: auto;
+    padding: inherit;
+    margin: inherit;
+    overflow: visible;
+    clip: auto;
+    white-space: normal;
+  }
+
+  /* Not sr-only - reverse the sr-only class */
+  .not-sr-only {
+    position: static;
+    width: auto;
+    height: auto;
+    padding: 0;
+    margin: 0;
+    overflow: visible;
+    clip: auto;
+    white-space: normal;
+  }
+
+  /* Focus visible styles for keyboard navigation */
+  .focus-visible-ring {
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2;
+  }
+}
+
+/* Enhanced focus styles for better keyboard navigation */
+@layer base {
+  /* Ensure all interactive elements have visible focus indicators */
+  button:focus-visible,
+  a:focus-visible,
+  input:focus-visible,
+  select:focus-visible,
+  textarea:focus-visible,
+  [tabindex]:focus-visible {
+    @apply outline-none ring-2 ring-ring ring-offset-2;
+  }
+
+  /* Skip to content link styling */
+  a[href="#main-content"] {
+    @apply transition-all duration-200;
+  }
+}

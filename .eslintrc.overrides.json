@@ -1,0 +1,22 @@
+{
+  "overrides": [
+    {
+      "files": ["scripts/**/*.ts", "tests/**/*.ts", "src/lib/validation-agents/**/*.ts"],
+      "rules": {
+        "@typescript-eslint/no-explicit-any": "warn"
+      }
+    },
+    {
+      "files": ["src/components/ui/**/*.tsx"],
+      "rules": {
+        "react-refresh/only-export-components": "warn"
+      }
+    },
+    {
+      "files": ["**/__example*.ts", "**/*.test-manual.ts"],
+      "rules": {
+        "@typescript-eslint/no-explicit-any": "off"
+      }
+    }
+  ]
+}

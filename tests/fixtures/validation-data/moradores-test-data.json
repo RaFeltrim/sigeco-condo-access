@@ -1,0 +1,42 @@
+{
+  "moradores": [
+    {
+      "id": "1",
+      "nome": "Carlos Pereira",
+      "unidade": "Apto 201",
+      "documento": "123.456.789-00",
+      "status": "Inativo",
+      "dataCadastro": "2024-01-15"
+    },
+    {
+      "id": "2",
+      "nome": "Maria Silva",
+      "unidade": "Apto 102",
+      "documento": "987.654.321-00",
+      "status": "Ativo",
+      "dataCadastro": "2024-02-20"
+    },
+    {
+      "id": "3",
+      "nome": "João Santos",
+      "unidade": "Apto 305",
+      "documento": "456.789.123-00",
+      "status": "Ativo",
+      "dataCadastro": "2024-03-10"
+    }
+  ],
+  "testScenarios": {
+    "createMorador": {
+      "nome": "Test Morador Validation",
+      "unidade": "Apto 999",
+      "documento": "111.222.333-44"
+    },
+    "updateMorador": {
+      "unidade": "Apto 998"
+    },
+    "searchMorador": {
+      "nome": "Carlos Pereira",
+      "expectedStatus": "Inativo"
+    }
+  }
+}

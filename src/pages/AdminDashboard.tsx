@@ -112,25 +112,43 @@ const AdminDashboard = () => {
         </div>
 
         {/* Main Content */}
-        <div className="flex-1 p-6">
+        <main className="flex-1 p-6" role="main">
           {activeSection === "overview" && (
             <div className="space-y-6">
-              <div>
-                <h1 className="text-3xl font-bold text-primary mb-2">Dashboard Administrativo</h1>
-                <p className="text-muted-foreground">Visão geral do sistema de controle de acesso</p>
+              <div className="flex items-center justify-between">
+                <div>
+                  <h1 className="text-3xl font-bold text-primary mb-2">Dashboard Administrativo</h1>
+                  <p className="text-muted-foreground">Visão geral do sistema de controle de acesso</p>
+                </div>
+                <div className="flex gap-3">
+                  <Button 
+                    onClick={() => setActiveSection("residents")}
+                    className="bg-accent hover:bg-accent-dark"
+                  >
+                    <Users className="h-4 w-4 mr-2" />
+                    Novo Morador
+                  </Button>
+                  <Button 
+                    onClick={() => setActiveSection("agendamento")}
+                    variant="outline"
+                  >
+                    <CalendarIcon className="h-4 w-4 mr-2" />
+                    Agendar Visita
+                  </Button>
+                </div>
               </div>
 
               {/* Stats Cards */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6" data-testid="stats-cards-container">
                 {stats.map((stat, index) => {
                   const Icon = stat.icon;
                   return (
-                    <Card key={index} className="shadow-lg border-0 bg-card/95 backdrop-blur">
+                    <Card key={index} className="shadow-lg border-0 bg-card/95 backdrop-blur" data-testid={`stat-card-${index}`}>
                       <CardContent className="p-6">
                         <div className="flex items-center justify-between">
                           <div>
-                            <p className="text-sm text-muted-foreground mb-1">{stat.title}</p>
-                            <p className="text-3xl font-bold text-primary">{stat.value}</p>
+                            <p className="text-sm text-muted-foreground mb-1" data-testid={`stat-title-${index}`}>{stat.title}</p>
+                            <p className="text-3xl font-bold text-primary" data-testid={`stat-value-${index}`}>{stat.value}</p>
                             <p className={`text-sm ${stat.color} mt-1`}>{stat.change}</p>
                           </div>
                           <div className="bg-primary/10 p-3 rounded-xl">
@@ -231,7 +249,7 @@ const AdminDashboard = () => {
           {activeSection === "security" && <SegurancaPage />}
 
           {activeSection === "support" && <SuporteAvancadoPage />}
-        </div>
+        </main>
       </div>
     </div>
   );

@@ -22,3 +22,17 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Validation reports
+.kiro/reports/*.json
+.kiro/reports/*.md
+.kiro/reports/downloads/*
+
+# Test coverage
+coverage
+.nyc_output
+
+# Playwright
+test-results
+playwright-report
+playwright/.cache

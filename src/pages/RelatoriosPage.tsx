@@ -16,17 +16,25 @@ import {
   Clock,
   BarChart3,
   PieChart,
-  TrendingUp
+  TrendingUp,
+  Loader2
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { ReportService, type ReportFilter, type ReportData, type VisitaRegistro, type Estatisticas } from "@/services/ReportService";
+import { AnalyticsService } from "@/services/AnalyticsService";
+import { SavedFiltersManager } from "@/components/reports/SavedFiltersManager";
 
-const RelatoriosPage = () => {
-  const [filtros, setFiltros] = useState({
+const RelatoriosPageContent = () => {
+  const [filtros, setFiltros] = useState<ReportFilter>({
     periodo: "",
     tipo: "",
     status: "",
     destino: ""
   });
+  
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [generatingFormat, setGeneratingFormat] = useState<'pdf' | 'excel' | null>(null);
   
   const { toast } = useToast();
 
@@ -45,18 +53,163 @@ const RelatoriosPage = () => {
     { titulo: "Taxa de Ocupação", valor: "67%", periodo: "Média diária", icon: BarChart3, cor: "text-warning" },
   ];
 
-  const handleGerarRelatorio = () => {
-    toast({
-      title: "Relatório gerado com sucesso",
-      description: "O arquivo foi salvo na pasta de downloads",
-    });
+  // Filter data based on current filters
+  const getFilteredData = (): VisitaRegistro[] => {
+    let filtered = [...dadosRelatorio];
+
+    if (filtros.tipo && filtros.tipo !== "todos") {
+      filtered = filtered.filter(registro => {
+        const tipoMap: Record<string, string> = {
+          'familiar': 'Visita familiar',
+          'servico': 'Prestador de serviço',
+          'entrega': 'Entrega',
+          'manutencao': 'Manutenção'
+        };
+        return registro.motivo === tipoMap[filtros.tipo];
+      });
+    }
+
+    if (filtros.status && filtros.status !== "todos") {
+      filtered = filtered.filter(registro => {
+        const statusMap: Record<string, string> = {
+          'ativo': 'Em andamento',
+          'concluida': 'Concluída',
+          'cancelada': 'Cancelada'
+        };
+        return registro.status === statusMap[filtros.status];
+      });
+    }
+
+    if (filtros.destino && filtros.destino.trim() !== "") {
+      const destinoLower = filtros.destino.toLowerCase();
+      filtered = filtered.filter(registro => 
+        registro.destino.toLowerCase().includes(destinoLower)
+      );
+    }
+
+    return filtered;
   };
 
-  const handleExportarDados = (formato: string) => {
-    toast({
-      title: `Exportando para ${formato.toUpperCase()}`,
-      description: "O download iniciará em alguns segundos",
-    });
+  // Prepare report data
+  const prepareReportData = (format: 'pdf' | 'excel'): ReportData => {
+    const filteredRegistros = getFilteredData();
+    
+    const estatisticasData: Estatisticas = {
+      totalAcessos: filteredRegistros.length,
+      tempoMedio: estatisticas[1].valor,
+      picoPeriodo: estatisticas[2].valor,
+      taxaOcupacao: estatisticas[3].valor
+    };
+
+    const metadata = ReportService.createMetadata(
+      filtros,
+      filteredRegistros.length,
+      format,
+      'Porteiro'
+    );
+
+    return {
+      registros: filteredRegistros,
+      estatisticas: estatisticasData,
+      metadata
+    };
+  };
+
+  const handleExportarDados = async (formato: 'pdf' | 'excel') => {
+    setIsGenerating(true);
+    setGeneratingFormat(formato);
+    const startTime = Date.now();
+
+    try {
+      // Prepare data
+      const reportData = prepareReportData(formato);
+
+      // Validate data
+      const validation = ReportService.validateReportData(reportData);
+      if (!validation.isValid) {
+        // Track validation error
+        AnalyticsService.track('report_validation_failed', {
+          format: formato,
+          errors: validation.errors,
+          filters: filtros
+        });
+        
+        toast({
+          title: "Erro na validação dos dados",
+          description: validation.errors.join(', '),
+          variant: "destructive"
+        });
+        return;
+      }
+
+      // Generate report
+      let blob: Blob;
+      if (formato === 'pdf') {
+        blob = await ReportService.generatePDF(reportData);
+      } else {
+        blob = await ReportService.generateExcel(reportData);
+      }
+
+      // Download report
+      const filename = ReportService.generateFilename(formato, 'relatorio_acessos');
+      ReportService.downloadReport(blob, filename);
+
+      // Calculate generation time
+      const generationTime = (Date.now() - startTime) / 1000;
+
+      // Track successful report generation
+      AnalyticsService.track('report_generated', {
+        format: formato,
+        filters: filtros,
+        recordCount: reportData.registros.length,
+        generationTime,
+        filename
+      });
+
+      toast({
+        title: "Relatório gerado com sucesso",
+        description: `O arquivo ${filename} foi baixado para sua pasta de downloads`,
+      });
+    } catch (error) {
+      console.error('Erro ao gerar relatório:', error);
+      
+      let errorMessage = 'Erro desconhecido ao gerar relatório';
+      let errorType = 'unknown';
+      
+      if (error instanceof Error) {
+        if (error.message.includes('tempo limite')) {
+          errorMessage = 'A geração do relatório demorou muito tempo. Tente reduzir o período ou filtros.';
+          errorType = 'timeout';
+        } else if (error.message.includes('Validação falhou')) {
+          errorMessage = error.message;
+          errorType = 'validation';
+        } else if (error.message.includes('download')) {
+          errorMessage = 'Falha ao fazer download do arquivo. Verifique as permissões do navegador.';
+          errorType = 'download';
+        } else {
+          errorMessage = error.message;
+          errorType = 'generation';
+        }
+      }
+
+      // Track report generation failure
+      AnalyticsService.track('report_generation_failed', {
+        format: formato,
+        filters: filtros,
+        errorType,
+        errorMessage,
+        generationTime: (Date.now() - startTime) / 1000
+      });
+
+      toast({
+        title: "Erro ao gerar relatório",
+        description: errorMessage,
+        variant: "destructive"
+      });
+    } finally {
+      setIsGenerating(false);
+      setGeneratingFormat(null);
+    }
   };
 
   return (
@@ -71,15 +224,25 @@ const RelatoriosPage = () => {
             onClick={() => handleExportarDados("pdf")} 
             variant="outline"
             className="border-accent text-accent hover:bg-accent hover:text-accent-foreground"
+            disabled={isGenerating}
           >
-            <Download className="h-4 w-4 mr-2" />
+            {isGenerating && generatingFormat === 'pdf' ? (
+              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+            ) : (
+              <Download className="h-4 w-4 mr-2" />
+            )}
             PDF
           </Button>
           <Button 
             onClick={() => handleExportarDados("excel")} 
             className="bg-success hover:bg-success/90"
+            disabled={isGenerating}
           >
-            <Download className="h-4 w-4 mr-2" />
+            {isGenerating && generatingFormat === 'excel' ? (
+              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+            ) : (
+              <Download className="h-4 w-4 mr-2" />
+            )}
             Excel
           </Button>
         </div>
@@ -176,20 +339,25 @@ const RelatoriosPage = () => {
             </div>
           </div>
 
-          <div className="flex gap-3">
-            <Button 
-              onClick={handleGerarRelatorio}
-              className="bg-accent hover:bg-accent-dark text-accent-foreground"
-            >
-              <FileText className="h-4 w-4 mr-2" />
-              Gerar Relatório
-            </Button>
-            <Button 
-              variant="outline"
-              onClick={() => setFiltros({periodo: "", tipo: "", status: "", destino: ""})}
-            >
-              Limpar Filtros
-            </Button>
+          <div className="flex justify-between items-center">
+            <div className="flex gap-3">
+              <Button 
+                variant="outline"
+                onClick={() => setFiltros({periodo: "", tipo: "", status: "", destino: ""})}
+                disabled={isGenerating}
+              >
+                Limpar Filtros
+              </Button>
+              <div className="text-sm text-muted-foreground flex items-center">
+                {getFilteredData().length} registro(s) encontrado(s)
+              </div>
+            </div>
+            
+            {/* REL-003: Saved Filters Manager */}
+            <SavedFiltersManager
+              currentFilters={filtros}
+              onApplyFilter={(filters) => setFiltros(filters)}
+            />
           </div>
         </CardContent>
       </Card>
@@ -218,7 +386,7 @@ const RelatoriosPage = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {dadosRelatorio.map((registro) => (
+                {getFilteredData().map((registro) => (
                   <TableRow key={registro.id} className="hover:bg-muted/50">
                     <TableCell>
                       <div>
@@ -311,6 +479,14 @@ const RelatoriosPage = () => {
         </Card>
       </div>
     </div>
+  );
+};
+
+const RelatoriosPage = () => {
+  return (
+    <ErrorBoundary context="Relatórios Page">
+      <RelatoriosPageContent />
+    </ErrorBoundary>
   );
 };
 

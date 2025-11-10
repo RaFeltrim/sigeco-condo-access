@@ -1,0 +1,29 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "composite": true,
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "types": ["vitest/globals", "@testing-library/jest-dom", "node"],
+    "jsx": "react-jsx",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "allowImportingTsExtensions": true,
+    "noEmit": true,
+    "strict": false,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "forceConsistentCasingInFileNames": true
+  },
+  "include": [
+    "tests/**/*.ts",
+    "tests/**/*.tsx",
+    "tests/**/*.test.ts",
+    "tests/**/*.test.tsx",
+    "tests/**/*.spec.ts",
+    "tests/**/*.spec.tsx",
+    "vitest.config.ts"
+  ],
+  "exclude": ["node_modules", "dist"]
+}

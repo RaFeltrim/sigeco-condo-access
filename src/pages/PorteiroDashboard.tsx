@@ -1,81 +1,221 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
 import { Logo } from "@/components/Logo";
 import NotificationSystem from "@/components/NotificationSystem";
-import { UserPlus, Search, Clock, User, FileText, LogOut, Phone, UserMinus, TrendingUp, Users, Eye } from "lucide-react";
+import { LogOut, Phone, TrendingUp, Users, Eye } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { AnalyticsService } from "@/services/AnalyticsService";
+import { VisitorSearch } from "@/components/visitor/VisitorSearch";
+import { VisitorForm, type VisitorFormData } from "@/components/visitor/VisitorForm";
+import { VisitorList } from "@/components/visitor/VisitorList";
+import { QuickCheckout } from "@/components/visitor/QuickCheckout";
+import { calculateDuration, formatDuration } from "@/lib/utils/duration";
+import { useVisitorStorage } from "@/hooks/useVisitorStorage";
 
-const PorteiroDashboard = () => {
-  const [visitante, setVisitante] = useState({ nome: "", documento: "", destino: "", motivo: "" });
-  const [busca, setBusca] = useState("");
-  const [registros, setRegistros] = useState([
-    { id: 1, nome: "João Silva", documento: "123.456.789-00", destino: "Apto 101", hora: "14:30", status: "Ativo", entrada: new Date() },
-    { id: 2, nome: "Maria Santos", documento: "987.654.321-00", destino: "Apto 205", hora: "13:15", status: "Saiu", entrada: new Date(), saida: new Date() },
-    { id: 3, nome: "Carlos Lima", documento: "456.789.123-00", destino: "Apto 304", hora: "12:45", status: "Ativo", entrada: new Date() },
-    { id: 4, nome: "Ana Costa", documento: "321.654.987-00", destino: "Apto 102", hora: "11:20", status: "Saiu", entrada: new Date(), saida: new Date() },
-  ]);
+// WhatsApp support configuration
+const SUPPORT_PHONE = '5519997775596';
+const SUPPORT_MESSAGE = 'Olá, preciso de suporte técnico com o SIGECO';
+
+/**
+ * Opens WhatsApp Web or native app with pre-filled support message
+ */
+const openWhatsAppSupport = () => {
+  const encodedMessage = encodeURIComponent(SUPPORT_MESSAGE);
+  const whatsappUrl = `https://wa.me/${SUPPORT_PHONE}?text=${encodedMessage}`;
+  
+  window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
+};
+
+const PorteiroDashboardContent = () => {
+  // Use persistent storage hook
+  const { visitors: registros, addVisitor, updateVisitor, isLoading } = useVisitorStorage();
+  
   const [visitantesSemana] = useState(284);
   const [visitantesHoje] = useState(47);
   const { toast } = useToast();
   const navigate = useNavigate();
 
-  const handleCadastro = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (visitante.nome && visitante.documento && visitante.destino) {
+  const handleFormSubmit = async (data: VisitorFormData) => {
+    try {
+      const entradaTime = new Date();
+      
+      // DSB-RBF-001: Check if visitor already exists and is active
+      const existingVisitor = registros.find(
+        r => r.documento === data.documento && r.status === "Ativo"
+      );
+      
+      if (existingVisitor) {
+        // Visitor is already inside - show warning instead of creating duplicate
+        toast({
+          title: "Visitante já está no prédio",
+          description: `${data.nome} já possui entrada ativa desde ${existingVisitor.hora}`,
+          variant: "destructive",
+        });
+        return;
+      }
+      
+      // Check if visitor has a recent exit (within last 24 hours) to reactivate
+      const recentExit = registros.find(
+        r => r.documento === data.documento && 
+        r.status === "Saiu" &&
+        r.saida &&
+        (entradaTime.getTime() - r.saida.getTime()) < 24 * 60 * 60 * 1000
+      );
+      
+      if (recentExit) {
+        // Reactivate existing visitor instead of creating new entry
+        updateVisitor(recentExit.id, {
+          status: "Ativo",
+          entrada: entradaTime,
+          hora: entradaTime.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
+          destino: data.destino,
+          motivo: data.motivo,
+          saida: undefined,
+          duracao: undefined
+        });
+        
+        // Track visitor re-entry
+        AnalyticsService.track('visitor_reentry', {
+          destination: data.destino,
+          hasMotivo: !!data.motivo,
+          timestamp: entradaTime.toISOString()
+        });
+        
+        toast({
+          title: "Entrada registrada com sucesso",
+          description: `Visitante ${data.nome} autorizado para ${data.destino}`,
+        });
+        return;
+      }
+      
+      // Create new visitor entry
       const novoRegistro = {
-        id: registros.length + 1,
-        nome: visitante.nome,
-        documento: visitante.documento,
-        destino: visitante.destino,
-        hora: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
-        status: "Ativo",
-        entrada: new Date(),
-        motivo: visitante.motivo
+        nome: data.nome,
+        documento: data.documento,
+        destino: data.destino,
+        hora: entradaTime.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
+        status: "Ativo" as const,
+        entrada: entradaTime,
+        motivo: data.motivo
       };
       
-      setRegistros([novoRegistro, ...registros]);
+      // Add visitor with automatic localStorage persistence
+      addVisitor(novoRegistro);
       
+      // Track visitor registration
+      AnalyticsService.track('visitor_registered', {
+        destination: data.destino,
+        hasMotivo: !!data.motivo,
+        timestamp: entradaTime.toISOString()
+      });
+      
+      // Show success toast
       toast({
         title: "Entrada registrada com sucesso",
-        description: `Visitante ${visitante.nome} autorizado para ${visitante.destino}`,
+        description: `Visitante ${data.nome} autorizado para ${data.destino}`,
       });
-      setVisitante({ nome: "", documento: "", destino: "", motivo: "" });
+    } catch (error) {
+      console.error('Error submitting form:', error);
+      // Error toast is already shown by useVisitorStorage hook
+      throw error; // Re-throw to let form handle it
     }
   };
 
-  const handleRegistrarSaida = (id: number) => {
-    setRegistros(registros.map(registro => 
-      registro.id === id 
-        ? { ...registro, status: "Saiu", saida: new Date() }
-        : registro
-    ));
-    
-    const visitante = registros.find(r => r.id === id);
-    toast({
-      title: "Saída registrada",
-      description: `${visitante?.nome} finalizou a visita`,
-    });
+  const handleCheckout = (id: number) => {
+    try {
+      const visitanteRecord = registros.find(r => r.id === id);
+      
+      if (!visitanteRecord) {
+        toast({
+          title: "Erro ao registrar saída",
+          description: "Visitante não encontrado",
+          variant: "destructive",
+        });
+        return;
+      }
+      
+      // DSB-RBF-002: Prevent duplicate checkout for visitors who already left
+      if (visitanteRecord.status === "Saiu") {
+        toast({
+          title: "Saída já registrada",
+          description: `${visitanteRecord.nome} já saiu do prédio às ${visitanteRecord.saida?.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}`,
+          variant: "destructive",
+        });
+        return;
+      }
+      
+      const saida = new Date();
+      
+      // Calculate duration
+      let duration;
+      if (visitanteRecord?.entrada) {
+        duration = calculateDuration(visitanteRecord.entrada, saida);
+      }
+      
+      // Update visitor with automatic localStorage persistence
+      updateVisitor(id, {
+        status: "Saiu",
+        saida,
+        duracao: duration
+      });
+      
+      // Track visitor exit
+      if (visitanteRecord?.entrada && duration) {
+        AnalyticsService.track('visitor_exit', {
+          destination: visitanteRecord.destino,
+          durationMinutes: duration.totalMinutes,
+          timestamp: saida.toISOString()
+        });
+      }
+      
+      // Show toast with duration
+      toast({
+        title: `Saída de ${visitanteRecord?.nome} registrada com sucesso`,
+        description: duration ? formatDuration(duration) : undefined,
+        duration: 5000,
+      });
+    } catch (error) {
+      console.error('Error during checkout:', error);
+      // Error toast is already shown by useVisitorStorage hook
+    }
   };
 
   const handleLogout = () => {
     navigate("/");
   };
 
+  // Show loading state while data is being loaded from localStorage
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-secondary via-background to-muted flex items-center justify-center">
+        <div className="text-center" role="status" aria-live="polite">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4" aria-hidden="true"></div>
+          <p className="text-muted-foreground">Carregando dados...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-secondary via-background to-muted">
+      {/* Skip to main content link for keyboard navigation */}
+      <a 
+        href="#main-content" 
+        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[10000] focus:bg-primary focus:text-primary-foreground focus:px-4 focus:py-2 focus:rounded-md"
+      >
+        Pular para o conteúdo principal
+      </a>
+      
       {/* Header */}
-      <div className="bg-card/95 backdrop-blur border-b border-border shadow-sm">
+      <header className="bg-card/95 backdrop-blur border-b border-border shadow-sm" role="banner">
         <div className="flex items-center justify-between p-4 max-w-7xl mx-auto">
           <Logo />
-          <div className="flex items-center gap-4">
+          <nav className="flex items-center gap-4" aria-label="Navegação principal">
             <NotificationSystem />
-            <div className="text-right">
+            <div className="text-right" role="status" aria-label="Informações do usuário">
               <p className="font-semibold text-primary">Porteiro</p>
               <p className="text-sm text-muted-foreground">Portaria Principal</p>
             </div>
@@ -84,26 +224,33 @@ const PorteiroDashboard = () => {
               size="sm"
               onClick={handleLogout}
               className="border-destructive text-destructive hover:bg-destructive hover:text-destructive-foreground"
+              aria-label="Sair do sistema"
             >
-              <LogOut className="h-4 w-4 mr-2" />
+              <LogOut className="h-4 w-4 mr-2" aria-hidden="true" />
               Sair
             </Button>
-          </div>
+          </nav>
         </div>
-      </div>
+      </header>
 
-      <div className="p-6 max-w-7xl mx-auto">
+      <main id="main-content" className="p-6 max-w-7xl mx-auto" role="main">
+        {/* Título da Página */}
+        <div className="mb-6">
+          <h1 className="text-3xl font-bold text-primary mb-2">Dashboard do Porteiro</h1>
+          <p className="text-muted-foreground">Controle de entrada e saída de visitantes</p>
+        </div>
+
         {/* Estatísticas Rápidas */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6" role="region" aria-label="Estatísticas de visitantes">
           <Card className="shadow-lg border-0 bg-card/95 backdrop-blur">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-muted-foreground mb-1">Visitantes Hoje</p>
-                  <p className="text-3xl font-bold text-primary">{visitantesHoje}</p>
-                  <p className="text-xs text-success mt-1">+12% vs. ontem</p>
+                  <p className="text-sm text-muted-foreground mb-1" id="stat-today-label">Visitantes Hoje</p>
+                  <p className="text-3xl font-bold text-primary" aria-labelledby="stat-today-label">{visitantesHoje}</p>
+                  <p className="text-xs text-success mt-1" aria-label="12% a mais que ontem">+12% vs. ontem</p>
                 </div>
-                <div className="bg-primary/10 p-3 rounded-xl">
+                <div className="bg-primary/10 p-3 rounded-xl" aria-hidden="true">
                   <Eye className="h-6 w-6 text-primary" />
                 </div>
               </div>
@@ -114,11 +261,11 @@ const PorteiroDashboard = () => {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-muted-foreground mb-1">Ativos Agora</p>
-                  <p className="text-3xl font-bold text-accent">{registros.filter(r => r.status === "Ativo").length}</p>
+                  <p className="text-sm text-muted-foreground mb-1" id="stat-active-label">Ativos Agora</p>
+                  <p className="text-3xl font-bold text-accent" aria-labelledby="stat-active-label">{registros.filter(r => r.status === "Ativo").length}</p>
                   <p className="text-xs text-muted-foreground mt-1">Visitantes no prédio</p>
                 </div>
-                <div className="bg-accent/10 p-3 rounded-xl">
+                <div className="bg-accent/10 p-3 rounded-xl" aria-hidden="true">
                   <Users className="h-6 w-6 text-accent" />
                 </div>
               </div>
@@ -129,11 +276,11 @@ const PorteiroDashboard = () => {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-muted-foreground mb-1">Total Semana</p>
-                  <p className="text-3xl font-bold text-success">{visitantesSemana}</p>
-                  <p className="text-xs text-success mt-1">+8% vs. anterior</p>
+                  <p className="text-sm text-muted-foreground mb-1" id="stat-week-label">Total Semana</p>
+                  <p className="text-3xl font-bold text-success" aria-labelledby="stat-week-label">{visitantesSemana}</p>
+                  <p className="text-xs text-success mt-1" aria-label="8% a mais que a semana anterior">+8% vs. anterior</p>
                 </div>
-                <div className="bg-success/10 p-3 rounded-xl">
+                <div className="bg-success/10 p-3 rounded-xl" aria-hidden="true">
                   <TrendingUp className="h-6 w-6 text-success" />
                 </div>
               </div>
@@ -143,161 +290,46 @@ const PorteiroDashboard = () => {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Coluna Esquerda - Cadastro de Visitante */}
-          <Card className="shadow-lg border-0 bg-card/95 backdrop-blur">
-            <CardHeader className="bg-gradient-to-r from-accent to-accent-light text-accent-foreground rounded-t-xl">
-              <CardTitle className="flex items-center gap-3">
-                <UserPlus className="h-6 w-6" />
-                Registrar Nova Entrada
-              </CardTitle>
-              <CardDescription className="text-accent-foreground/90">
-                Cadastre a entrada de visitantes no condomínio
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="p-6">
-              <form onSubmit={handleCadastro} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="nome">Nome do Visitante *</Label>
-                  <Input
-                    id="nome"
-                    placeholder="Digite o nome completo"
-                    value={visitante.nome}
-                    onChange={(e) => setVisitante({ ...visitante, nome: e.target.value })}
-                    required
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="documento">Documento *</Label>
-                  <Input
-                    id="documento"
-                    placeholder="CPF, RG ou outro documento"
-                    value={visitante.documento}
-                    onChange={(e) => setVisitante({ ...visitante, documento: e.target.value })}
-                    required
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="destino">Destino da Visita *</Label>
-                  <Input
-                    id="destino"
-                    placeholder="Ex: Apto 101, Administração, etc."
-                    value={visitante.destino}
-                    onChange={(e) => setVisitante({ ...visitante, destino: e.target.value })}
-                    required
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="motivo">Motivo da Visita</Label>
-                  <Textarea
-                    id="motivo"
-                    placeholder="Descreva o motivo da visita (opcional)"
-                    value={visitante.motivo}
-                    onChange={(e) => setVisitante({ ...visitante, motivo: e.target.value })}
-                    rows={3}
-                  />
-                </div>
-
-                <Button 
-                  type="submit" 
-                  className="w-full h-12 bg-accent hover:bg-accent-dark text-accent-foreground font-semibold"
-                >
-                  <UserPlus className="h-4 w-4 mr-2" />
-                  Confirmar Entrada
-                </Button>
-              </form>
-            </CardContent>
-          </Card>
+          <VisitorForm onSubmit={handleFormSubmit} />
 
           {/* Coluna Direita - Consulta e Histórico */}
           <div className="space-y-6">
+            {/* DSB-004: Quick Checkout - Pronto para a Saída */}
+            <QuickCheckout 
+              visitors={registros}
+              onCheckout={handleCheckout}
+            />
+
             {/* Busca */}
-            <Card className="shadow-lg border-0 bg-card/95 backdrop-blur">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-3 text-primary">
-                  <Search className="h-5 w-5" />
-                  Consultar Visitante
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="flex gap-3">
-                  <Input
-                    placeholder="Buscar por nome ou documento..."
-                    value={busca}
-                    onChange={(e) => setBusca(e.target.value)}
-                    className="flex-1"
-                  />
-                  <Button variant="outline" className="border-accent text-accent hover:bg-accent hover:text-accent-foreground">
-                    <Search className="h-4 w-4" />
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
+            <VisitorSearch 
+              visitors={registros}
+              onSelectVisitor={(visitor) => {
+                console.log('Selected visitor:', visitor);
+              }}
+            />
 
             {/* Registros Recentes */}
-            <Card className="shadow-lg border-0 bg-card/95 backdrop-blur">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-3 text-primary">
-                  <Clock className="h-5 w-5" />
-                  Entradas Recentes
-                </CardTitle>
-                <CardDescription>Últimas entradas registradas hoje</CardDescription>
-              </CardHeader>
-              <CardContent className="p-0">
-                <div className="space-y-1 max-h-96 overflow-y-auto">
-                  {registros.slice(0, 10).map((registro) => (
-                    <div
-                      key={registro.id}
-                      className="flex items-center justify-between p-4 hover:bg-muted/50 border-b border-border last:border-0"
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className="bg-primary/10 p-2 rounded-lg">
-                          <User className="h-4 w-4 text-primary" />
-                        </div>
-                        <div>
-                          <p className="font-semibold text-sm">{registro.nome}</p>
-                          <p className="text-xs text-muted-foreground">{registro.destino}</p>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        {registro.status === "Ativo" && (
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => handleRegistrarSaida(registro.id)}
-                            className="border-destructive text-destructive hover:bg-destructive hover:text-destructive-foreground"
-                          >
-                            <UserMinus className="h-3 w-3 mr-1" />
-                            Saída
-                          </Button>
-                        )}
-                        <div className="text-right">
-                          <Badge
-                            variant={registro.status === "Ativo" ? "default" : "secondary"}
-                            className={registro.status === "Ativo" ? "bg-success" : ""}
-                          >
-                            {registro.status}
-                          </Badge>
-                          <p className="text-xs text-muted-foreground mt-1">{registro.hora}</p>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
+            <VisitorList 
+              visitors={registros}
+              onCheckout={handleCheckout}
+            />
 
             {/* Suporte */}
             <Card className="shadow-lg border-0 bg-gradient-to-r from-primary/5 to-accent/5">
               <CardContent className="p-4">
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between" role="complementary" aria-label="Suporte técnico">
                   <div>
                     <p className="font-semibold text-primary">Precisa de Ajuda?</p>
                     <p className="text-sm text-muted-foreground">Suporte técnico disponível</p>
                   </div>
-                  <Button variant="outline" size="sm" className="border-primary text-primary hover:bg-primary hover:text-primary-foreground">
-                    <Phone className="h-4 w-4 mr-2" />
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={openWhatsAppSupport}
+                    className="border-primary text-primary hover:bg-primary hover:text-primary-foreground"
+                    aria-label="Contatar suporte técnico via WhatsApp"
+                  >
+                    <Phone className="h-4 w-4 mr-2" aria-hidden="true" />
                     Contatar
                   </Button>
                 </div>
@@ -305,8 +337,16 @@ const PorteiroDashboard = () => {
             </Card>
           </div>
         </div>
-      </div>
+      </main>
     </div>
+  );
+};
+
+const PorteiroDashboard = () => {
+  return (
+    <ErrorBoundary context="Porteiro Dashboard">
+      <PorteiroDashboardContent />
+    </ErrorBoundary>
   );
 };
 
