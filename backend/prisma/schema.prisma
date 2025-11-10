@@ -1,0 +1,329 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// User authentication and authorization
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  name      String
+  role      UserRole @default(PORTEIRO)
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  accessLogs AccessLog[]
+  
+  @@map("users")
+}
+
+enum UserRole {
+  ADMIN
+  PORTEIRO
+  SINDICO
+}
+
+// Residential units
+model Unit {
+  id            String   @id @default(uuid())
+  number        String   // e.g., "101"
+  block         String?  // e.g., "A"
+  type          String   // e.g., "2 Quartos", "3 Quartos"
+  status        UnitStatus @default(VAGO)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Relations
+  residents     Resident[]
+  appointments  Appointment[]
+  visits        Visit[]
+  
+  @@unique([number, block])
+  @@map("units")
+}
+
+enum UnitStatus {
+  OCUPADO
+  VAGO
+}
+
+// Residents (Moradores)
+model Resident {
+  id           String       @id @default(uuid())
+  name         String
+  email        String       @unique
+  phone        String
+  document     String       @unique // CPF
+  type         ResidentType @default(PROPRIETARIO)
+  status       ResidentStatus @default(ATIVO)
+  unitId       String
+  registeredAt DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  // Relations
+  unit         Unit         @relation(fields: [unitId], references: [id], onDelete: Cascade)
+  appointments Appointment[]
+  
+  @@index([unitId])
+  @@map("residents")
+}
+
+enum ResidentType {
+  PROPRIETARIO
+  LOCATARIO
+  DEPENDENTE
+}
+
+enum ResidentStatus {
+  ATIVO
+  INATIVO
+}
+
+// Appointments (Agendamentos)
+model Appointment {
+  id            String            @id @default(uuid())
+  visitorName   String
+  visitorDoc    String
+  visitorPhone  String
+  destination   String            // Unit reference
+  reason        String
+  scheduledDate DateTime
+  scheduledTime String
+  status        AppointmentStatus @default(PENDENTE)
+  observations  String?
+  residentId    String
+  unitId        String
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+
+  // Relations
+  resident      Resident          @relation(fields: [residentId], references: [id], onDelete: Cascade)
+  unit          Unit              @relation(fields: [unitId], references: [id], onDelete: Cascade)
+  
+  @@index([residentId])
+  @@index([unitId])
+  @@index([scheduledDate])
+  @@map("appointments")
+}
+
+enum AppointmentStatus {
+  PENDENTE
+  CONFIRMADO
+  CANCELADO
+  CONCLUIDO
+}
+
+// Visits/Access (Visitantes/Acessos)
+model Visit {
+  id         String      @id @default(uuid())
+  visitorName String
+  document   String
+  unitId     String
+  purpose    String
+  entryTime  DateTime    @default(now())
+  exitTime   DateTime?
+  status     VisitStatus @default(ATIVO)
+  photo      String?     // Photo URL
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+
+  // Relations
+  unit       Unit        @relation(fields: [unitId], references: [id])
+  
+  @@index([unitId])
+  @@index([entryTime])
+  @@map("visits")
+}
+
+enum VisitStatus {
+  ATIVO
+  SAIU
+}
+
+// Employees (Funcionários)
+model Employee {
+  id          String         @id @default(uuid())
+  name        String
+  document    String         @unique
+  phone       String
+  role        String         // e.g., "Porteiro", "Zelador"
+  status      EmployeeStatus @default(ATIVO)
+  hireDate    DateTime       @default(now())
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  // Relations
+  entries     EmployeeEntry[]
+  
+  @@map("employees")
+}
+
+enum EmployeeStatus {
+  ATIVO
+  INATIVO
+}
+
+// Employee entries/exits
+model EmployeeEntry {
+  id         String    @id @default(uuid())
+  employeeId String
+  entryTime  DateTime  @default(now())
+  exitTime   DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  // Relations
+  employee   Employee  @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  
+  @@index([employeeId])
+  @@index([entryTime])
+  @@map("employee_entries")
+}
+
+// Deliveries (Entregas)
+model Delivery {
+  id            String         @id @default(uuid())
+  recipient     String
+  unitNumber    String
+  carrier       String         // e.g., "Correios", "Sedex"
+  trackingCode  String?
+  status        DeliveryStatus @default(PENDENTE)
+  receivedAt    DateTime       @default(now())
+  deliveredAt   DateTime?
+  photo         String?        // Photo URL
+  observations  String?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  
+  @@index([unitNumber])
+  @@index([status])
+  @@map("deliveries")
+}
+
+enum DeliveryStatus {
+  PENDENTE
+  ENTREGUE
+}
+
+// Insumos (Supplies/Resources)
+model Supply {
+  id           String       @id @default(uuid())
+  name         String
+  category     String       // e.g., "Limpeza", "Manutenção"
+  quantity     Int
+  unit         String       // e.g., "Unidade", "Litro", "Kg"
+  minStock     Int
+  status       SupplyStatus
+  lastRestockAt DateTime?
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  // Relations
+  movements    SupplyMovement[]
+  
+  @@map("supplies")
+}
+
+enum SupplyStatus {
+  DISPONIVEL
+  BAIXO_ESTOQUE
+  INDISPONIVEL
+}
+
+// Supply movements
+model SupplyMovement {
+  id        String   @id @default(uuid())
+  supplyId  String
+  type      MovementType
+  quantity  Int
+  reason    String?
+  createdAt DateTime @default(now())
+  
+  // Relations
+  supply    Supply   @relation(fields: [supplyId], references: [id], onDelete: Cascade)
+  
+  @@index([supplyId])
+  @@index([createdAt])
+  @@map("supply_movements")
+}
+
+enum MovementType {
+  ENTRADA
+  SAIDA
+}
+
+// Access logs for audit
+model AccessLog {
+  id        String   @id @default(uuid())
+  userId    String
+  action    String
+  resource  String
+  details   String?
+  ipAddress String?
+  createdAt DateTime @default(now())
+
+  // Relations
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@index([userId])
+  @@index([createdAt])
+  @@map("access_logs")
+}
+
+// System backups
+model Backup {
+  id          String       @id @default(uuid())
+  filename    String
+  size        Int          // Size in bytes
+  status      BackupStatus @default(PENDING)
+  type        BackupType   @default(AUTOMATIC)
+  createdAt   DateTime     @default(now())
+  completedAt DateTime?
+  
+  @@index([createdAt])
+  @@map("backups")
+}
+
+enum BackupStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  FAILED
+}
+
+enum BackupType {
+  AUTOMATIC
+  MANUAL
+}
+
+// Notifications
+model Notification {
+  id        String   @id @default(uuid())
+  title     String
+  message   String
+  type      NotificationType
+  read      Boolean  @default(false)
+  userId    String?  // If null, it's a system-wide notification
+  createdAt DateTime @default(now())
+  
+  @@index([userId])
+  @@index([createdAt])
+  @@map("notifications")
+}
+
+enum NotificationType {
+  INFO
+  WARNING
+  ERROR
+  SUCCESS
+}

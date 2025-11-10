@@ -1,0 +1,167 @@
+###
+# SIGECO API Test Collection
+# Use with REST Client extension in VS Code or similar HTTP client
+###
+
+@baseUrl = http://localhost:3001/api
+@token = YOUR_JWT_TOKEN_HERE
+
+### Health Check
+GET {{baseUrl}}/health
+
+### ========================================
+### Authentication Endpoints
+### ========================================
+
+### Register new user
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "email": "test@sigeco.com",
+  "password": "Test123!@#",
+  "name": "Test User",
+  "role": "PORTEIRO"
+}
+
+### Login
+# @name login
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@sigeco.com",
+  "password": "admin123"
+}
+
+### Get current user
+GET {{baseUrl}}/auth/me
+Authorization: Bearer {{token}}
+
+### ========================================
+### Residents Endpoints
+### ========================================
+
+### Get all residents
+GET {{baseUrl}}/residents
+Authorization: Bearer {{token}}
+
+### Get all residents with filters
+GET {{baseUrl}}/residents?status=ATIVO&search=Ana
+Authorization: Bearer {{token}}
+
+### Get resident by ID
+GET {{baseUrl}}/residents/RESIDENT_ID_HERE
+Authorization: Bearer {{token}}
+
+### Create new resident (Admin/Sindico only)
+POST {{baseUrl}}/residents
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "Maria Santos",
+  "email": "maria.santos@email.com",
+  "phone": "(11) 98888-7777",
+  "document": "111.222.333-44",
+  "type": "PROPRIETARIO",
+  "unitId": "UNIT_ID_HERE"
+}
+
+### Update resident (Admin/Sindico only)
+PUT {{baseUrl}}/residents/RESIDENT_ID_HERE
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "phone": "(11) 99999-8888",
+  "status": "ATIVO"
+}
+
+### Delete resident (Admin/Sindico only)
+DELETE {{baseUrl}}/residents/RESIDENT_ID_HERE
+Authorization: Bearer {{token}}
+
+### ========================================
+### Appointments Endpoints
+### ========================================
+
+### Get all appointments
+GET {{baseUrl}}/appointments
+Authorization: Bearer {{token}}
+
+### Get appointments with filters
+GET {{baseUrl}}/appointments?status=CONFIRMADO&date=2024-11-15
+Authorization: Bearer {{token}}
+
+### Create new appointment
+POST {{baseUrl}}/appointments
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "visitorName": "Dr. Roberto Silva",
+  "visitorDoc": "555.666.777-88",
+  "visitorPhone": "(11) 97777-6666",
+  "destination": "Apto 101",
+  "reason": "Consulta médica",
+  "scheduledDate": "2024-11-15",
+  "scheduledTime": "14:00",
+  "observations": "Médico cardiologista",
+  "residentId": "RESIDENT_ID_HERE",
+  "unitId": "UNIT_ID_HERE"
+}
+
+### Update appointment status
+PUT {{baseUrl}}/appointments/APPOINTMENT_ID_HERE
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "status": "CONFIRMADO",
+  "observations": "Confirmado por telefone"
+}
+
+### Delete appointment
+DELETE {{baseUrl}}/appointments/APPOINTMENT_ID_HERE
+Authorization: Bearer {{token}}
+
+### ========================================
+### Visits Endpoints
+### ========================================
+
+### Get all visits
+GET {{baseUrl}}/visits
+Authorization: Bearer {{token}}
+
+### Get visits with filters
+GET {{baseUrl}}/visits?status=ATIVO&date=2024-11-10
+Authorization: Bearer {{token}}
+
+### Register new visit
+POST {{baseUrl}}/visits
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "visitorName": "Paulo Oliveira",
+  "document": "999.888.777-66",
+  "unitId": "UNIT_ID_HERE",
+  "purpose": "Visita social"
+}
+
+### Checkout visitor
+PUT {{baseUrl}}/visits/VISIT_ID_HERE/checkout
+Authorization: Bearer {{token}}
+
+### ========================================
+### Dashboard Endpoints
+### ========================================
+
+### Get dashboard statistics
+GET {{baseUrl}}/dashboard/stats
+Authorization: Bearer {{token}}
+
+### Get reports
+GET {{baseUrl}}/dashboard/reports?startDate=2024-11-01&endDate=2024-11-30
+Authorization: Bearer {{token}}

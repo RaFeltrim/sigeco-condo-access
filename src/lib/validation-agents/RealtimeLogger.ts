@@ -12,7 +12,7 @@ export interface LogEntry {
   level: LogLevel;
   agentName?: string;
   message: string;
-  data?: any;
+  data?: unknown;
 }
 
 export class RealtimeLogger {
@@ -28,35 +28,35 @@ export class RealtimeLogger {
   /**
    * Log an info message
    */
-  info(message: string, agentName?: string, data?: any): void {
+  info(message: string, agentName?: string, data?: unknown): void {
     this.log('info', message, agentName, data);
   }
 
   /**
    * Log a success message
    */
-  success(message: string, agentName?: string, data?: any): void {
+  success(message: string, agentName?: string, data?: unknown): void {
     this.log('success', message, agentName, data);
   }
 
   /**
    * Log a warning message
    */
-  warning(message: string, agentName?: string, data?: any): void {
+  warning(message: string, agentName?: string, data?: unknown): void {
     this.log('warning', message, agentName, data);
   }
 
   /**
    * Log an error message
    */
-  error(message: string, agentName?: string, data?: any): void {
+  error(message: string, agentName?: string, data?: unknown): void {
     this.log('error', message, agentName, data);
   }
 
   /**
    * Log a debug message (only shown in verbose mode)
    */
-  debug(message: string, agentName?: string, data?: any): void {
+  debug(message: string, agentName?: string, data?: unknown): void {
     if (this.verbose) {
       this.log('debug', message, agentName, data);
     }
@@ -65,7 +65,7 @@ export class RealtimeLogger {
   /**
    * Internal log method
    */
-  private log(level: LogLevel, message: string, agentName?: string, data?: any): void {
+  private log(level: LogLevel, message: string, agentName?: string, data?: unknown): void {
     const entry: LogEntry = {
       timestamp: new Date(),
       level,
