@@ -6,6 +6,8 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { AnalyticsService, ConsoleAnalyticsProvider, CustomAnalyticsProvider } from "@/services/AnalyticsService";
+import { useUserActivityLogger } from "@/hooks/useUserActivityLogger";
+import { ActivityLoggerIndicator } from "@/components/ActivityLoggerIndicator";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
 import PorteiroDashboard from "./pages/PorteiroDashboard";
@@ -13,6 +15,26 @@ import AdminDashboard from "./pages/AdminDashboard";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
+
+const AppContent = () => {
+  // Inicializar user activity logger (apenas em dev)
+  useUserActivityLogger();
+
+  return (
+    <>
+      <Routes>
+        <Route path="/" element={<Index />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/porteiro-dashboard" element={<PorteiroDashboard />} />
+        <Route path="/admin-dashboard" element={<AdminDashboard />} />
+        {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+      {/* Indicador de logging ativo */}
+      <ActivityLoggerIndicator />
+    </>
+  );
+};
 
 const App = () => {
   useEffect(() => {
@@ -38,14 +60,7 @@ const App = () => {
           <Toaster />
           <Sonner />
           <BrowserRouter>
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/porteiro-dashboard" element={<PorteiroDashboard />} />
-              <Route path="/admin-dashboard" element={<AdminDashboard />} />
-              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
+            <AppContent />
           </BrowserRouter>
         </TooltipProvider>
       </QueryClientProvider>
