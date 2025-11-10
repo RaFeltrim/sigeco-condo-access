@@ -7,8 +7,7 @@ const prismaClientSingleton = () => {
 };
 
 declare global {
-  // Using var is required for global augmentation
-  // eslint-disable-next-line no-var
+  // Using var is required for global augmentation in Node.js
   var prisma: undefined | ReturnType<typeof prismaClientSingleton>;
 }
 

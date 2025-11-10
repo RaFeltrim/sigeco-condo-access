@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { Request, Response } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
@@ -44,7 +44,7 @@ app.use(
 app.use('/api', routes);
 
 // Root endpoint
-app.get('/', (req, res) => {
+app.get('/', (_req: Request, res: Response) => {
   res.json({
     message: 'SIGECO Backend API',
     version: '1.0.0',
@@ -60,7 +60,7 @@ app.get('/', (req, res) => {
 });
 
 // 404 handler
-app.use((req, res) => {
+app.use((_req: Request, res: Response) => {
   res.status(404).json({ error: 'Route not found' });
 });
 

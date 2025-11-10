@@ -14,10 +14,12 @@ const logger = winston.createLogger({
       format: winston.format.combine(
         winston.format.colorize(),
         winston.format.printf(
-          ({ timestamp, level, message, ...meta }) =>
-            `${timestamp} [${level}]: ${message} ${
+          (info: { timestamp: string; level: string; message: string; [key: string]: unknown }) => {
+            const { timestamp, level, message, ...meta } = info;
+            return `${timestamp} [${level}]: ${message} ${
               Object.keys(meta).length ? JSON.stringify(meta, null, 2) : ''
-            }`
+            }`;
+          }
         )
       ),
     }),
