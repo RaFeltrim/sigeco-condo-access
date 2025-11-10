@@ -118,7 +118,7 @@ export const useUserActivityLogger = () => {
       UserActivityLogger.logNavigation(previousPath, location.pathname);
       sessionStorage.setItem('lastPath', location.pathname);
     }
-  }, [location]);
+  }, [location, location.pathname]);
 
   return {
     isLogging: UserActivityLogger.isLogging(),
