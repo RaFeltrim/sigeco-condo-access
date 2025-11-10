@@ -70,7 +70,7 @@ test.describe('Admin Dashboard E2E Tests', () => {
     
     test.beforeEach(async ({ page }) => {
       await page.click('button:has-text("Gerenciamento de Moradores")');
-      await expect(page.getByText('Gerenciamento de Moradores')).toBeVisible();
+      await expect(page.getByRole('heading', { name: 'Gerenciamento de Moradores' })).toBeVisible();
     });
 
     test('T2.1 - Abrir modal Novo Morador', async ({ page }) => {
