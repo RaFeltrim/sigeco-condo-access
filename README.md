@@ -2,6 +2,47 @@
 
 Sistema de gerenciamento de visitantes para condomínios.
 
+## 📊 Status do Projeto
+
+[![MVP Completion](https://img.shields.io/badge/MVP%20Completion-58.6%25-orange)](./TODO.md)
+[![Build](https://img.shields.io/badge/Build-Passing-success)]()
+[![Security](https://img.shields.io/badge/Security-3%20Issues-red)](#-segurança)
+[![TypeScript](https://img.shields.io/badge/TypeScript-Passing-success)]()
+
+**Última Atualização:** 11 de Novembro de 2025
+
+### Métricas de Qualidade
+
+| Categoria | Score | Status |
+|-----------|-------|--------|
+| **Componentes** | 55.0% | ⚠️ Atenção Necessária |
+| **Estrutura** | 90.0% | ✅ Bom |
+| **Features** | 38.0% | ❌ Precisa Melhoria |
+| **Qualidade** | 30.0% | ❌ Precisa Melhoria |
+| **Dependências** | 80.0% | ✅ Bom |
+
+### 📋 Tarefas e Progresso
+
+Para uma visão completa das tarefas pendentes, prioridades e roadmap de desenvolvimento, consulte:
+- **[TODO.md](./TODO.md)** - Lista detalhada de todas as tarefas de melhoria contínua
+- **[CONTRIBUTING.md](./CONTRIBUTING.md)** - Processo de contribuição e Definition of Done
+
+### 🎯 Próximos Passos
+
+1. **🔴 Prioridade Crítica**: Corrigir vulnerabilidades de segurança (3-5 horas)
+2. **🟠 Alta Prioridade**: Completar features core (Access Control, Dashboard, User Management)
+3. **🟡 Média Prioridade**: Melhorar qualidade de código e acessibilidade
+4. **⚪ Baixa Prioridade**: Otimizações e testes extensivos
+
+### 🐛 Problemas Conhecidos
+
+- **Segurança**: 3 vulnerabilidades em dependências (xlsx, vite, esbuild)
+- **Features Incompletas**: 4 features principais abaixo de 50% de completude
+- **Testes**: Coverage 0% - implementação de testes necessária
+- **Bundle Size**: Chunk principal com 1.3MB - otimização necessária
+
+---
+
 ## Project info
 
 **URL**: https://lovable.dev/projects/550ae652-c4e5-4f30-a9dd-54040128e05d
@@ -74,6 +115,36 @@ To connect a domain, navigate to Project > Settings > Domains and click Connect 
 
 Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
 
+## 🔒 Segurança
+
+### Status de Vulnerabilidades
+
+O projeto atualmente possui **3 vulnerabilidades** identificadas:
+
+| Pacote | Severidade | CVE | Score | Status |
+|--------|-----------|-----|-------|--------|
+| xlsx | 🔴 High | GHSA-4r6h-8v6p-xvw6 | 7.8 | Pendente |
+| xlsx | 🔴 High | GHSA-5pgg-2g8v-p4x9 | 7.5 | Pendente |
+| vite | 🟠 Moderate | Multiple | 5.3 | Pendente |
+
+### Ações Recomendadas
+
+```bash
+# Verificar vulnerabilidades
+npm audit
+
+# Atualizar dependências (após testes de compatibilidade)
+npm install xlsx@latest
+npm install vite@latest
+
+# Re-verificar
+npm audit
+```
+
+Para detalhes completos, consulte [TODO.md - Seção de Segurança](./TODO.md#-prioridade-crítica---segurança).
+
+---
+
 ## Development Guidelines
 
 ### Quality Assurance
@@ -95,6 +166,11 @@ npm run dev
 ```
 
 3. Execute testes funcionais relevantes
+
+4. Verifique o MVP Verifier:
+```bash
+npm run verify:mvp
+```
 
 Para detalhes completos sobre o processo de contribuição, validação e Definition of Done, consulte [CONTRIBUTING.md](./CONTRIBUTING.md).
 
@@ -259,3 +335,118 @@ The system includes the following validation agents:
 - `HEADLESS` - Run browser in headless mode (default: true)
 
 For more information, see the [Validation Agents README](src/lib/validation-agents/README.md).
+
+---
+
+## 📈 Estatísticas do Projeto
+
+### Arquitetura
+
+```
+📁 src/
+├── 📦 components/     63 componentes
+├── 🔧 services/       Multiple services
+├── 📄 pages/          10 páginas
+├── 🎨 lib/            Utilities e helpers
+└── 📝 types/          Type definitions
+```
+
+### Tecnologias e Versões
+
+| Tecnologia | Versão | Propósito |
+|------------|--------|-----------|
+| React | 18.3.1 | UI Framework |
+| TypeScript | 5.8.3 | Type Safety |
+| Vite | 5.4.19 | Build Tool |
+| Tailwind CSS | 3.4.17 | Styling |
+| shadcn/ui | Latest | Component Library |
+| Vitest | 4.0.7 | Testing Framework |
+| Playwright | 1.56.1 | E2E Testing |
+
+### Linhas de Código (Aproximado)
+
+- **Total**: ~50,000+ linhas
+- **TypeScript/TSX**: ~45,000 linhas
+- **Testes**: Em desenvolvimento
+- **Documentação**: 40+ arquivos markdown
+
+### Features Implementadas
+
+✅ **Completas (70%+)**
+- Visitor Registration (71%)
+- Estrutura do Projeto (90%)
+- Sistema de Dependências (80%)
+
+⚠️ **Em Desenvolvimento (40-69%)**
+- Dashboard (40%)
+- Componentes UI (55%)
+
+❌ **Planejadas (<40%)**
+- Access Control (20%)
+- Reports (33%)
+- User Management (25%)
+- Testing Coverage (0%)
+- Qualidade de Código (30%)
+
+---
+
+## 📚 Documentação Adicional
+
+### Guides e READMEs
+
+- [CONTRIBUTING.md](./CONTRIBUTING.md) - Guia de contribuição e DoD
+- [TODO.md](./TODO.md) - Lista completa de tarefas e roadmap
+- [ACTIVITY_LOGGER_GUIDE.md](./ACTIVITY_LOGGER_GUIDE.md) - Sistema de logging
+- [Backend README](./backend/README.md) - Documentação do backend
+- [Testing Guide](./backend/TESTING.md) - Guia de testes
+
+### Documentação Técnica
+
+Consulte a pasta [docs/](./docs/) para documentação detalhada:
+- Plano de Ação e Status
+- Implementação de Features
+- Acessibilidade (WCAG 2.1)
+- Compliance LGPD
+- Deployment Guide
+- Troubleshooting
+
+---
+
+## 🤝 Contribuindo
+
+Contribuições são bem-vindas! Por favor:
+
+1. Leia o [CONTRIBUTING.md](./CONTRIBUTING.md)
+2. Revise o [TODO.md](./TODO.md) para tarefas disponíveis
+3. Crie uma branch para sua feature: `git checkout -b feature/nome-feature`
+4. Execute `npm run validate` antes de commitar
+5. Abra um Pull Request com descrição detalhada
+
+### Prioridades Atuais
+
+Se você deseja contribuir, estas são as áreas que mais precisam de ajuda:
+
+1. 🔴 **Segurança**: Atualização de dependências vulneráveis
+2. 🟠 **Features**: Completar Access Control e Dashboard
+3. 🟡 **Testes**: Aumentar coverage de 0% para 60%+
+4. 🟢 **Docs**: Melhorar documentação de componentes
+
+---
+
+## 📄 Licença
+
+Este projeto está licenciado sob os termos definidos pelo proprietário do repositório.
+
+---
+
+## 🔗 Links Úteis
+
+- **Projeto Lovable**: https://lovable.dev/projects/550ae652-c4e5-4f30-a9dd-54040128e05d
+- **Relatórios MVP**: `.kiro/reports/mvp-verification-latest.md`
+- **Validation Reports**: `.kiro/reports/system-validation-latest.md`
+
+---
+
+**Última Atualização do README:** 11 de Novembro de 2025  
+**Versão do Projeto:** 0.0.0 (Pre-MVP)  
+**Status:** 🟡 Em Desenvolvimento Ativo
