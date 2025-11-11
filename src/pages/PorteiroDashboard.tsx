@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Logo } from "@/components/Logo";
 import NotificationSystem from "@/components/NotificationSystem";
-import { LogOut, Phone, TrendingUp, Users, Eye } from "lucide-react";
+import { LogOut, Phone, TrendingUp, Users, Eye, Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
@@ -31,12 +31,59 @@ const openWhatsAppSupport = () => {
 
 const PorteiroDashboardContent = () => {
   // Use persistent storage hook
-  const { visitors: registros, addVisitor, updateVisitor, isLoading } = useVisitorStorage();
+  const { visitors: registros, addVisitor, updateVisitor, clearOldVisitors, isLoading } = useVisitorStorage();
   
-  const [visitantesSemana] = useState(284);
-  const [visitantesHoje] = useState(47);
   const { toast } = useToast();
   const navigate = useNavigate();
+  
+  // Calculate dynamic statistics from actual data
+  const hoje = new Date();
+  hoje.setHours(0, 0, 0, 0);
+  
+  const visitantesHoje = registros.filter(r => {
+    const entradaDate = new Date(r.entrada);
+    entradaDate.setHours(0, 0, 0, 0);
+    return entradaDate.getTime() === hoje.getTime();
+  }).length;
+  
+  // Calculate yesterday's visitors
+  const ontem = new Date(hoje);
+  ontem.setDate(ontem.getDate() - 1);
+  const visitantesOntem = registros.filter(r => {
+    const entradaDate = new Date(r.entrada);
+    entradaDate.setHours(0, 0, 0, 0);
+    return entradaDate.getTime() === ontem.getTime();
+  }).length;
+  
+  // Calculate percentage change vs yesterday
+  const percentualOntem = visitantesOntem > 0 
+    ? Math.round(((visitantesHoje - visitantesOntem) / visitantesOntem) * 100)
+    : visitantesHoje > 0 ? 100 : 0;
+  
+  const inicioSemana = new Date();
+  inicioSemana.setDate(inicioSemana.getDate() - inicioSemana.getDay());
+  inicioSemana.setHours(0, 0, 0, 0);
+  
+  const visitantesSemana = registros.filter(r => {
+    const entradaDate = new Date(r.entrada);
+    return entradaDate >= inicioSemana;
+  }).length;
+  
+  // Calculate previous week's visitors
+  const inicioSemanaAnterior = new Date(inicioSemana);
+  inicioSemanaAnterior.setDate(inicioSemanaAnterior.getDate() - 7);
+  const fimSemanaAnterior = new Date(inicioSemana);
+  fimSemanaAnterior.setTime(fimSemanaAnterior.getTime() - 1);
+  
+  const visitantesSemanaAnterior = registros.filter(r => {
+    const entradaDate = new Date(r.entrada);
+    return entradaDate >= inicioSemanaAnterior && entradaDate <= fimSemanaAnterior;
+  }).length;
+  
+  // Calculate percentage change vs previous week
+  const percentualSemana = visitantesSemanaAnterior > 0
+    ? Math.round(((visitantesSemana - visitantesSemanaAnterior) / visitantesSemanaAnterior) * 100)
+    : visitantesSemana > 0 ? 100 : 0;
 
   const handleFormSubmit = async (data: VisitorFormData) => {
     try {
@@ -248,7 +295,13 @@ const PorteiroDashboardContent = () => {
                 <div>
                   <p className="text-sm text-muted-foreground mb-1" id="stat-today-label">Visitantes Hoje</p>
                   <p className="text-3xl font-bold text-primary" aria-labelledby="stat-today-label">{visitantesHoje}</p>
-                  <p className="text-xs text-success mt-1" aria-label="12% a mais que ontem">+12% vs. ontem</p>
+                  {visitantesOntem > 0 ? (
+                    <p className={`text-xs mt-1 ${percentualOntem >= 0 ? 'text-success' : 'text-destructive'}`} aria-label={`${percentualOntem >= 0 ? '' : '-'}${Math.abs(percentualOntem)}% ${percentualOntem >= 0 ? 'a mais' : 'a menos'} que ontem`}>
+                      {percentualOntem >= 0 ? '+' : ''}{percentualOntem}% vs. ontem
+                    </p>
+                  ) : (
+                    <p className="text-xs text-muted-foreground mt-1">Primeiro dia de registros</p>
+                  )}
                 </div>
                 <div className="bg-primary/10 p-3 rounded-xl" aria-hidden="true">
                   <Eye className="h-6 w-6 text-primary" />
@@ -278,7 +331,13 @@ const PorteiroDashboardContent = () => {
                 <div>
                   <p className="text-sm text-muted-foreground mb-1" id="stat-week-label">Total Semana</p>
                   <p className="text-3xl font-bold text-success" aria-labelledby="stat-week-label">{visitantesSemana}</p>
-                  <p className="text-xs text-success mt-1" aria-label="8% a mais que a semana anterior">+8% vs. anterior</p>
+                  {visitantesSemanaAnterior > 0 ? (
+                    <p className={`text-xs mt-1 ${percentualSemana >= 0 ? 'text-success' : 'text-destructive'}`} aria-label={`${percentualSemana >= 0 ? '' : '-'}${Math.abs(percentualSemana)}% ${percentualSemana >= 0 ? 'a mais' : 'a menos'} que a semana anterior`}>
+                      {percentualSemana >= 0 ? '+' : ''}{percentualSemana}% vs. anterior
+                    </p>
+                  ) : (
+                    <p className="text-xs text-muted-foreground mt-1">Primeira semana de registros</p>
+                  )}
                 </div>
                 <div className="bg-success/10 p-3 rounded-xl" aria-hidden="true">
                   <TrendingUp className="h-6 w-6 text-success" />
@@ -313,6 +372,28 @@ const PorteiroDashboardContent = () => {
               visitors={registros}
               onCheckout={handleCheckout}
             />
+
+            {/* Manutenção de Dados */}
+            <Card className="shadow-lg border-0 bg-gradient-to-r from-warning/5 to-destructive/5">
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between" role="complementary" aria-label="Manutenção de dados">
+                  <div>
+                    <p className="font-semibold text-primary">Manutenção de Dados</p>
+                    <p className="text-sm text-muted-foreground">Limpar registros antigos (30+ dias)</p>
+                  </div>
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={() => clearOldVisitors(30)}
+                    className="border-warning text-warning hover:bg-warning hover:text-warning-foreground"
+                    aria-label="Limpar registros com mais de 30 dias"
+                  >
+                    <Trash2 className="h-4 w-4 mr-2" aria-hidden="true" />
+                    Limpar
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
 
             {/* Suporte */}
             <Card className="shadow-lg border-0 bg-gradient-to-r from-primary/5 to-accent/5">
