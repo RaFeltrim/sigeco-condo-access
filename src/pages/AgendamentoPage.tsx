@@ -92,26 +92,84 @@ const AgendamentoPage = () => {
     { titulo: "Esta Semana", valor: "12", icon: Clock, cor: "text-accent" },
   ];
 
+  const checkConflict = (data: string, horario: string, destino: string): boolean => {
+    // Check if there's already an appointment for the same destination at the same time
+    return agendamentos.some(ag => {
+      if (ag.status === "Cancelado") return false;
+      
+      const agDateTime = new Date(`${ag.data}T${ag.horario}`);
+      const newDateTime = new Date(`${data}T${horario}`);
+      
+      // Check if same destination and within 1 hour
+      if (ag.destino === destino) {
+        const timeDiff = Math.abs(agDateTime.getTime() - newDateTime.getTime());
+        const hoursDiff = timeDiff / (1000 * 60 * 60);
+        return hoursDiff < 1;
+      }
+      
+      return false;
+    });
+  };
+
   const handleNovoAgendamento = (e: React.FormEvent) => {
     e.preventDefault();
-    if (novoAgendamento.visitante && novoAgendamento.destino && novoAgendamento.data && novoAgendamento.horario) {
+    
+    if (!novoAgendamento.visitante || !novoAgendamento.destino || !novoAgendamento.data || !novoAgendamento.horario) {
       toast({
-        title: "Agendamento criado com sucesso",
-        description: `Visita de ${novoAgendamento.visitante} agendada para ${novoAgendamento.data} às ${novoAgendamento.horario}`,
+        title: "Campos obrigatórios faltando",
+        description: "Preencha todos os campos obrigatórios (*)",
+        variant: "destructive",
       });
-      setNovoAgendamento({
-        visitante: "", documento: "", destino: "", motivo: "", 
-        data: "", horario: "", telefone: "", observacoes: ""
-      });
+      return;
     }
+
+    // Check for scheduling conflicts
+    const hasConflict = checkConflict(novoAgendamento.data, novoAgendamento.horario, novoAgendamento.destino);
+    if (hasConflict) {
+      toast({
+        title: "Conflito de agendamento",
+        description: "Já existe um agendamento para este destino no mesmo horário (±1 hora)",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Validate date is in the future
+    const appointmentDate = new Date(`${novoAgendamento.data}T${novoAgendamento.horario}`);
+    const now = new Date();
+    if (appointmentDate < now) {
+      toast({
+        title: "Data inválida",
+        description: "Não é possível agendar visitas para datas passadas",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    toast({
+      title: "Agendamento criado com sucesso",
+      description: `Visita de ${novoAgendamento.visitante} agendada para ${new Date(novoAgendamento.data).toLocaleDateString('pt-BR')} às ${novoAgendamento.horario}`,
+    });
+    setNovoAgendamento({
+      visitante: "", documento: "", destino: "", motivo: "", 
+      data: "", horario: "", telefone: "", observacoes: ""
+    });
   };
 
   const handleStatusChange = (id: number, novoStatus: string) => {
     const agendamento = agendamentos.find(a => a.id === id);
+    if (!agendamento) return;
+    
+    // In a real application, this would update the backend
+    // For now, we'll just show a toast notification
+    const statusText = novoStatus === "Confirmado" ? "confirmado" : "cancelado";
     toast({
       title: "Status atualizado",
-      description: `Agendamento de ${agendamento?.visitante} marcado como ${novoStatus}`,
+      description: `Agendamento de ${agendamento.visitante} foi ${statusText}`,
     });
+    
+    // Here you would call an API to update the status
+    // Example: AgendamentoService.updateStatus(id, novoStatus);
   };
 
   const getStatusColor = (status: string) => {
@@ -123,8 +181,19 @@ const AgendamentoPage = () => {
     }
   };
 
-  const agendamentosHoje = agendamentos.filter(a => a.data === "2024-09-18");
-  const proximosAgendamentos = agendamentos.filter(a => new Date(a.data) > new Date());
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  
+  const agendamentosHoje = agendamentos.filter(a => {
+    const agDate = new Date(a.data);
+    agDate.setHours(0, 0, 0, 0);
+    return agDate.getTime() === today.getTime();
+  });
+  
+  const proximosAgendamentos = agendamentos.filter(a => {
+    const agDate = new Date(a.data);
+    return agDate > today && a.status !== "Cancelado";
+  }).sort((a, b) => new Date(a.data).getTime() - new Date(b.data).getTime());
 
   return (
     <div className="p-6 space-y-6 max-w-7xl mx-auto">
@@ -399,11 +468,15 @@ const AgendamentoPage = () => {
             <CalendarIcon className="h-5 w-5" />
             Todos os Agendamentos
           </CardTitle>
-          <CardDescription>Lista completa de visitas agendadas</CardDescription>
+          <CardDescription>
+            {agendamentos.length} agendamento(s) registrado(s) • 
+            {agendamentos.filter(a => a.status === "Confirmado").length} confirmado(s)
+          </CardDescription>
         </CardHeader>
         <CardContent className="p-0">
           <div className="space-y-3 p-6">
-            {agendamentos.map((agendamento) => (
+            {agendamentos.length > 0 ? (
+              agendamentos.map((agendamento) => (
               <Card key={agendamento.id} className="border border-border/50">
                 <CardContent className="p-4">
                   <div className="flex justify-between items-start mb-3">
@@ -447,7 +520,14 @@ const AgendamentoPage = () => {
                   )}
                 </CardContent>
               </Card>
-            ))}
+              ))
+            ) : (
+              <div className="p-8 text-center text-muted-foreground">
+                <CalendarIcon className="h-12 w-12 mx-auto mb-3 opacity-50" />
+                <p className="font-medium">Nenhum agendamento registrado</p>
+                <p className="text-sm mt-1">Crie um novo agendamento para começar</p>
+              </div>
+            )}
           </div>
         </CardContent>
       </Card>
