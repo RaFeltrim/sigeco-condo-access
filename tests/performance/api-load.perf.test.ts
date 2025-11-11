@@ -34,14 +34,14 @@ const measureApiPerformance = async (
 
 describe('API Performance Tests', () => {
   describe('Authentication Endpoints', () => {
-    it('should complete login within 200ms (p95)', async () => {
+    it('should complete login within 200ms (p95)', { timeout: 30000 }, async () => {
       const results = await measureApiPerformance('/api/auth/login', 100);
       
       expect(results.p95).toBeLessThan(200);
       expect(results.avg).toBeLessThan(100);
-    }, { timeout: 30000 });
+    });
 
-    it('should handle 100 concurrent login requests', async () => {
+    it('should handle 100 concurrent login requests', { timeout: 30000 }, async () => {
       const start = performance.now();
       
       const requests = Array(100).fill(null).map(() =>
@@ -54,7 +54,7 @@ describe('API Performance Tests', () => {
       
       // Should complete 100 concurrent requests in under 5 seconds
       expect(duration).toBeLessThan(5000);
-    }, { timeout: 30000 });
+    });
   });
 
   describe('CRUD Operations', () => {
@@ -121,14 +121,14 @@ describe('API Performance Tests', () => {
   });
 
   describe('Stress Testing', () => {
-    it('should maintain performance under sustained load', async () => {
+    it('should maintain performance under sustained load', { timeout: 60000 }, async () => {
       const iterations = 500;
       const results = await measureApiPerformance('/api/health', iterations);
       
       // Performance should remain stable even after many requests
       expect(results.p95).toBeLessThan(100);
       expect(results.max).toBeLessThan(500);
-    }, { timeout: 60000 });
+    });
 
     it('should recover after burst traffic', async () => {
       // Burst phase
@@ -147,7 +147,7 @@ describe('API Performance Tests', () => {
   });
 
   describe('Memory and Resource Usage', () => {
-    it('should not leak memory during repeated requests', async () => {
+    it('should not leak memory during repeated requests', { timeout: 30000 }, async () => {
       const initialMemory = performance.memory?.usedJSHeapSize || 0;
       
       // Perform many requests
@@ -165,16 +165,16 @@ describe('API Performance Tests', () => {
       
       // Memory increase should be reasonable (less than 50MB)
       expect(memoryIncrease).toBeLessThan(50 * 1024 * 1024);
-    }, { timeout: 30000 });
+    });
   });
 
   describe('Response Times by Percentile', () => {
-    it('should meet SLA requirements across all percentiles', async () => {
+    it('should meet SLA requirements across all percentiles', { timeout: 120000 }, async () => {
       const results = await measureApiPerformance('/api/residents', 1000);
       
       expect(results.avg).toBeLessThan(100); // Average: < 100ms
       expect(results.p95).toBeLessThan(200); // 95th percentile: < 200ms
       expect(results.max).toBeLessThan(1000); // Max: < 1s
-    }, { timeout: 120000 });
+    });
   });
 });
