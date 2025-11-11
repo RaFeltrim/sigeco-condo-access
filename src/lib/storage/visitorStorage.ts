@@ -250,6 +250,38 @@ export function clearStorage(): void {
 }
 
 /**
+ * Removes records older than specified days
+ * @param daysOld - Number of days (default: 30)
+ * @returns Number of records removed
+ */
+export function clearOldRecords(daysOld: number = 30): number {
+  try {
+    const visitors = loadVisitors();
+    const cutoffDate = new Date();
+    cutoffDate.setDate(cutoffDate.getDate() - daysOld);
+    
+    // Filter out old records
+    const filteredVisitors = visitors.filter(v => {
+      const entradaDate = new Date(v.entrada);
+      return entradaDate >= cutoffDate;
+    });
+    
+    const removedCount = visitors.length - filteredVisitors.length;
+    
+    if (removedCount > 0) {
+      // Save filtered visitors back to storage
+      const serialized = filteredVisitors.map(v => serializeVisitor(v));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(serialized));
+    }
+    
+    return removedCount;
+  } catch (error) {
+    console.error('Error clearing old records:', error);
+    return 0;
+  }
+}
+
+/**
  * Gets the current number of stored visitors
  */
 export function getStorageCount(): number {

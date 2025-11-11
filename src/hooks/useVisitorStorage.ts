@@ -10,6 +10,7 @@ import {
   saveVisitor as saveVisitorToStorage,
   updateVisitor as updateVisitorInStorage,
   pruneOldRecords,
+  clearOldRecords,
   StorageError,
 } from '@/lib/storage/visitorStorage';
 import { useToast } from '@/hooks/use-toast';
@@ -20,6 +21,7 @@ export interface UseVisitorStorageReturn {
   addVisitor: (visitor: Omit<Visitor, 'id'>) => void;
   updateVisitor: (id: number, updates: Partial<Visitor>) => void;
   removeVisitor: (id: number) => void;
+  clearOldVisitors: (daysOld?: number) => number;
   isLoading: boolean;
   error: string | null;
 }
@@ -184,11 +186,54 @@ export function useVisitorStorage(): UseVisitorStorageReturn {
     }
   }, [toast]);
 
+  /**
+   * Clears old visitor records from storage
+   * @param daysOld - Number of days (default: 30)
+   * @returns Number of records removed
+   */
+  const clearOldVisitors = useCallback((daysOld: number = 30): number => {
+    try {
+      const removedCount = clearOldRecords(daysOld);
+      
+      if (removedCount > 0) {
+        // Reload visitors to update state
+        const updatedVisitors = loadVisitors();
+        setVisitors(updatedVisitors);
+        
+        toast({
+          title: 'Registros antigos removidos',
+          description: `${removedCount} ${removedCount === 1 ? 'registro removido' : 'registros removidos'} com sucesso.`,
+        });
+      } else {
+        toast({
+          title: 'Nenhum registro antigo',
+          description: `Não há registros com mais de ${daysOld} dias.`,
+        });
+      }
+      
+      return removedCount;
+    } catch (err) {
+      console.error('Failed to clear old visitors:', err);
+      
+      const errorMessage = ERROR_MESSAGES.generic.unexpected;
+      setError(errorMessage);
+      
+      toast({
+        title: 'Erro ao limpar registros',
+        description: errorMessage,
+        variant: 'destructive',
+      });
+      
+      return 0;
+    }
+  }, [toast]);
+
   return {
     visitors,
     addVisitor,
     updateVisitor,
     removeVisitor,
+    clearOldVisitors,
     isLoading,
     error,
   };
