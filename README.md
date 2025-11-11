@@ -9,7 +9,7 @@ Sistema de gerenciamento de visitantes para condomínios.
 [![Security](https://img.shields.io/badge/Security-3%20Issues-red)](#-segurança)
 [![TypeScript](https://img.shields.io/badge/TypeScript-Passing-success)]()
 
-**Última Atualização:** 11 de Novembro de 2025
+**Última Atualização:** 11 de Janeiro de 2025
 
 ### Métricas de Qualidade
 
@@ -40,6 +40,156 @@ Para uma visão completa das tarefas pendentes, prioridades e roadmap de desenvo
 - **Features Incompletas**: 4 features principais abaixo de 50% de completude
 - **Testes**: Coverage 0% - implementação de testes necessária
 - **Bundle Size**: Chunk principal com 1.3MB - otimização necessária
+
+---
+
+## 📋 Lista Consolidada de Correções Necessárias
+
+**Total de Issues Identificados:** 130  
+**Tempo Estimado Total:** 239-350 horas (~1.5-2 meses de trabalho)
+
+### 🔴 PRIORIDADE CRÍTICA - Segurança (3-5 horas)
+
+#### 1. Vulnerabilidades de Dependências
+- **xlsx** - Prototype Pollution e ReDoS (HIGH SEVERITY)
+  - CVEs: GHSA-4r6h-8v6p-xvw6 (7.8), GHSA-5pgg-2g8v-p4x9 (7.5)
+  - **Solução:** Atualizar de 0.18.5 para 0.20.2+
+  - **Esforço:** 1-2 horas
+  
+- **vite** - Multiple Security Issues (MODERATE)
+  - CVEs: GHSA-93m4-6634-74q7, GHSA-g4jq-h2w9-997c, GHSA-jqfw-vq24-v9c3
+  - **Solução:** Atualizar de 5.4.19 para 6.1.7+
+  - **Esforço:** 2-3 horas
+
+### 🟠 ALTA PRIORIDADE - Features Incompletas (114-166 horas)
+
+#### 2. Access Control (20% → 100%) - 29-42 horas
+- [ ] AccessLog Component (8-12h)
+- [ ] AccessControl Component (12-16h)
+- [ ] AccessService (8-12h)
+- [ ] AccessRecord Type (1-2h)
+
+#### 3. Dashboard (40% → 100%) - 15-22 horas
+- [ ] DashboardStats Component (8-12h)
+- [ ] DashboardLayout Component (6-8h)
+- [ ] DashboardData Type (1-2h)
+
+#### 4. Reports (33% → 100%) - 22-32 horas
+- [ ] ReportGenerator Component (12-16h)
+- [ ] ReportViewer Component (8-12h)
+- [ ] Report Type (1-2h)
+- [ ] ReportConfig Type (1-2h)
+
+#### 5. User Management (25% → 100%) - 36-52 horas
+- [ ] UserForm Component (8-12h)
+- [ ] UserList Component (6-8h)
+- [ ] AuthService (12-16h)
+- [ ] UserService (8-12h)
+- [ ] User Type (1-2h)
+- [ ] UserRole Type (1-2h)
+
+#### 6. Visitor Registration (71% → 100%) - 12-18 horas
+- [ ] VisitorCard Component (4-6h)
+- [ ] VisitorService (8-12h)
+
+### 🟡 MÉDIA PRIORIDADE - Qualidade de Código (42-59 horas)
+
+#### 7. Acessibilidade (11-15 horas)
+- [ ] select component (30% score) - 2-3h
+- [ ] VisitorForm (0% score) - 3-4h
+- [ ] Outros 5 componentes - 6-8h
+
+#### 8. Error Handling e Loading States (14-21 horas)
+- [ ] Error Handling em 9 páginas - 6-9h
+- [ ] Loading States em 10 páginas - 8-12h
+
+#### 9. TypeScript Props Interfaces (17-23 horas)
+- [ ] 40 UI Components - 15-20h
+- [ ] 3 Feature Components - 2-3h
+
+#### 10. Type Definitions para Services (2-3 horas)
+- [ ] 2 services sem tipos definidos
+
+### ⚪ BAIXA PRIORIDADE - Otimizações (80-120 horas)
+
+#### 11. ESLint Warnings (4-5 horas)
+- [ ] Fast Refresh warnings em 7 componentes
+- [ ] React Hooks dependencies
+- [ ] Test Utils export
+
+#### 12. Naming Conventions (2.5-3.5 horas)
+- [ ] 2 arquivos de componentes para PascalCase
+- [ ] 25 arquivos de serviços para camelCase
+
+#### 13. Dependencies Management (2.5-3.5 horas)
+- [ ] Adicionar playwright ao package.json
+- [ ] Revisar 5 dependências potencialmente não utilizadas
+
+#### 14. Build Optimization (6-9 horas)
+- [ ] Implementar Code Splitting
+- [ ] Configurar Manual Chunks
+
+#### 15. Testing Coverage (64-96 horas)
+- [ ] Setup de Testes (4-6h)
+- [ ] Testes Unitários (40-60h)
+- [ ] Testes de Integração (20-30h)
+
+#### 16. ErrorBoundary Wrapping (3-5 horas)
+- [ ] Implementar nos 10 componentes principais
+
+#### 17. Orphaned Components (2-3 horas)
+- [ ] Revisar 4 componentes órfãos
+
+---
+
+### 📈 Resumo de Esforço por Prioridade
+
+| Prioridade | Horas Estimadas | Semanas (40h/sem) |
+|------------|-----------------|-------------------|
+| 🔴 Crítica | 3-5 horas | <1 semana |
+| 🟠 Alta | 114-166 horas | 3-4 semanas |
+| 🟡 Média | 42-59 horas | 1-1.5 semanas |
+| ⚪ Baixa | 80-120 horas | 2-3 semanas |
+| **TOTAL** | **239-350 horas** | **~6-9 semanas** |
+
+---
+
+### 🗺️ Roadmap Sugerido
+
+Consulte o [ROADMAP.md](./ROADMAP.md) para o plano detalhado de 5 sprints:
+
+- **Sprint 1** (1 sem) → 65% - Segurança + Access Control
+- **Sprint 2** (2 sem) → 72% - Dashboard + User Management  
+- **Sprint 3** (2 sem) → 78% - Reports + Finalizações
+- **Sprint 4** (2 sem) → 82%+ - Qualidade de Código ✅ **MVP READY**
+- **Sprint 5** (4+ sem) → 90%+ - Otimização + Testes 🎯 **EXCELÊNCIA**
+
+---
+
+### 📚 Documentação Completa de Planejamento
+
+Para detalhes completos de cada issue e plano de ação, consulte:
+
+- **[TODO.md](./TODO.md)** - Lista detalhada de 130 issues com priorização completa
+- **[ROADMAP.md](./ROADMAP.md)** - Plano de 5 sprints com timeline de 12 semanas
+- **[PROJECT_ANALYSIS_SUMMARY.md](./PROJECT_ANALYSIS_SUMMARY.md)** - Resumo executivo da análise
+- **[IMPROVEMENT_PLAN_INDEX.md](./IMPROVEMENT_PLAN_INDEX.md)** - Índice de toda documentação
+
+---
+
+### 🎯 Como Contribuir com as Correções
+
+1. Escolha uma task do [TODO.md](./TODO.md) de acordo com a prioridade
+2. Revise o [ROADMAP.md](./ROADMAP.md) para entender o contexto do sprint
+3. Siga o [CONTRIBUTING.md](./CONTRIBUTING.md) para Definition of Done
+4. Execute `npm run validate` antes de criar PR
+5. Marque a task como completa no TODO.md
+
+**Áreas que mais precisam de ajuda agora:**
+1. 🔴 **Segurança** - Atualização de dependências vulneráveis (URGENTE)
+2. 🟠 **Access Control** - Feature crítica incompleta
+3. 🟠 **Dashboard** - Feature core do sistema
+4. 🟡 **Acessibilidade** - Melhorias de UX essenciais
 
 ---
 
@@ -395,7 +545,10 @@ For more information, see the [Validation Agents README](src/lib/validation-agen
 ### Guides e READMEs
 
 - [CONTRIBUTING.md](./CONTRIBUTING.md) - Guia de contribuição e DoD
-- [TODO.md](./TODO.md) - Lista completa de tarefas e roadmap
+- [TODO.md](./TODO.md) - Lista detalhada de 130 issues com priorização completa
+- [ROADMAP.md](./ROADMAP.md) - Plano de 5 sprints com timeline de 12 semanas
+- [PROJECT_ANALYSIS_SUMMARY.md](./PROJECT_ANALYSIS_SUMMARY.md) - Resumo executivo da análise completa
+- [IMPROVEMENT_PLAN_INDEX.md](./IMPROVEMENT_PLAN_INDEX.md) - Índice de toda documentação de planejamento
 - [ACTIVITY_LOGGER_GUIDE.md](./ACTIVITY_LOGGER_GUIDE.md) - Sistema de logging
 - [Backend README](./backend/README.md) - Documentação do backend
 - [Testing Guide](./backend/TESTING.md) - Guia de testes
@@ -447,6 +600,6 @@ Este projeto está licenciado sob os termos definidos pelo proprietário do repo
 
 ---
 
-**Última Atualização do README:** 11 de Novembro de 2025  
+**Última Atualização do README:** 11 de Janeiro de 2025  
 **Versão do Projeto:** 0.0.0 (Pre-MVP)  
 **Status:** 🟡 Em Desenvolvimento Ativo
