@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -28,10 +28,52 @@ import ControleInsumosPage from "./ControleInsumosPage";
 import SuporteAvancadoPage from "./SuporteAvancadoPage";
 import GerenciamentoMoradoresPage from "./GerenciamentoMoradoresPage";
 import AgendamentoPage from "./AgendamentoPage";
+import VisitorService from "@/services/VisitorService";
+import { Visitor } from "@/types/visitor";
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
   const [activeSection, setActiveSection] = useState("overview");
+  const [recentVisitors, setRecentVisitors] = useState<Visitor[]>([]);
+  const [todayStats, setTodayStats] = useState({ total: 0, active: 0, completed: 0 });
+  const [weekStats, setWeekStats] = useState({ total: 0 });
+  const [weeklyData, setWeeklyData] = useState<number[]>([]);
+
+  useEffect(() => {
+    // Load real data from VisitorService
+    const loadData = () => {
+      const today = VisitorService.getTodayStats();
+      const week = VisitorService.getWeekStats();
+      const recent = VisitorService.getRecentVisitors(10);
+      
+      setTodayStats(today);
+      setWeekStats(week);
+      setRecentVisitors(recent);
+      
+      // Calculate weekly data for the chart
+      const weekData = [];
+      const now = new Date();
+      for (let i = 6; i >= 0; i--) {
+        const date = new Date(now);
+        date.setDate(date.getDate() - i);
+        date.setHours(0, 0, 0, 0);
+        
+        const nextDay = new Date(date);
+        nextDay.setDate(nextDay.getDate() + 1);
+        
+        const dayVisitors = VisitorService.getVisitorsByDateRange(date, nextDay);
+        weekData.push(dayVisitors.length);
+      }
+      setWeeklyData(weekData);
+    };
+
+    loadData();
+    
+    // Refresh data every 30 seconds
+    const interval = setInterval(loadData, 30000);
+    
+    return () => clearInterval(interval);
+  }, []);
 
   const menuItems = [
     { id: "overview", label: "Visão Geral", icon: BarChart3 },
@@ -43,17 +85,22 @@ const AdminDashboard = () => {
     { id: "support", label: "Suporte Avançado", icon: Phone },
   ];
 
-  const stats = [
-    { title: "Acessos Hoje", value: "47", change: "+12%", icon: Eye, color: "text-accent" },
-    { title: "Visitantes Ativos", value: "8", change: "-2", icon: UserCheck, color: "text-success" },
-    { title: "Total Semanal", value: "284", change: "+8%", icon: TrendingUp, color: "text-primary" },
-    { title: "Sistema Online", value: "99.9%", change: "Estável", icon: Activity, color: "text-success" },
-  ];
+  // Calculate changes for stats
+  const yesterdayTotal = Math.max(0, weekStats.total - todayStats.total);
+  const todayChange = yesterdayTotal > 0 
+    ? `${todayStats.total > yesterdayTotal ? '+' : ''}${Math.round(((todayStats.total - yesterdayTotal) / yesterdayTotal) * 100)}%`
+    : '+0%';
+  
+  const avgWeekly = Math.round(weekStats.total / 7);
+  const weekChange = avgWeekly > 0
+    ? `${todayStats.total > avgWeekly ? '+' : ''}${Math.round(((todayStats.total - avgWeekly) / avgWeekly) * 100)}%`
+    : '+0%';
 
-  const visitasRecentes = [
-    { nome: "João Silva", documento: "123.456.789-00", destino: "Apto 101", hora: "14:30", status: "Ativo" },
-    { nome: "Maria Santos", documento: "987.654.321-00", destino: "Apto 205", hora: "13:15", status: "Saiu" },
-    { nome: "Carlos Lima", documento: "456.789.123-00", destino: "Apto 304", hora: "12:45", status: "Ativo" },
+  const stats = [
+    { title: "Acessos Hoje", value: todayStats.total.toString(), change: todayChange, icon: Eye, color: "text-accent" },
+    { title: "Visitantes Ativos", value: todayStats.active.toString(), change: `${todayStats.active} ativos`, icon: UserCheck, color: "text-success" },
+    { title: "Total Semanal", value: weekStats.total.toString(), change: weekChange, icon: TrendingUp, color: "text-primary" },
+    { title: "Sistema Online", value: "99.9%", change: "Estável", icon: Activity, color: "text-success" },
   ];
 
   const handleLogout = () => {
@@ -173,10 +220,10 @@ const AdminDashboard = () => {
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-4">
-                      {["Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado", "Domingo"].map((dia, index) => {
-                        const valores = [45, 52, 38, 61, 47, 23, 15];
-                        const valor = valores[index];
-                        const width = (valor / 61) * 100;
+                      {["Domingo", "Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado"].map((dia, index) => {
+                        const valor = weeklyData[index] || 0;
+                        const maxValue = Math.max(...weeklyData, 1);
+                        const width = (valor / maxValue) * 100;
                         
                         return (
                           <div key={dia} className="flex items-center gap-4">
@@ -206,31 +253,38 @@ const AdminDashboard = () => {
                   </CardHeader>
                   <CardContent className="p-0">
                     <div className="space-y-1">
-                      {visitasRecentes.map((visita, index) => (
-                        <div
-                          key={index}
-                          className="flex items-center justify-between p-4 hover:bg-muted/50 border-b border-border last:border-0"
-                        >
-                          <div className="flex items-center gap-3">
-                            <div className="bg-primary/10 p-2 rounded-lg">
-                              <Shield className="h-4 w-4 text-primary" />
+                      {recentVisitors.length > 0 ? (
+                        recentVisitors.slice(0, 5).map((visitor) => (
+                          <div
+                            key={visitor.id}
+                            className="flex items-center justify-between p-4 hover:bg-muted/50 border-b border-border last:border-0"
+                          >
+                            <div className="flex items-center gap-3">
+                              <div className="bg-primary/10 p-2 rounded-lg">
+                                <Shield className="h-4 w-4 text-primary" />
+                              </div>
+                              <div>
+                                <p className="font-semibold text-sm">{visitor.nome}</p>
+                                <p className="text-xs text-muted-foreground">{visitor.destino}</p>
+                              </div>
                             </div>
-                            <div>
-                              <p className="font-semibold text-sm">{visita.nome}</p>
-                              <p className="text-xs text-muted-foreground">{visita.destino}</p>
+                            <div className="text-right">
+                              <Badge
+                                variant={visitor.status === "Ativo" ? "default" : "secondary"}
+                                className={visitor.status === "Ativo" ? "bg-success" : ""}
+                              >
+                                {visitor.status}
+                              </Badge>
+                              <p className="text-xs text-muted-foreground mt-1">{visitor.hora}</p>
                             </div>
                           </div>
-                          <div className="text-right">
-                            <Badge
-                              variant={visita.status === "Ativo" ? "default" : "secondary"}
-                              className={visita.status === "Ativo" ? "bg-success" : ""}
-                            >
-                              {visita.status}
-                            </Badge>
-                            <p className="text-xs text-muted-foreground mt-1">{visita.hora}</p>
-                          </div>
+                        ))
+                      ) : (
+                        <div className="p-8 text-center text-muted-foreground">
+                          <Clock className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                          <p>Nenhuma visita registrada ainda</p>
                         </div>
-                      ))}
+                      )}
                     </div>
                   </CardContent>
                 </Card>
