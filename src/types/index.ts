@@ -21,3 +21,18 @@ export {
   isNameValidation,
   isVisitorArray,
 } from './visitor';
+
+export type {
+  AccessRecord,
+  AccessFilter,
+  AccessStats,
+  AccessLogEntry,
+  AccessStatus,
+  AccessType,
+  UserRole,
+} from './access';
+
+export {
+  isAccessRecord,
+  isAccessRecordArray,
+} from './access';
