@@ -91,10 +91,11 @@ Os **10% restantes** são features **extras** que podem ser implementadas confor
 ## 📊 Análise Completa de Completude dos Portais
 
 [![Análise Completa](https://img.shields.io/badge/Análise%20Completa-Disponível-blue)](./PORTAL_COMPLETION_ANALYSIS.md)
+[![Gráficos Visuais](https://img.shields.io/badge/Gráficos-Disponível-blue)](./PORTAL_COMPLETION_CHART.md)
 
 Para uma **visão consolidada e detalhada** da completude dos dois principais portais do SIGECO, consulte:
 
-**[📊 PORTAL_COMPLETION_ANALYSIS.md](./PORTAL_COMPLETION_ANALYSIS.md)**
+**[📊 PORTAL_COMPLETION_ANALYSIS.md](./PORTAL_COMPLETION_ANALYSIS.md)** - Análise completa (24KB, 791 linhas)
 
 Este documento apresenta:
 - ✅ **Comparativo completo** entre Portal do Porteiro (90%) e Portal Administrativo (72%)
@@ -102,6 +103,15 @@ Este documento apresenta:
 - 🎯 **Plano de ação** para atingir 80%+ completion
 - 📅 **Timeline e projeções** de evolução
 - 🏆 **Certificações e recomendações** para produção
+
+**[📊 PORTAL_COMPLETION_CHART.md](./PORTAL_COMPLETION_CHART.md)** - Gráficos visuais (18KB, 368 linhas)
+
+Este documento complementar apresenta:
+- 📊 **Gráficos visuais ASCII** com barras de progresso
+- 🔄 **Comparações lado a lado** dos dois portais
+- 📅 **Timeline visual** de evolução do projeto
+- 🎯 **Matriz de prioridades** para desenvolvimento
+- 📖 **Guia de referência rápida** com legendas
 
 ### Resumo Rápido
 
