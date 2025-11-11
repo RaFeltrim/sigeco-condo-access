@@ -3,14 +3,14 @@
  * Comprehensive tests for the Overview (Visão Geral) section
  */
 
-import { test, expect } from '@playwright/test';
+import { test, expect, Page } from '@playwright/test';
 
 const BASE_URL = 'http://localhost:9323';
 const ADMIN_USERNAME = 'admin';
 const ADMIN_PASSWORD = 'a';
 
 // Helper function to login
-async function login(page: any) {
+async function login(page: Page) {
   await page.goto(BASE_URL);
   await page.fill('input[name="username"], input[type="text"]', ADMIN_USERNAME);
   await page.fill('input[name="password"], input[type="password"]', ADMIN_PASSWORD);
