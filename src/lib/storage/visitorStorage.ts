@@ -166,6 +166,7 @@ export function loadVisitors(): Visitor[] {
 
 /**
  * Updates an existing visitor in localStorage with comprehensive error handling
+ * Throws UPDATE_FAILED error if visitor not found (caller should handle by saving full visitor)
  */
 export function updateVisitor(id: number, updates: Partial<Visitor>): void {
   try {
@@ -173,6 +174,11 @@ export function updateVisitor(id: number, updates: Partial<Visitor>): void {
     const index = visitors.findIndex(v => v.id === id);
     
     if (index === -1) {
+      // Visitor not found in storage - this can happen if:
+      // 1. Storage was pruned and the visitor was removed
+      // 2. Storage was cleared or corrupted
+      // 3. State is out of sync with localStorage
+      // Throw a specific error that the caller can handle
       throw new StorageError(
         ERROR_MESSAGES.checkout.notFound,
         'UPDATE_FAILED'
