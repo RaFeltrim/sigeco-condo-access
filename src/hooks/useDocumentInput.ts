@@ -27,6 +27,16 @@ export function useDocumentInput(initialValue: string = ''): UseDocumentInputRet
   const [touched, setTouched] = useState(false);
 
   const onChange = useCallback((newValue: string) => {
+    // Remove non-numeric characters for length check
+    const cleaned = newValue.replace(/\D/g, '');
+    
+    // Enforce maximum length: 11 digits for CPF (most common case)
+    // This prevents users from entering 18+ digits
+    if (cleaned.length > 11) {
+      // Truncate to 11 digits
+      newValue = cleaned.substring(0, 11);
+    }
+    
     // Store raw value
     setValue(newValue);
     
