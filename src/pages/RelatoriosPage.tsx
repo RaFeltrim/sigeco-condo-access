@@ -22,8 +22,10 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { ReportService, type ReportFilter, type ReportData, type VisitaRegistro, type Estatisticas } from "@/services/ReportService";
+import { ReportTemplateService } from "@/services/ReportTemplateService";
 import { AnalyticsService } from "@/services/AnalyticsService";
 import { SavedFiltersManager } from "@/components/reports/SavedFiltersManager";
+import { ReportTemplateSelector } from "@/components/reports/ReportTemplateSelector";
 
 const RelatoriosPageContent = () => {
   const [filtros, setFiltros] = useState<ReportFilter>({
@@ -145,7 +147,8 @@ const RelatoriosPageContent = () => {
       // Generate report
       let blob: Blob;
       if (formato === 'pdf') {
-        blob = await ReportService.generatePDF(reportData);
+        // REL-RBF-001: Use template service for PDF generation
+        blob = await ReportTemplateService.generatePDFWithTemplate(reportData);
       } else {
         blob = await ReportService.generateExcel(reportData);
       }
@@ -220,6 +223,8 @@ const RelatoriosPageContent = () => {
           <p className="text-muted-foreground">Análise completa do fluxo de visitantes</p>
         </div>
         <div className="flex gap-3">
+          {/* REL-RBF-002: Template selector for PDF customization */}
+          <ReportTemplateSelector />
           <Button 
             onClick={() => handleExportarDados("pdf")} 
             variant="outline"
