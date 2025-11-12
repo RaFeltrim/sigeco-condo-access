@@ -26,6 +26,7 @@ import { ReportTemplateService } from "@/services/ReportTemplateService";
 import { AnalyticsService } from "@/services/AnalyticsService";
 import { SavedFiltersManager } from "@/components/reports/SavedFiltersManager";
 import { ReportTemplateSelector } from "@/components/reports/ReportTemplateSelector";
+import { PDFPreviewButton } from "@/components/reports/PDFPreview";
 
 const RelatoriosPageContent = () => {
   const [filtros, setFiltros] = useState<ReportFilter>({
@@ -225,6 +226,8 @@ const RelatoriosPageContent = () => {
         <div className="flex gap-3">
           {/* REL-RBF-002: Template selector for PDF customization */}
           <ReportTemplateSelector />
+          {/* REL-003: PDF Preview */}
+          <PDFPreviewButton data={prepareReportData('pdf')} />
           <Button 
             onClick={() => handleExportarDados("pdf")} 
             variant="outline"
