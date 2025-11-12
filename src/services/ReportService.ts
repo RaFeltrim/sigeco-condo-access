@@ -1,5 +1,5 @@
 import jsPDF from 'jspdf';
-import * as XLSX from 'xlsx';
+import ExcelJS from 'exceljs';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
@@ -255,7 +255,7 @@ class ReportServiceClass {
   }
 
   /**
-   * Generates Excel report with multiple sheets
+   * Generates Excel report with multiple sheets using ExcelJS
    */
   async generateExcel(data: ReportData): Promise<Blob> {
     return this.withTimeout(async () => {
@@ -265,88 +265,112 @@ class ReportServiceClass {
         throw new Error(`Validação falhou: ${validation.errors.join(', ')}`);
       }
 
-      const workbook = XLSX.utils.book_new();
+      const workbook = new ExcelJS.Workbook();
+      workbook.creator = data.metadata.generatedBy;
+      workbook.created = data.metadata.generatedAt;
 
       // Sheet 1: Dados Detalhados
-      const registrosData = data.registros.map(registro => ({
-        'Data': registro.data,
-        'Hora': registro.hora,
-        'Visitante': registro.visitante,
-        'Documento': registro.documento,
-        'Destino': registro.destino,
-        'Motivo': registro.motivo,
-        'Status': registro.status,
-        'Duração': registro.duracao
-      }));
+      const wsRegistros = workbook.addWorksheet('Dados', {
+        views: [{ state: 'frozen', xSplit: 0, ySplit: 1 }]
+      });
 
-      const wsRegistros = XLSX.utils.json_to_sheet(registrosData);
-      
-      // Set column widths
-      wsRegistros['!cols'] = [
-        { wch: 12 }, // Data
-        { wch: 8 },  // Hora
-        { wch: 25 }, // Visitante
-        { wch: 18 }, // Documento
-        { wch: 20 }, // Destino
-        { wch: 25 }, // Motivo
-        { wch: 15 }, // Status
-        { wch: 12 }  // Duração
+      // Define columns
+      wsRegistros.columns = [
+        { header: 'Data', key: 'data', width: 12 },
+        { header: 'Hora', key: 'hora', width: 8 },
+        { header: 'Visitante', key: 'visitante', width: 25 },
+        { header: 'Documento', key: 'documento', width: 18 },
+        { header: 'Destino', key: 'destino', width: 20 },
+        { header: 'Motivo', key: 'motivo', width: 25 },
+        { header: 'Status', key: 'status', width: 15 },
+        { header: 'Duração', key: 'duracao', width: 12 }
       ];
 
-      XLSX.utils.book_append_sheet(workbook, wsRegistros, 'Dados');
+      // Style header row
+      wsRegistros.getRow(1).font = { bold: true };
+      wsRegistros.getRow(1).fill = {
+        type: 'pattern',
+        pattern: 'solid',
+        fgColor: { argb: 'FFE0E0E0' }
+      };
+
+      // Add data rows
+      data.registros.forEach(registro => {
+        wsRegistros.addRow({
+          data: registro.data,
+          hora: registro.hora,
+          visitante: registro.visitante,
+          documento: registro.documento,
+          destino: registro.destino,
+          motivo: registro.motivo,
+          status: registro.status,
+          duracao: registro.duracao
+        });
+      });
 
       // Sheet 2: Estatísticas
-      const estatisticasData = [
-        { 'Métrica': 'Total de Acessos', 'Valor': data.estatisticas.totalAcessos },
-        { 'Métrica': 'Tempo Médio', 'Valor': data.estatisticas.tempoMedio },
-        { 'Métrica': 'Pico de Movimento', 'Valor': data.estatisticas.picoPeriodo },
-        { 'Métrica': 'Taxa de Ocupação', 'Valor': data.estatisticas.taxaOcupacao }
+      const wsEstatisticas = workbook.addWorksheet('Estatísticas');
+      
+      wsEstatisticas.columns = [
+        { header: 'Métrica', key: 'metrica', width: 25 },
+        { header: 'Valor', key: 'valor', width: 20 }
       ];
 
-      const wsEstatisticas = XLSX.utils.json_to_sheet(estatisticasData);
-      wsEstatisticas['!cols'] = [
-        { wch: 25 }, // Métrica
-        { wch: 20 }  // Valor
-      ];
+      wsEstatisticas.getRow(1).font = { bold: true };
+      wsEstatisticas.getRow(1).fill = {
+        type: 'pattern',
+        pattern: 'solid',
+        fgColor: { argb: 'FFE0E0E0' }
+      };
 
-      XLSX.utils.book_append_sheet(workbook, wsEstatisticas, 'Estatísticas');
+      wsEstatisticas.addRow({ metrica: 'Total de Acessos', valor: data.estatisticas.totalAcessos });
+      wsEstatisticas.addRow({ metrica: 'Tempo Médio', valor: data.estatisticas.tempoMedio });
+      wsEstatisticas.addRow({ metrica: 'Pico de Movimento', valor: data.estatisticas.picoPeriodo });
+      wsEstatisticas.addRow({ metrica: 'Taxa de Ocupação', valor: data.estatisticas.taxaOcupacao });
 
       // Sheet 3: Metadados
-      const metadadosData = [
-        { 'Campo': 'Data de Geração', 'Valor': format(data.metadata.generatedAt, "dd/MM/yyyy HH:mm:ss", { locale: ptBR }) },
-        { 'Campo': 'Gerado Por', 'Valor': data.metadata.generatedBy },
-        { 'Campo': 'Total de Registros', 'Valor': data.metadata.totalRecords },
-        { 'Campo': 'Versão', 'Valor': data.metadata.version },
-        { 'Campo': 'Formato', 'Valor': data.metadata.format }
+      const wsMetadados = workbook.addWorksheet('Metadados');
+      
+      wsMetadados.columns = [
+        { header: 'Campo', key: 'campo', width: 25 },
+        { header: 'Valor', key: 'valor', width: 40 }
       ];
+
+      wsMetadados.getRow(1).font = { bold: true };
+      wsMetadados.getRow(1).fill = {
+        type: 'pattern',
+        pattern: 'solid',
+        fgColor: { argb: 'FFE0E0E0' }
+      };
+
+      wsMetadados.addRow({ 
+        campo: 'Data de Geração', 
+        valor: format(data.metadata.generatedAt, "dd/MM/yyyy HH:mm:ss", { locale: ptBR }) 
+      });
+      wsMetadados.addRow({ campo: 'Gerado Por', valor: data.metadata.generatedBy });
+      wsMetadados.addRow({ campo: 'Total de Registros', valor: data.metadata.totalRecords });
+      wsMetadados.addRow({ campo: 'Versão', valor: data.metadata.version });
+      wsMetadados.addRow({ campo: 'Formato', valor: data.metadata.format });
 
       // Add filters to metadata
       if (data.metadata.filters) {
         if (data.metadata.filters.periodo) {
-          metadadosData.push({ 'Campo': 'Filtro - Período', 'Valor': data.metadata.filters.periodo });
+          wsMetadados.addRow({ campo: 'Filtro - Período', valor: data.metadata.filters.periodo });
         }
         if (data.metadata.filters.tipo) {
-          metadadosData.push({ 'Campo': 'Filtro - Tipo', 'Valor': data.metadata.filters.tipo });
+          wsMetadados.addRow({ campo: 'Filtro - Tipo', valor: data.metadata.filters.tipo });
         }
         if (data.metadata.filters.status) {
-          metadadosData.push({ 'Campo': 'Filtro - Status', 'Valor': data.metadata.filters.status });
+          wsMetadados.addRow({ campo: 'Filtro - Status', valor: data.metadata.filters.status });
         }
         if (data.metadata.filters.destino) {
-          metadadosData.push({ 'Campo': 'Filtro - Destino', 'Valor': data.metadata.filters.destino });
+          wsMetadados.addRow({ campo: 'Filtro - Destino', valor: data.metadata.filters.destino });
         }
       }
 
-      const wsMetadados = XLSX.utils.json_to_sheet(metadadosData);
-      wsMetadados['!cols'] = [
-        { wch: 25 }, // Campo
-        { wch: 40 }  // Valor
-      ];
-
-      XLSX.utils.book_append_sheet(workbook, wsMetadados, 'Metadados');
-
       // Generate Excel file
-      const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
-      return new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+      const buffer = await workbook.xlsx.writeBuffer();
+      return new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
     }, 'Geração de Excel');
   }
 
