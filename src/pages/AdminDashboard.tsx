@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Logo } from "@/components/Logo";
 import NotificationSystem from "@/components/NotificationSystem";
+import { DashboardStats, DashboardLayout, DashboardChart, type StatItem, type DashboardWidget } from "@/components/dashboard";
 import { 
   BarChart3, 
   Users, 
@@ -96,11 +97,43 @@ const AdminDashboard = () => {
     ? `${todayStats.total > avgWeekly ? '+' : ''}${Math.round(((todayStats.total - avgWeekly) / avgWeekly) * 100)}%`
     : '+0%';
 
-  const stats = [
-    { title: "Acessos Hoje", value: todayStats.total.toString(), change: todayChange, icon: Eye, color: "text-accent" },
-    { title: "Visitantes Ativos", value: todayStats.active.toString(), change: `${todayStats.active} ativos`, icon: UserCheck, color: "text-success" },
-    { title: "Total Semanal", value: weekStats.total.toString(), change: weekChange, icon: TrendingUp, color: "text-primary" },
-    { title: "Sistema Online", value: "99.9%", change: "Estável", icon: Activity, color: "text-success" },
+  const stats: StatItem[] = [
+    { 
+      title: "Acessos Hoje", 
+      value: todayStats.total, 
+      change: todayChange, 
+      changeType: todayStats.total > yesterdayTotal ? 'positive' : 'negative',
+      icon: Eye, 
+      color: "text-accent",
+      description: "Visitantes registrados hoje"
+    },
+    { 
+      title: "Visitantes Ativos", 
+      value: todayStats.active, 
+      change: `${todayStats.active} no prédio`,
+      changeType: 'neutral',
+      icon: UserCheck, 
+      color: "text-success",
+      description: "Atualmente no condomínio"
+    },
+    { 
+      title: "Total Semanal", 
+      value: weekStats.total, 
+      change: weekChange,
+      changeType: todayStats.total > avgWeekly ? 'positive' : 'negative',
+      icon: TrendingUp, 
+      color: "text-primary",
+      description: "Acessos nos últimos 7 dias"
+    },
+    { 
+      title: "Sistema Online", 
+      value: "99.9%", 
+      change: "Estável",
+      changeType: 'positive',
+      icon: Activity, 
+      color: "text-success",
+      description: "Uptime do sistema"
+    },
   ];
 
   const handleLogout = () => {
@@ -185,62 +218,28 @@ const AdminDashboard = () => {
                 </div>
               </div>
 
-              {/* Stats Cards */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6" data-testid="stats-cards-container">
-                {stats.map((stat, index) => {
-                  const Icon = stat.icon;
-                  return (
-                    <Card key={index} className="shadow-lg border-0 bg-card/95 backdrop-blur" data-testid={`stat-card-${index}`}>
-                      <CardContent className="p-6">
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <p className="text-sm text-muted-foreground mb-1" data-testid={`stat-title-${index}`}>{stat.title}</p>
-                            <p className="text-3xl font-bold text-primary" data-testid={`stat-value-${index}`}>{stat.value}</p>
-                            <p className={`text-sm ${stat.color} mt-1`}>{stat.change}</p>
-                          </div>
-                          <div className="bg-primary/10 p-3 rounded-xl">
-                            <Icon className={`h-6 w-6 ${stat.color}`} />
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  );
-                })}
-              </div>
+              {/* Stats Cards - Using New DashboardStats Component */}
+              <DashboardStats stats={stats} />
 
               {/* Chart and Recent Activity */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {/* Fluxo de Visitas */}
-                <Card className="shadow-lg border-0 bg-card/95 backdrop-blur">
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-3 text-primary">
-                      <BarChart3 className="h-5 w-5" />
-                      Fluxo de Visitas - Última Semana
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
-                      {["Domingo", "Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado"].map((dia, index) => {
-                        const valor = weeklyData[index] || 0;
-                        const maxValue = Math.max(...weeklyData, 1);
-                        const width = (valor / maxValue) * 100;
-                        
-                        return (
-                          <div key={dia} className="flex items-center gap-4">
-                            <span className="text-sm font-medium w-16">{dia}</span>
-                            <div className="flex-1 bg-secondary rounded-full h-3">
-                              <div 
-                                className="bg-gradient-to-r from-accent to-accent-dark h-3 rounded-full transition-all duration-500"
-                                style={{ width: `${width}%` }}
-                              />
-                            </div>
-                            <span className="text-sm font-semibold text-primary w-8">{valor}</span>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </CardContent>
-                </Card>
+                {/* Fluxo de Visitas - Using New DashboardChart Component */}
+                <DashboardChart
+                  title="Fluxo de Visitas - Última Semana"
+                  description="Número de visitantes por dia da semana"
+                  data={[
+                    { name: "Dom", value: weeklyData[0] || 0 },
+                    { name: "Seg", value: weeklyData[1] || 0 },
+                    { name: "Ter", value: weeklyData[2] || 0 },
+                    { name: "Qua", value: weeklyData[3] || 0 },
+                    { name: "Qui", value: weeklyData[4] || 0 },
+                    { name: "Sex", value: weeklyData[5] || 0 },
+                    { name: "Sáb", value: weeklyData[6] || 0 },
+                  ]}
+                  type="bar"
+                  height={300}
+                  className="shadow-lg border-0 bg-card/95 backdrop-blur"
+                />
 
                 {/* Visitantes Recentes */}
                 <Card className="shadow-lg border-0 bg-card/95 backdrop-blur">
