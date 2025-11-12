@@ -465,12 +465,40 @@ class BackupServiceClass {
    * Private: Calculate checksum
    */
   private async calculateChecksum(data: BackupData['data']): Promise<string> {
-    const str = JSON.stringify(data);
-    const encoder = new TextEncoder();
-    const dataBuffer = encoder.encode(str);
-    const hashBuffer = await crypto.subtle.digest('SHA-256', dataBuffer);
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-    return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
+    try {
+      // Check if Web Crypto API is available (requires HTTPS or localhost)
+      if (!crypto || !crypto.subtle || !crypto.subtle.digest) {
+        // Fallback to simple hash for non-HTTPS contexts
+        return this.simpleHash(JSON.stringify(data));
+      }
+
+      const str = JSON.stringify(data);
+      const encoder = new TextEncoder();
+      const dataBuffer = encoder.encode(str);
+      const hashBuffer = await crypto.subtle.digest('SHA-256', dataBuffer);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
+    } catch (error) {
+      // Fallback if crypto operation fails
+      LoggingService.warn('Crypto API unavailable, using fallback hash', { error });
+      return this.simpleHash(JSON.stringify(data));
+    }
+  }
+
+  /**
+   * Private: Simple hash fallback (for non-HTTPS contexts)
+   */
+  private simpleHash(str: string): string {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+      const char = str.charCodeAt(i);
+      hash = ((hash << 5) - hash) + char;
+      hash = hash & hash; // Convert to 32bit integer
+    }
+    // Convert to hex string with padding
+    return Math.abs(hash).toString(16).padStart(16, '0') + 
+           str.length.toString(16).padStart(8, '0') +
+           Date.now().toString(16).padStart(12, '0');
   }
 
   /**
