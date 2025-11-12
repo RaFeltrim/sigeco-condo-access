@@ -24,17 +24,24 @@ import {
   Edit,
   Trash2,
   Eye,
-  Plus
+  Plus,
+  Download,
+  FileSpreadsheet
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { validatePhone, validateDocument } from "@/lib/utils/validation";
+import * as XLSX from 'xlsx';
 
 const GerenciamentoMoradoresPage = () => {
   const [filtroUnidade, setFiltroUnidade] = useState("");
   const [busca, setBusca] = useState("");
+  const [filtroStatus, setFiltroStatus] = useState("");
+  const [filtroTipo, setFiltroTipo] = useState("");
   const [novoMorador, setNovoMorador] = useState({
     nome: "", email: "", telefone: "", unidade: "", documento: "", tipo: ""
   });
+  const [editingMorador, setEditingMorador] = useState<typeof moradores[0] | null>(null);
+  const [showEditDialog, setShowEditDialog] = useState(false);
   const [formErrors, setFormErrors] = useState<{
     telefone?: string;
     documento?: string;
@@ -181,11 +188,170 @@ const GerenciamentoMoradoresPage = () => {
     setMoradorToDelete(null);
   };
 
-  const moradoresFiltrados = moradores.filter(morador => 
-    morador.nome.toLowerCase().includes(busca.toLowerCase()) ||
-    morador.unidade.toLowerCase().includes(busca.toLowerCase()) ||
-    morador.documento.includes(busca)
-  );
+  // MRD-RBF-002: Handle edit functionality
+  const handleEditClick = (morador: typeof moradores[0]) => {
+    setEditingMorador(morador);
+    setShowEditDialog(true);
+  };
+
+  const handleEditSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!editingMorador) return;
+    
+    // Validate phone and document
+    const errors: { telefone?: string; documento?: string } = {};
+    
+    if (editingMorador.telefone && !validatePhone(editingMorador.telefone)) {
+      errors.telefone = "Telefone inválido. Use o formato (11) 99999-9999";
+    }
+    
+    if (!editingMorador.documento) {
+      errors.documento = "Documento é obrigatório";
+    } else {
+      const docValidation = validateDocument(editingMorador.documento);
+      if (!docValidation.isValid) {
+        errors.documento = docValidation.message || "Documento inválido";
+      }
+    }
+    
+    if (Object.keys(errors).length > 0) {
+      setFormErrors(errors);
+      toast({
+        title: "Erro na validação",
+        description: "Por favor, corrija os erros no formulário",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    setFormErrors({});
+    
+    // Here you would call the API to update the morador
+    toast({
+      title: "Morador atualizado",
+      description: `${editingMorador.nome} foi atualizado com sucesso`,
+    });
+    
+    setShowEditDialog(false);
+    setEditingMorador(null);
+  };
+
+  const handleCancelEdit = () => {
+    setShowEditDialog(false);
+    setEditingMorador(null);
+    setFormErrors({});
+  };
+
+  // MRD-RBF-005: Enhanced filtering with multiple criteria
+  const moradoresFiltrados = moradores.filter(morador => {
+    // Text search filter
+    const matchesSearch = 
+      morador.nome.toLowerCase().includes(busca.toLowerCase()) ||
+      morador.unidade.toLowerCase().includes(busca.toLowerCase()) ||
+      morador.documento.includes(busca);
+    
+    // Status filter
+    const matchesStatus = !filtroStatus || filtroStatus === "todos" || 
+      morador.status.toLowerCase() === filtroStatus.toLowerCase();
+    
+    // Type filter
+    const matchesTipo = !filtroTipo || filtroTipo === "todos" || 
+      morador.tipo.toLowerCase() === filtroTipo.toLowerCase();
+    
+    return matchesSearch && matchesStatus && matchesTipo;
+  });
+
+  // MRD-RBF-006: Export to Excel/CSV functionality
+  const handleExportExcel = () => {
+    try {
+      const dataToExport = moradoresFiltrados.map(morador => ({
+        'Nome': morador.nome,
+        'Email': morador.email,
+        'Telefone': morador.telefone,
+        'Unidade': morador.unidade,
+        'Documento': morador.documento,
+        'Tipo': morador.tipo,
+        'Status': morador.status,
+        'Data Cadastro': morador.dataCadastro
+      }));
+
+      const ws = XLSX.utils.json_to_sheet(dataToExport);
+      
+      // Set column widths
+      ws['!cols'] = [
+        { wch: 25 }, // Nome
+        { wch: 30 }, // Email
+        { wch: 18 }, // Telefone
+        { wch: 12 }, // Unidade
+        { wch: 18 }, // Documento
+        { wch: 15 }, // Tipo
+        { wch: 10 }, // Status
+        { wch: 15 }  // Data Cadastro
+      ];
+
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, 'Moradores');
+
+      const timestamp = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+      const filename = `moradores_${timestamp}.xlsx`;
+      
+      XLSX.writeFile(wb, filename);
+
+      toast({
+        title: "Exportação concluída",
+        description: `${moradoresFiltrados.length} registro(s) exportado(s) para ${filename}`,
+      });
+    } catch (error) {
+      console.error('Erro ao exportar:', error);
+      toast({
+        title: "Erro na exportação",
+        description: "Não foi possível exportar os dados",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleExportCSV = () => {
+    try {
+      const dataToExport = moradoresFiltrados.map(morador => ({
+        'Nome': morador.nome,
+        'Email': morador.email,
+        'Telefone': morador.telefone,
+        'Unidade': morador.unidade,
+        'Documento': morador.documento,
+        'Tipo': morador.tipo,
+        'Status': morador.status,
+        'Data Cadastro': morador.dataCadastro
+      }));
+
+      const ws = XLSX.utils.json_to_sheet(dataToExport);
+      const csv = XLSX.utils.sheet_to_csv(ws);
+      
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      
+      const timestamp = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+      link.href = url;
+      link.download = `moradores_${timestamp}.csv`;
+      link.click();
+      
+      window.URL.revokeObjectURL(url);
+
+      toast({
+        title: "Exportação concluída",
+        description: `${moradoresFiltrados.length} registro(s) exportado(s) para CSV`,
+      });
+    } catch (error) {
+      console.error('Erro ao exportar:', error);
+      toast({
+        title: "Erro na exportação",
+        description: "Não foi possível exportar os dados",
+        variant: "destructive",
+      });
+    }
+  };
 
   return (
     <div className="p-6 space-y-6 max-w-7xl mx-auto">
@@ -230,16 +396,87 @@ const GerenciamentoMoradoresPage = () => {
 
         {/* Tab Moradores */}
         <TabsContent value="moradores" className="space-y-6">
+          {/* MRD-RBF-005: Enhanced filters section */}
+          <Card className="shadow-lg border-0 bg-card/95 backdrop-blur">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-3 text-primary">
+                <Search className="h-5 w-5" />
+                Filtros Avançados
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="space-y-2">
+                  <Label>Buscar</Label>
+                  <Input
+                    placeholder="Nome, unidade ou documento..."
+                    value={busca}
+                    onChange={(e) => setBusca(e.target.value)}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Status</Label>
+                  <Select value={filtroStatus} onValueChange={setFiltroStatus}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Todos os status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="todos">Todos</SelectItem>
+                      <SelectItem value="ativo">Ativo</SelectItem>
+                      <SelectItem value="inativo">Inativo</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label>Tipo</Label>
+                  <Select value={filtroTipo} onValueChange={setFiltroTipo}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Todos os tipos" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="todos">Todos</SelectItem>
+                      <SelectItem value="proprietário">Proprietário</SelectItem>
+                      <SelectItem value="locatário">Locatário</SelectItem>
+                      <SelectItem value="familiar">Familiar</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              <div className="flex justify-between items-center mt-4">
+                <Button 
+                  variant="outline"
+                  onClick={() => {
+                    setBusca("");
+                    setFiltroStatus("");
+                    setFiltroTipo("");
+                  }}
+                >
+                  Limpar Filtros
+                </Button>
+                <div className="text-sm text-muted-foreground">
+                  {moradoresFiltrados.length} registro(s) encontrado(s)
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
           <div className="flex justify-between items-center gap-4">
-            <div className="flex gap-3 flex-1">
-              <Input
-                placeholder="Buscar por nome, unidade ou documento..."
-                value={busca}
-                onChange={(e) => setBusca(e.target.value)}
-                className="max-w-md"
-              />
-              <Button variant="outline">
-                <Search className="h-4 w-4" />
+            <div className="flex gap-3">
+              {/* MRD-RBF-006: Export buttons */}
+              <Button 
+                variant="outline"
+                onClick={handleExportExcel}
+                className="border-success text-success hover:bg-success hover:text-success-foreground"
+              >
+                <FileSpreadsheet className="h-4 w-4 mr-2" />
+                Excel
+              </Button>
+              <Button 
+                variant="outline"
+                onClick={handleExportCSV}
+              >
+                <Download className="h-4 w-4 mr-2" />
+                CSV
               </Button>
             </div>
             
@@ -404,7 +641,13 @@ const GerenciamentoMoradoresPage = () => {
                           <Button size="sm" variant="outline" aria-label={`Ver detalhes de ${morador.nome}`}>
                             <Eye className="h-3 w-3" />
                           </Button>
-                          <Button size="sm" variant="outline" aria-label={`Editar ${morador.nome}`}>
+                          {/* MRD-RBF-002: Edit button with functionality */}
+                          <Button 
+                            size="sm" 
+                            variant="outline" 
+                            onClick={() => handleEditClick(morador)}
+                            aria-label={`Editar ${morador.nome}`}
+                          >
                             <Edit className="h-3 w-3" />
                           </Button>
                           <Button 
@@ -491,6 +734,145 @@ const GerenciamentoMoradoresPage = () => {
         </TabsContent>
       </Tabs>
       
+      {/* MRD-RBF-002: Edit Dialog */}
+      <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Editar Morador</DialogTitle>
+            <DialogDescription>
+              Atualize os dados do morador
+            </DialogDescription>
+          </DialogHeader>
+          {editingMorador && (
+            <form onSubmit={handleEditSubmit} className="space-y-4">
+              <div className="space-y-2">
+                <Label>Nome Completo *</Label>
+                <Input
+                  placeholder="Digite o nome completo"
+                  value={editingMorador.nome}
+                  onChange={(e) => setEditingMorador({...editingMorador, nome: e.target.value})}
+                  required
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label>Email *</Label>
+                <Input
+                  type="email"
+                  placeholder="email@exemplo.com"
+                  value={editingMorador.email}
+                  onChange={(e) => setEditingMorador({...editingMorador, email: e.target.value})}
+                  required
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label>Telefone</Label>
+                <MaskedInput
+                  mask="phone"
+                  placeholder="(11) 99999-9999"
+                  value={editingMorador.telefone}
+                  onChange={(value) => {
+                    setEditingMorador({...editingMorador, telefone: value});
+                    if (formErrors.telefone) {
+                      setFormErrors({...formErrors, telefone: undefined});
+                    }
+                  }}
+                  error={formErrors.telefone}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label>Unidade *</Label>
+                <Input
+                  placeholder="Ex: Apto 101"
+                  value={editingMorador.unidade}
+                  onChange={(e) => setEditingMorador({...editingMorador, unidade: e.target.value})}
+                  required
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label>Documento *</Label>
+                <MaskedInput
+                  mask="document"
+                  placeholder="CPF ou RG"
+                  value={editingMorador.documento}
+                  onChange={(value) => {
+                    setEditingMorador({...editingMorador, documento: value});
+                    if (formErrors.documento) {
+                      setFormErrors({...formErrors, documento: undefined});
+                    }
+                  }}
+                  error={formErrors.documento}
+                  required
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label>Tipo *</Label>
+                <Select 
+                  value={editingMorador.tipo.toLowerCase()} 
+                  onValueChange={(value) => {
+                    const tipoMap: Record<string, string> = {
+                      'proprietario': 'Proprietário',
+                      'locatario': 'Locatário',
+                      'familiar': 'Familiar'
+                    };
+                    setEditingMorador({...editingMorador, tipo: tipoMap[value] || value});
+                  }}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecione o tipo" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="proprietario">Proprietário</SelectItem>
+                    <SelectItem value="locatario">Locatário</SelectItem>
+                    <SelectItem value="familiar">Familiar</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label>Status *</Label>
+                <Select 
+                  value={editingMorador.status.toLowerCase()} 
+                  onValueChange={(value) => {
+                    const statusMap: Record<string, string> = {
+                      'ativo': 'Ativo',
+                      'inativo': 'Inativo'
+                    };
+                    setEditingMorador({...editingMorador, status: statusMap[value] || value});
+                  }}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecione o status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="ativo">Ativo</SelectItem>
+                    <SelectItem value="inativo">Inativo</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="flex gap-2">
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  className="flex-1"
+                  onClick={handleCancelEdit}
+                >
+                  Cancelar
+                </Button>
+                <Button type="submit" className="flex-1 bg-success hover:bg-success/90">
+                  Salvar Alterações
+                </Button>
+              </div>
+            </form>
+          )}
+        </DialogContent>
+      </Dialog>
+
       {/* MRD-RBF-004: Delete Confirmation Dialog */}
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <AlertDialogContent>
