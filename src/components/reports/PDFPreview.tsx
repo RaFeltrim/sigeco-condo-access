@@ -20,19 +20,6 @@ export const PDFPreview = ({ data, template, isOpen, onClose }: PDFPreviewProps)
   const [zoom, setZoom] = useState(100);
   const { toast } = useToast();
 
-  useEffect(() => {
-    if (isOpen) {
-      generatePreview();
-    }
-
-    // Cleanup URL when dialog closes
-    return () => {
-      if (previewUrl) {
-        URL.revokeObjectURL(previewUrl);
-      }
-    };
-  }, [isOpen, template]);
-
   const generatePreview = async () => {
     setIsLoading(true);
     try {
@@ -50,6 +37,20 @@ export const PDFPreview = ({ data, template, isOpen, onClose }: PDFPreviewProps)
       setIsLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (isOpen) {
+      generatePreview();
+    }
+
+    // Cleanup URL when dialog closes
+    return () => {
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl);
+      }
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen, template]);
 
   const handleDownload = async () => {
     try {
