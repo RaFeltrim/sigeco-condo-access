@@ -9,6 +9,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { Checkbox } from "@/components/ui/checkbox";
 import { MaskedInput } from "@/components/ui/masked-input";
 import { UnitCombobox } from "@/components/ui/unit-combobox";
 import { 
@@ -26,7 +27,9 @@ import {
   Eye,
   Plus,
   Download,
-  FileSpreadsheet
+  FileSpreadsheet,
+  CheckSquare,
+  Square
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { validatePhone, validateDocument } from "@/lib/utils/validation";
@@ -48,6 +51,15 @@ const GerenciamentoMoradoresPage = () => {
   }>({});
   const [moradorToDelete, setMoradorToDelete] = useState<typeof moradores[0] | null>(null);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  
+  // Sprint 4: Batch operations state
+  const [selectedMoradores, setSelectedMoradores] = useState<number[]>([]);
+  const [showBulkDeleteDialog, setShowBulkDeleteDialog] = useState(false);
+  const [showBulkEditDialog, setShowBulkEditDialog] = useState(false);
+  const [bulkEditData, setBulkEditData] = useState({
+    status: "",
+    tipo: ""
+  });
   
   const { toast } = useToast();
 
@@ -235,6 +247,64 @@ const GerenciamentoMoradoresPage = () => {
     
     setShowEditDialog(false);
     setEditingMorador(null);
+  };
+
+  // Sprint 4: Batch operations handlers
+  const toggleSelectAll = () => {
+    if (selectedMoradores.length === moradoresFiltrados.length) {
+      setSelectedMoradores([]);
+    } else {
+      setSelectedMoradores(moradoresFiltrados.map(m => m.id));
+    }
+  };
+
+  const toggleSelectMorador = (id: number) => {
+    setSelectedMoradores(prev => 
+      prev.includes(id) ? prev.filter(morId => morId !== id) : [...prev, id]
+    );
+  };
+
+  const handleBulkDelete = () => {
+    // Here you would call the API to delete multiple moradores
+    toast({
+      title: "Moradores excluídos",
+      description: `${selectedMoradores.length} morador(es) foram excluídos com sucesso`,
+    });
+    setSelectedMoradores([]);
+    setShowBulkDeleteDialog(false);
+  };
+
+  const handleBulkEdit = () => {
+    if (!bulkEditData.status && !bulkEditData.tipo) {
+      toast({
+        title: "Nenhuma alteração",
+        description: "Selecione pelo menos um campo para editar",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Here you would call the API to update multiple moradores
+    toast({
+      title: "Moradores atualizados",
+      description: `${selectedMoradores.length} morador(es) foram atualizados com sucesso`,
+    });
+    setSelectedMoradores([]);
+    setShowBulkEditDialog(false);
+    setBulkEditData({ status: "", tipo: "" });
+  };
+
+  const handleBulkExport = () => {
+    const selectedData = moradores.filter(m => selectedMoradores.includes(m.id));
+    const worksheet = XLSX.utils.json_to_sheet(selectedData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Moradores Selecionados");
+    XLSX.writeFile(workbook, `moradores_selecionados_${new Date().toISOString().split('T')[0]}.xlsx`);
+    
+    toast({
+      title: "Export realizado",
+      description: `${selectedMoradores.length} morador(es) foram exportados com sucesso`,
+    });
   };
 
   const handleCancelEdit = () => {
@@ -460,6 +530,54 @@ const GerenciamentoMoradoresPage = () => {
             </CardContent>
           </Card>
 
+          {/* Sprint 4: Bulk operations toolbar */}
+          {selectedMoradores.length > 0 && (
+            <Card className="mb-4 bg-primary/5 border-primary/20">
+              <CardContent className="p-4">
+                <div className="flex justify-between items-center">
+                  <div className="flex items-center gap-2">
+                    <CheckSquare className="h-5 w-5 text-primary" />
+                    <span className="font-medium">{selectedMoradores.length} morador(es) selecionado(s)</span>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button 
+                      variant="outline"
+                      size="sm"
+                      onClick={handleBulkExport}
+                    >
+                      <Download className="h-4 w-4 mr-2" />
+                      Exportar Seleção
+                    </Button>
+                    <Button 
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setShowBulkEditDialog(true)}
+                    >
+                      <Edit className="h-4 w-4 mr-2" />
+                      Editar em Lote
+                    </Button>
+                    <Button 
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setShowBulkDeleteDialog(true)}
+                      className="border-destructive text-destructive hover:bg-destructive hover:text-destructive-foreground"
+                    >
+                      <Trash2 className="h-4 w-4 mr-2" />
+                      Excluir Seleção
+                    </Button>
+                    <Button 
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setSelectedMoradores([])}
+                    >
+                      Cancelar
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
           <div className="flex justify-between items-center gap-4">
             <div className="flex gap-3">
               {/* MRD-RBF-006: Export buttons */}
@@ -590,6 +708,13 @@ const GerenciamentoMoradoresPage = () => {
               <Table>
                 <TableHeader>
                   <TableRow>
+                    <TableHead className="w-[50px]">
+                      <Checkbox
+                        checked={selectedMoradores.length === moradoresFiltrados.length && moradoresFiltrados.length > 0}
+                        onCheckedChange={toggleSelectAll}
+                        aria-label="Selecionar todos"
+                      />
+                    </TableHead>
                     <TableHead>Morador</TableHead>
                     <TableHead>Unidade</TableHead>
                     <TableHead>Contato</TableHead>
@@ -601,6 +726,13 @@ const GerenciamentoMoradoresPage = () => {
                 <TableBody>
                   {moradoresFiltrados.map((morador) => (
                     <TableRow key={morador.id} className="hover:bg-muted/50">
+                      <TableCell>
+                        <Checkbox
+                          checked={selectedMoradores.includes(morador.id)}
+                          onCheckedChange={() => toggleSelectMorador(morador.id)}
+                          aria-label={`Selecionar ${morador.nome}`}
+                        />
+                      </TableCell>
                       <TableCell>
                         <div className="flex items-center gap-3">
                           <div className="bg-primary/10 p-2 rounded-lg">
@@ -898,6 +1030,80 @@ const GerenciamentoMoradoresPage = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Sprint 4: Bulk delete dialog */}
+      <AlertDialog open={showBulkDeleteDialog} onOpenChange={setShowBulkDeleteDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Excluir moradores selecionados?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Você está prestes a excluir {selectedMoradores.length} morador(es). Esta ação não pode ser desfeita.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={handleBulkDelete}
+              className="bg-destructive hover:bg-destructive/90 text-destructive-foreground"
+            >
+              Excluir Todos
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Sprint 4: Bulk edit dialog */}
+      <Dialog open={showBulkEditDialog} onOpenChange={setShowBulkEditDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Editar {selectedMoradores.length} morador(es) em lote</DialogTitle>
+            <DialogDescription>
+              As alterações serão aplicadas a todos os moradores selecionados
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label>Status</Label>
+              <Select 
+                value={bulkEditData.status}
+                onValueChange={(value) => setBulkEditData({...bulkEditData, status: value})}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Manter atual" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Ativo">Ativo</SelectItem>
+                  <SelectItem value="Inativo">Inativo</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label>Tipo</Label>
+              <Select 
+                value={bulkEditData.tipo}
+                onValueChange={(value) => setBulkEditData({...bulkEditData, tipo: value})}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Manter atual" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Proprietário">Proprietário</SelectItem>
+                  <SelectItem value="Locatário">Locatário</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <div className="flex justify-end gap-2">
+            <Button variant="outline" onClick={() => setShowBulkEditDialog(false)}>
+              Cancelar
+            </Button>
+            <Button onClick={handleBulkEdit} className="bg-success hover:bg-success/90">
+              Aplicar Alterações
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
