@@ -241,12 +241,45 @@ const AgendamentoPage = () => {
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>Destino da Visita *</Label>
-                  <Input
-                    placeholder="Ex: Apto 101"
+                  <Select
                     value={novoAgendamento.destino}
-                    onChange={(e) => setNovoAgendamento({...novoAgendamento, destino: e.target.value})}
-                    required
-                  />
+                    onValueChange={(value) => setNovoAgendamento({...novoAgendamento, destino: value})}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecione o destino" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none" disabled>Selecione o destino</SelectItem>
+                      
+                      {/* Apartamentos */}
+                      <SelectItem value="Apto 101">Apto 101</SelectItem>
+                      <SelectItem value="Apto 102">Apto 102</SelectItem>
+                      <SelectItem value="Apto 103">Apto 103</SelectItem>
+                      <SelectItem value="Apto 104">Apto 104</SelectItem>
+                      <SelectItem value="Apto 201">Apto 201</SelectItem>
+                      <SelectItem value="Apto 202">Apto 202</SelectItem>
+                      <SelectItem value="Apto 203">Apto 203</SelectItem>
+                      <SelectItem value="Apto 204">Apto 204</SelectItem>
+                      <SelectItem value="Apto 205">Apto 205</SelectItem>
+                      <SelectItem value="Apto 301">Apto 301</SelectItem>
+                      <SelectItem value="Apto 302">Apto 302</SelectItem>
+                      <SelectItem value="Apto 303">Apto 303</SelectItem>
+                      <SelectItem value="Apto 304">Apto 304</SelectItem>
+                      
+                      {/* Áreas Comuns */}
+                      <SelectItem value="Salão de Festas">Salão de Festas</SelectItem>
+                      <SelectItem value="Academia">Academia</SelectItem>
+                      <SelectItem value="Piscina">Piscina</SelectItem>
+                      <SelectItem value="Churrasqueira">Churrasqueira</SelectItem>
+                      <SelectItem value="Playground">Playground</SelectItem>
+                      <SelectItem value="Quadra Esportiva">Quadra Esportiva</SelectItem>
+                      
+                      {/* Administração */}
+                      <SelectItem value="Administração">Administração</SelectItem>
+                      <SelectItem value="Síndico">Síndico</SelectItem>
+                      <SelectItem value="Zelador">Zelador</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div className="space-y-2">
                   <Label>Telefone</Label>
