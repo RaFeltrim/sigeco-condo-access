@@ -33,6 +33,7 @@ import {
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { validatePhone, validateDocument } from "@/lib/utils/validation";
+import { ImportDialog } from "@/components/moradores/ImportDialog";
 import * as XLSX from 'xlsx';
 
 const GerenciamentoMoradoresPage = () => {
@@ -598,7 +599,14 @@ const GerenciamentoMoradoresPage = () => {
               </Button>
             </div>
             
-            <Dialog>
+            <div className="flex gap-3">
+              {/* Sprint 5: Import Dialog */}
+              <ImportDialog onImportComplete={(data) => {
+                // Here you would call the API to create multiple moradores
+                console.log('Importing moradores:', data);
+              }} />
+              
+              <Dialog>
               <DialogTrigger asChild>
                 <Button className="bg-accent hover:bg-accent-dark text-accent-foreground" data-testid="btn-novo-morador">
                   <Plus className="h-4 w-4 mr-2" />
