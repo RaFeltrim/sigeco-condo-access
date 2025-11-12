@@ -7,6 +7,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { DatePickerWithRange } from "@/components/ui/date-range-picker";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { 
   FileText, 
   Download, 
@@ -17,7 +19,9 @@ import {
   BarChart3,
   PieChart,
   TrendingUp,
-  Loader2
+  Loader2,
+  Info,
+  RefreshCcw
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
@@ -38,6 +42,7 @@ const RelatoriosPageContent = () => {
   
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatingFormat, setGeneratingFormat] = useState<'pdf' | 'excel' | null>(null);
+  const [showClearConfirm, setShowClearConfirm] = useState(false);
   
   const { toast } = useToast();
 
@@ -223,37 +228,62 @@ const RelatoriosPageContent = () => {
           <h1 className="text-3xl font-bold text-primary">Relatórios de Acesso</h1>
           <p className="text-muted-foreground">Análise completa do fluxo de visitantes</p>
         </div>
-        <div className="flex gap-3">
-          {/* REL-RBF-002: Template selector for PDF customization */}
-          <ReportTemplateSelector />
-          {/* REL-003: PDF Preview */}
-          <PDFPreviewButton data={prepareReportData('pdf')} />
-          <Button 
-            onClick={() => handleExportarDados("pdf")} 
-            variant="outline"
-            className="border-accent text-accent hover:bg-accent hover:text-accent-foreground"
-            disabled={isGenerating}
-          >
-            {isGenerating && generatingFormat === 'pdf' ? (
-              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-            ) : (
-              <Download className="h-4 w-4 mr-2" />
-            )}
-            PDF
-          </Button>
-          <Button 
-            onClick={() => handleExportarDados("excel")} 
-            className="bg-success hover:bg-success/90"
-            disabled={isGenerating}
-          >
-            {isGenerating && generatingFormat === 'excel' ? (
-              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-            ) : (
-              <Download className="h-4 w-4 mr-2" />
-            )}
-            Excel
-          </Button>
-        </div>
+        <TooltipProvider>
+          <div className="flex gap-3">
+            {/* REL-RBF-002: Template selector for PDF customization */}
+            <ReportTemplateSelector />
+            {/* REL-003: PDF Preview */}
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <span>
+                  <PDFPreviewButton data={prepareReportData('pdf')} />
+                </span>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Visualize o relatório antes de baixar</p>
+              </TooltipContent>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button 
+                  onClick={() => handleExportarDados("pdf")} 
+                  variant="outline"
+                  className="border-accent text-accent hover:bg-accent hover:text-accent-foreground"
+                  disabled={isGenerating}
+                >
+                  {isGenerating && generatingFormat === 'pdf' ? (
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  ) : (
+                    <Download className="h-4 w-4 mr-2" />
+                  )}
+                  PDF
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Baixar relatório em formato PDF</p>
+              </TooltipContent>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button 
+                  onClick={() => handleExportarDados("excel")} 
+                  className="bg-success hover:bg-success/90"
+                  disabled={isGenerating}
+                >
+                  {isGenerating && generatingFormat === 'excel' ? (
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  ) : (
+                    <Download className="h-4 w-4 mr-2" />
+                  )}
+                  Excel
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Baixar relatório em formato Excel (planilha)</p>
+              </TooltipContent>
+            </Tooltip>
+          </div>
+        </TooltipProvider>
       </div>
 
       {/* Estatísticas Gerais */}
@@ -289,73 +319,125 @@ const RelatoriosPageContent = () => {
           <CardDescription>Configure os parâmetros para gerar relatórios personalizados</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-            <div className="space-y-2">
-              <Label>Período</Label>
-              <Select onValueChange={(value) => setFiltros({...filtros, periodo: value})}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Selecione o período" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="hoje">Hoje</SelectItem>
-                  <SelectItem value="ontem">Ontem</SelectItem>
-                  <SelectItem value="semana">Esta semana</SelectItem>
-                  <SelectItem value="mes">Este mês</SelectItem>
-                  <SelectItem value="personalizado">Personalizado</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+          <TooltipProvider>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+              <div className="space-y-2">
+                <Label className="flex items-center gap-1">
+                  Período
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Info className="h-3 w-3 text-muted-foreground cursor-help" />
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Filtre os registros por período de tempo</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </Label>
+                <Select onValueChange={(value) => setFiltros({...filtros, periodo: value})} value={filtros.periodo}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecione o período" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="hoje">Hoje</SelectItem>
+                    <SelectItem value="ontem">Ontem</SelectItem>
+                    <SelectItem value="semana">Esta semana</SelectItem>
+                    <SelectItem value="mes">Este mês</SelectItem>
+                    <SelectItem value="personalizado">Personalizado</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
 
-            <div className="space-y-2">
-              <Label>Tipo de Visita</Label>
-              <Select onValueChange={(value) => setFiltros({...filtros, tipo: value})}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Todos os tipos" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="todos">Todos</SelectItem>
-                  <SelectItem value="familiar">Visita Familiar</SelectItem>
-                  <SelectItem value="servico">Prestador de Serviço</SelectItem>
-                  <SelectItem value="entrega">Entrega</SelectItem>
-                  <SelectItem value="manutencao">Manutenção</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+              <div className="space-y-2">
+                <Label className="flex items-center gap-1">
+                  Tipo de Visita
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Info className="h-3 w-3 text-muted-foreground cursor-help" />
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Filtre por categoria de visita</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </Label>
+                <Select onValueChange={(value) => setFiltros({...filtros, tipo: value})} value={filtros.tipo}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Todos os tipos" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="todos">Todos</SelectItem>
+                    <SelectItem value="familiar">Visita Familiar</SelectItem>
+                    <SelectItem value="servico">Prestador de Serviço</SelectItem>
+                    <SelectItem value="entrega">Entrega</SelectItem>
+                    <SelectItem value="manutencao">Manutenção</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
 
-            <div className="space-y-2">
-              <Label>Status</Label>
-              <Select onValueChange={(value) => setFiltros({...filtros, status: value})}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Todos os status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="todos">Todos</SelectItem>
-                  <SelectItem value="ativo">Em andamento</SelectItem>
-                  <SelectItem value="concluida">Concluída</SelectItem>
-                  <SelectItem value="cancelada">Cancelada</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+              <div className="space-y-2">
+                <Label className="flex items-center gap-1">
+                  Status
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Info className="h-3 w-3 text-muted-foreground cursor-help" />
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Filtre por status da visita</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </Label>
+                <Select onValueChange={(value) => setFiltros({...filtros, status: value})} value={filtros.status}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Todos os status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="todos">Todos</SelectItem>
+                    <SelectItem value="ativo">Em andamento</SelectItem>
+                    <SelectItem value="concluida">Concluída</SelectItem>
+                    <SelectItem value="cancelada">Cancelada</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
 
-            <div className="space-y-2">
-              <Label>Destino</Label>
-              <Input 
-                placeholder="Ex: Apto 101, Administração..."
-                value={filtros.destino}
-                onChange={(e) => setFiltros({...filtros, destino: e.target.value})}
-              />
+              <div className="space-y-2">
+                <Label className="flex items-center gap-1">
+                  Destino
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Info className="h-3 w-3 text-muted-foreground cursor-help" />
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Busque por apartamento ou local específico</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </Label>
+                <Input 
+                  placeholder="Ex: Apto 101, Administração..."
+                  value={filtros.destino}
+                  onChange={(e) => setFiltros({...filtros, destino: e.target.value})}
+                />
+              </div>
             </div>
-          </div>
+          </TooltipProvider>
 
           <div className="flex justify-between items-center">
             <div className="flex gap-3">
-              <Button 
-                variant="outline"
-                onClick={() => setFiltros({periodo: "", tipo: "", status: "", destino: ""})}
-                disabled={isGenerating}
-              >
-                Limpar Filtros
-              </Button>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button 
+                      variant="outline"
+                      onClick={() => setShowClearConfirm(true)}
+                      disabled={isGenerating || (!filtros.periodo && !filtros.tipo && !filtros.status && !filtros.destino)}
+                    >
+                      <RefreshCcw className="h-4 w-4 mr-2" />
+                      Limpar Filtros
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Remove todos os filtros aplicados</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
               <div className="text-sm text-muted-foreground flex items-center">
                 {getFilteredData().length} registro(s) encontrado(s)
               </div>
@@ -367,6 +449,30 @@ const RelatoriosPageContent = () => {
               onApplyFilter={(filters) => setFiltros(filters)}
             />
           </div>
+
+          {/* Sprint 3: Confirmation dialog for clearing filters */}
+          <AlertDialog open={showClearConfirm} onOpenChange={setShowClearConfirm}>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Limpar todos os filtros?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Esta ação irá remover todos os filtros aplicados e mostrar todos os registros disponíveis.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                <AlertDialogAction onClick={() => {
+                  setFiltros({periodo: "", tipo: "", status: "", destino: ""});
+                  toast({
+                    title: "Filtros limpos",
+                    description: "Todos os filtros foram removidos com sucesso",
+                  });
+                }}>
+                  Limpar Filtros
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </CardContent>
       </Card>
 
