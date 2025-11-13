@@ -181,7 +181,7 @@ Portal administrativo com funcionalidades principais implementadas e em evoluç�
 
 ```bash
 # 1. Clone o repositório
-git clone <YOUR_GIT_URL>
+git clone https://github.com/RaFeltrim/sigeco-condo-access.git
 
 # 2. Entre no diretório do projeto
 cd sigeco-condo-access
