@@ -335,40 +335,64 @@ const GerenciamentoMoradoresPage = () => {
   });
 
   // MRD-RBF-006: Export to Excel/CSV functionality
-  const handleExportExcel = () => {
+  const handleExportExcel = async () => {
     try {
-      const dataToExport = moradoresFiltrados.map(morador => ({
-        'Nome': morador.nome,
-        'Email': morador.email,
-        'Telefone': morador.telefone,
-        'Unidade': morador.unidade,
-        'Documento': morador.documento,
-        'Tipo': morador.tipo,
-        'Status': morador.status,
-        'Data Cadastro': morador.dataCadastro
-      }));
-
-      const ws = XLSX.utils.json_to_sheet(dataToExport);
+      const workbook = new ExcelJS.Workbook();
+      workbook.creator = 'SIGECO';
+      workbook.created = new Date();
       
-      // Set column widths
-      ws['!cols'] = [
-        { wch: 25 }, // Nome
-        { wch: 30 }, // Email
-        { wch: 18 }, // Telefone
-        { wch: 12 }, // Unidade
-        { wch: 18 }, // Documento
-        { wch: 15 }, // Tipo
-        { wch: 10 }, // Status
-        { wch: 15 }  // Data Cadastro
+      const worksheet = workbook.addWorksheet('Moradores', {
+        views: [{ state: 'frozen', xSplit: 0, ySplit: 1 }]
+      });
+
+      // Define columns
+      worksheet.columns = [
+        { header: 'Nome', key: 'nome', width: 25 },
+        { header: 'Email', key: 'email', width: 30 },
+        { header: 'Telefone', key: 'telefone', width: 18 },
+        { header: 'Unidade', key: 'unidade', width: 12 },
+        { header: 'Documento', key: 'documento', width: 18 },
+        { header: 'Tipo', key: 'tipo', width: 15 },
+        { header: 'Status', key: 'status', width: 10 },
+        { header: 'Data Cadastro', key: 'dataCadastro', width: 15 }
       ];
 
-      const wb = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb, ws, 'Moradores');
+      // Style header row
+      worksheet.getRow(1).font = { bold: true };
+      worksheet.getRow(1).fill = {
+        type: 'pattern',
+        pattern: 'solid',
+        fgColor: { argb: 'FFE0E0E0' }
+      };
 
+      // Add data rows
+      moradoresFiltrados.forEach(morador => {
+        worksheet.addRow({
+          nome: morador.nome,
+          email: morador.email,
+          telefone: morador.telefone,
+          unidade: morador.unidade,
+          documento: morador.documento,
+          tipo: morador.tipo,
+          status: morador.status,
+          dataCadastro: morador.dataCadastro
+        });
+      });
+
+      // Generate and download file
+      const buffer = await workbook.xlsx.writeBuffer();
+      const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      
       const timestamp = new Date().toISOString().slice(0, 10).replace(/-/g, '');
       const filename = `moradores_${timestamp}.xlsx`;
       
-      XLSX.writeFile(wb, filename);
+      link.href = url;
+      link.download = filename;
+      link.click();
+      
+      window.URL.revokeObjectURL(url);
 
       toast({
         title: "Exportação concluída",
@@ -384,21 +408,31 @@ const GerenciamentoMoradoresPage = () => {
     }
   };
 
-  const handleExportCSV = () => {
+  const handleExportCSV = async () => {
     try {
-      const dataToExport = moradoresFiltrados.map(morador => ({
-        'Nome': morador.nome,
-        'Email': morador.email,
-        'Telefone': morador.telefone,
-        'Unidade': morador.unidade,
-        'Documento': morador.documento,
-        'Tipo': morador.tipo,
-        'Status': morador.status,
-        'Data Cadastro': morador.dataCadastro
-      }));
+      const workbook = new ExcelJS.Workbook();
+      const worksheet = workbook.addWorksheet('Moradores');
 
-      const ws = XLSX.utils.json_to_sheet(dataToExport);
-      const csv = XLSX.utils.sheet_to_csv(ws);
+      // Define columns
+      worksheet.columns = [
+        { header: 'Nome', key: 'nome' },
+        { header: 'Email', key: 'email' },
+        { header: 'Telefone', key: 'telefone' },
+        { header: 'Unidade', key: 'unidade' },
+        { header: 'Documento', key: 'documento' },
+        { header: 'Tipo', key: 'tipo' },
+        { header: 'Status', key: 'status' },
+        { header: 'Data Cadastro', key: 'dataCadastro' }
+      ];
+
+      // Add data rows
+      moradoresFiltrados.forEach(morador => {
+        worksheet.addRow(morador);
+      });
+
+      // Generate CSV
+      const buffer = await workbook.csv.writeBuffer();
+      const csv = new TextDecoder().decode(buffer);
       
       const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
       const url = window.URL.createObjectURL(blob);
