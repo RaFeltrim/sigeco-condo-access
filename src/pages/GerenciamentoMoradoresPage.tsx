@@ -35,6 +35,7 @@ import { useToast } from "@/hooks/use-toast";
 import { validatePhone, validateDocument } from "@/lib/utils/validation";
 import { ImportDialog } from "@/components/moradores/ImportDialog";
 import * as XLSX from 'xlsx';
+import ExcelJS from 'exceljs';
 
 const GerenciamentoMoradoresPage = () => {
   const [filtroUnidade, setFiltroUnidade] = useState("");
