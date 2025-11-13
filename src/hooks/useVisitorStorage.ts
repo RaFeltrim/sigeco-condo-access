@@ -124,11 +124,20 @@ export function useVisitorStorage(): UseVisitorStorageReturn {
     const previousVisitors = visitors;
     
     try {
+      // Find the visitor to update
+      const visitorToUpdate = visitors.find(v => v.id === id);
+      if (!visitorToUpdate) {
+        throw new Error('Visitor not found in state');
+      }
+
+      // Create updated visitor object
+      const updatedVisitor = { ...visitorToUpdate, ...updates };
+
       // Update state optimistically
       setVisitors(prev => 
         prev.map(visitor => 
           visitor.id === id 
-            ? { ...visitor, ...updates } 
+            ? updatedVisitor 
             : visitor
         )
       );
@@ -138,11 +147,26 @@ export function useVisitorStorage(): UseVisitorStorageReturn {
         updateVisitorInStorage(id, updates);
         setError(null);
       } catch (storageErr) {
+        let finalError = storageErr;
+        
+        // If visitor not found in storage, save the complete visitor object
+        // This handles cases where storage was pruned or cleared
+        if (storageErr instanceof StorageError && storageErr.code === 'UPDATE_FAILED') {
+          try {
+            saveVisitorToStorage(updatedVisitor);
+            setError(null);
+            return; // Successfully recovered from storage sync issue
+          } catch (saveErr) {
+            // If save also fails, use the save error for reporting
+            finalError = saveErr;
+          }
+        }
+
         // Revert optimistic update on storage failure
         setVisitors(previousVisitors);
         
-        const errorMessage = storageErr instanceof StorageError 
-          ? storageErr.message 
+        const errorMessage = finalError instanceof StorageError 
+          ? finalError.message 
           : ERROR_MESSAGES.storage.updateFailed;
         
         setError(errorMessage);
@@ -154,7 +178,7 @@ export function useVisitorStorage(): UseVisitorStorageReturn {
           variant: 'destructive',
         });
         
-        throw storageErr;
+        throw finalError;
       }
     } catch (err) {
       console.error('Failed to update visitor:', err);

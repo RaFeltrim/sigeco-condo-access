@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,9 +17,12 @@ import {
   AlertCircle,
   X,
   MapPin,
-  Phone
+  Phone,
+  Loader2
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { StatsSkeleton, TableSkeleton } from "@/components/ui/loading-skeleton";
+import { ErrorDisplay } from "@/components/ui/error-display";
 
 const AgendamentoPage = () => {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
@@ -27,8 +30,28 @@ const AgendamentoPage = () => {
     visitante: "", documento: "", destino: "", motivo: "", 
     data: "", horario: "", telefone: "", observacoes: ""
   });
+  const [isLoading, setIsLoading] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   
   const { toast } = useToast();
+
+  // Simulate loading data
+  useEffect(() => {
+    const loadData = async () => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        // Simulate API call
+        await new Promise(resolve => setTimeout(resolve, 500));
+        setIsLoading(false);
+      } catch (err) {
+        setError('Falha ao carregar agendamentos');
+        setIsLoading(false);
+      }
+    };
+    loadData();
+  }, []);
 
   const agendamentos = [
     {
@@ -111,7 +134,7 @@ const AgendamentoPage = () => {
     });
   };
 
-  const handleNovoAgendamento = (e: React.FormEvent) => {
+  const handleNovoAgendamento = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!novoAgendamento.visitante || !novoAgendamento.destino || !novoAgendamento.data || !novoAgendamento.horario) {
@@ -146,14 +169,28 @@ const AgendamentoPage = () => {
       return;
     }
 
-    toast({
-      title: "Agendamento criado com sucesso",
-      description: `Visita de ${novoAgendamento.visitante} agendada para ${new Date(novoAgendamento.data).toLocaleDateString('pt-BR')} às ${novoAgendamento.horario}`,
-    });
-    setNovoAgendamento({
-      visitante: "", documento: "", destino: "", motivo: "", 
-      data: "", horario: "", telefone: "", observacoes: ""
-    });
+    setIsSaving(true);
+    try {
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      toast({
+        title: "Agendamento criado com sucesso",
+        description: `Visita de ${novoAgendamento.visitante} agendada para ${new Date(novoAgendamento.data).toLocaleDateString('pt-BR')} às ${novoAgendamento.horario}`,
+      });
+      setNovoAgendamento({
+        visitante: "", documento: "", destino: "", motivo: "", 
+        data: "", horario: "", telefone: "", observacoes: ""
+      });
+    } catch (err) {
+      toast({
+        title: "Erro ao criar agendamento",
+        description: "Tente novamente mais tarde",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleStatusChange = (id: number, novoStatus: string) => {
@@ -194,6 +231,17 @@ const AgendamentoPage = () => {
     const agDate = new Date(a.data);
     return agDate > today && a.status !== "Cancelado";
   }).sort((a, b) => new Date(a.data).getTime() - new Date(b.data).getTime());
+
+  if (error) {
+    return (
+      <div className="p-6 space-y-6 max-w-7xl mx-auto">
+        <ErrorDisplay 
+          message={error} 
+          onRetry={() => window.location.reload()}
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="p-6 space-y-6 max-w-7xl mx-auto">
@@ -241,12 +289,45 @@ const AgendamentoPage = () => {
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>Destino da Visita *</Label>
-                  <Input
-                    placeholder="Ex: Apto 101"
+                  <Select
                     value={novoAgendamento.destino}
-                    onChange={(e) => setNovoAgendamento({...novoAgendamento, destino: e.target.value})}
-                    required
-                  />
+                    onValueChange={(value) => setNovoAgendamento({...novoAgendamento, destino: value})}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecione o destino" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none" disabled>Selecione o destino</SelectItem>
+                      
+                      {/* Apartamentos */}
+                      <SelectItem value="Apto 101">Apto 101</SelectItem>
+                      <SelectItem value="Apto 102">Apto 102</SelectItem>
+                      <SelectItem value="Apto 103">Apto 103</SelectItem>
+                      <SelectItem value="Apto 104">Apto 104</SelectItem>
+                      <SelectItem value="Apto 201">Apto 201</SelectItem>
+                      <SelectItem value="Apto 202">Apto 202</SelectItem>
+                      <SelectItem value="Apto 203">Apto 203</SelectItem>
+                      <SelectItem value="Apto 204">Apto 204</SelectItem>
+                      <SelectItem value="Apto 205">Apto 205</SelectItem>
+                      <SelectItem value="Apto 301">Apto 301</SelectItem>
+                      <SelectItem value="Apto 302">Apto 302</SelectItem>
+                      <SelectItem value="Apto 303">Apto 303</SelectItem>
+                      <SelectItem value="Apto 304">Apto 304</SelectItem>
+                      
+                      {/* Áreas Comuns */}
+                      <SelectItem value="Salão de Festas">Salão de Festas</SelectItem>
+                      <SelectItem value="Academia">Academia</SelectItem>
+                      <SelectItem value="Piscina">Piscina</SelectItem>
+                      <SelectItem value="Churrasqueira">Churrasqueira</SelectItem>
+                      <SelectItem value="Playground">Playground</SelectItem>
+                      <SelectItem value="Quadra Esportiva">Quadra Esportiva</SelectItem>
+                      
+                      {/* Administração */}
+                      <SelectItem value="Administração">Administração</SelectItem>
+                      <SelectItem value="Síndico">Síndico</SelectItem>
+                      <SelectItem value="Zelador">Zelador</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div className="space-y-2">
                   <Label>Telefone</Label>
@@ -307,8 +388,15 @@ const AgendamentoPage = () => {
                 />
               </div>
 
-              <Button type="submit" className="w-full bg-success hover:bg-success/90">
-                Agendar Visita
+              <Button type="submit" className="w-full bg-success hover:bg-success/90" disabled={isSaving}>
+                {isSaving ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Agendando...
+                  </>
+                ) : (
+                  'Agendar Visita'
+                )}
               </Button>
             </form>
           </DialogContent>
@@ -316,26 +404,30 @@ const AgendamentoPage = () => {
       </div>
 
       {/* Estatísticas */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {estatisticas.map((stat, index) => {
-          const Icon = stat.icon;
-          return (
-            <Card key={index} className="shadow-lg border-0 bg-card/95 backdrop-blur">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-muted-foreground mb-1">{stat.titulo}</p>
-                    <p className="text-3xl font-bold text-primary">{stat.valor}</p>
+      {isLoading ? (
+        <StatsSkeleton count={4} />
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {estatisticas.map((stat, index) => {
+            const Icon = stat.icon;
+            return (
+              <Card key={index} className="shadow-lg border-0 bg-card/95 backdrop-blur">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm text-muted-foreground mb-1">{stat.titulo}</p>
+                      <p className="text-3xl font-bold text-primary">{stat.valor}</p>
+                    </div>
+                    <div className="bg-primary/10 p-3 rounded-xl">
+                      <Icon className={`h-6 w-6 ${stat.cor}`} />
+                    </div>
                   </div>
-                  <div className="bg-primary/10 p-3 rounded-xl">
-                    <Icon className={`h-6 w-6 ${stat.cor}`} />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          );
-        })}
-      </div>
+                </CardContent>
+              </Card>
+            );
+          })}
+        </div>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Calendário */}
@@ -367,9 +459,14 @@ const AgendamentoPage = () => {
             <CardDescription>Visitas programadas para hoje</CardDescription>
           </CardHeader>
           <CardContent className="p-0">
-            <div className="space-y-1">
-              {agendamentosHoje.length > 0 ? (
-                agendamentosHoje.map((agendamento) => (
+            {isLoading ? (
+              <div className="p-4">
+                <TableSkeleton rows={3} />
+              </div>
+            ) : (
+              <div className="space-y-1">
+                {agendamentosHoje.length > 0 ? (
+                  agendamentosHoje.map((agendamento) => (
                   <div
                     key={agendamento.id}
                     className="flex items-center justify-between p-4 hover:bg-muted/50 border-b border-border last:border-0"
@@ -392,12 +489,13 @@ const AgendamentoPage = () => {
                   </div>
                 ))
               ) : (
-                <div className="p-8 text-center text-muted-foreground">
-                  <CalendarIcon className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                  <p>Nenhum agendamento para hoje</p>
-                </div>
-              )}
-            </div>
+                  <div className="p-8 text-center text-muted-foreground">
+                    <CalendarIcon className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                    <p>Nenhum agendamento para hoje</p>
+                  </div>
+                )}
+              </div>
+            )}
           </CardContent>
         </Card>
 

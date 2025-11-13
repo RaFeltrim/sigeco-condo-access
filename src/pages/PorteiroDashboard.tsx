@@ -114,28 +114,34 @@ const PorteiroDashboardContent = () => {
       
       if (recentExit) {
         // Reactivate existing visitor instead of creating new entry
-        updateVisitor(recentExit.id, {
-          status: "Ativo",
-          entrada: entradaTime,
-          hora: entradaTime.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
-          destino: data.destino,
-          motivo: data.motivo,
-          saida: undefined,
-          duracao: undefined
-        });
-        
-        // Track visitor re-entry
-        AnalyticsService.track('visitor_reentry', {
-          destination: data.destino,
-          hasMotivo: !!data.motivo,
-          timestamp: entradaTime.toISOString()
-        });
-        
-        toast({
-          title: "Entrada registrada com sucesso",
-          description: `Visitante ${data.nome} autorizado para ${data.destino}`,
-        });
-        return;
+        try {
+          updateVisitor(recentExit.id, {
+            status: "Ativo",
+            entrada: entradaTime,
+            hora: entradaTime.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
+            destino: data.destino,
+            motivo: data.motivo,
+            saida: undefined,
+            duracao: undefined
+          });
+          
+          // Track visitor re-entry
+          AnalyticsService.track('visitor_reentry', {
+            destination: data.destino,
+            hasMotivo: !!data.motivo,
+            timestamp: entradaTime.toISOString()
+          });
+          
+          toast({
+            title: "Entrada registrada com sucesso",
+            description: `Visitante ${data.nome} autorizado para ${data.destino}`,
+          });
+          return;
+        } catch (reactivationError) {
+          // If reactivation fails (e.g., visitor was pruned from storage),
+          // fall through to create a new entry instead
+          console.warn('Failed to reactivate visitor, creating new entry:', reactivationError);
+        }
       }
       
       // Create new visitor entry
