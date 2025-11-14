@@ -30,7 +30,15 @@ import {
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { validatePhone, validateDocument } from "@/lib/utils/validation";
-import ExcelJS from 'exceljs';
+import * as XLSX from 'xlsx';
+import { 
+  type Morador,
+  createMorador,
+  calculateTotalMoradores,
+  calculateMoradoresAtivos,
+  calculateCadastrosEsteMes
+} from "@/lib/moradores-crud";
+
 
 const GerenciamentoMoradoresPage = () => {
   const [filtroUnidade, setFiltroUnidade] = useState("");
@@ -40,18 +48,20 @@ const GerenciamentoMoradoresPage = () => {
   const [novoMorador, setNovoMorador] = useState({
     nome: "", email: "", telefone: "", unidade: "", documento: "", tipo: ""
   });
-  const [editingMorador, setEditingMorador] = useState<typeof moradores[0] | null>(null);
+  const [showAddDialog, setShowAddDialog] = useState(false);
+  const [editingMorador, setEditingMorador] = useState<Morador | null>(null);
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [formErrors, setFormErrors] = useState<{
     telefone?: string;
     documento?: string;
   }>({});
-  const [moradorToDelete, setMoradorToDelete] = useState<typeof moradores[0] | null>(null);
+  const [moradorToDelete, setMoradorToDelete] = useState<Morador | null>(null);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   
   const { toast } = useToast();
 
-  const moradores = [
+  // State management for moradores list
+  const [moradores, setMoradores] = useState<Morador[]>([
     {
       id: 1,
       nome: "Ana Silva Costa",
@@ -96,7 +106,7 @@ const GerenciamentoMoradoresPage = () => {
       status: "Inativo",
       dataCadastro: "12/12/2023"
     }
-  ];
+  ]);
 
   const unidades = [
     { numero: "101", bloco: "A", tipo: "2 Quartos", proprietario: "Ana Silva Costa", status: "Ocupado" },
@@ -108,11 +118,16 @@ const GerenciamentoMoradoresPage = () => {
     { numero: "304", bloco: "A", tipo: "Cobertura", proprietario: "Carlos Pereira", status: "Ocupado" },
   ];
 
+  // Calculate dynamic statistics using extracted logic
+  const totalMoradores = calculateTotalMoradores(moradores);
+  const moradoresAtivos = calculateMoradoresAtivos(moradores);
+  const cadastrosEsteMes = calculateCadastrosEsteMes(moradores);
+  
   const estatisticas = [
-    { titulo: "Total de Moradores", valor: "48", icon: Users, cor: "text-primary" },
+    { titulo: "Total de Moradores", valor: String(totalMoradores), icon: Users, cor: "text-primary" },
     { titulo: "Unidades Ocupadas", valor: "15", icon: Home, cor: "text-accent" },
     { titulo: "Unidades Vagas", valor: "5", icon: MapPin, cor: "text-warning" },
-    { titulo: "Cadastros Este Mês", valor: "3", icon: UserPlus, cor: "text-success" },
+    { titulo: "Cadastros Este Mês", valor: String(cadastrosEsteMes), icon: UserPlus, cor: "text-success" },
   ];
 
   const handleCadastroMorador = (e: React.FormEvent) => {
@@ -151,11 +166,27 @@ const GerenciamentoMoradoresPage = () => {
     setFormErrors({});
     
     if (novoMorador.nome && novoMorador.email && novoMorador.unidade && novoMorador.tipo) {
+      // Use extracted business logic
+      const newMorador = createMorador(moradores, {
+        nome: novoMorador.nome,
+        email: novoMorador.email,
+        telefone: novoMorador.telefone,
+        unidade: novoMorador.unidade,
+        documento: novoMorador.documento,
+        tipo: novoMorador.tipo
+      });
+      
+      // Add to state
+      setMoradores([...moradores, newMorador]);
+      
       toast({
         title: "Morador cadastrado com sucesso",
         description: `${novoMorador.nome} foi adicionado à unidade ${novoMorador.unidade}`,
       });
+      
+      // Reset form and close dialog
       setNovoMorador({ nome: "", email: "", telefone: "", unidade: "", documento: "", tipo: "" });
+      setShowAddDialog(false);
     } else {
       toast({
         title: "Campos obrigatórios faltando",
@@ -166,14 +197,16 @@ const GerenciamentoMoradoresPage = () => {
   };
 
   // MRD-RBF-004: Handle delete with confirmation
-  const handleDeleteClick = (morador: typeof moradores[0]) => {
+  const handleDeleteClick = (morador: Morador) => {
     setMoradorToDelete(morador);
     setShowDeleteDialog(true);
   };
   
   const handleConfirmDelete = () => {
     if (moradorToDelete) {
-      // Here you would call the API to delete the morador
+      // Remove from state
+      setMoradores(moradores.filter(m => m.id !== moradorToDelete.id));
+      
       toast({
         title: "Morador excluído",
         description: `${moradorToDelete.nome} foi removido do sistema`,
@@ -189,7 +222,7 @@ const GerenciamentoMoradoresPage = () => {
   };
 
   // MRD-RBF-002: Handle edit functionality
-  const handleEditClick = (morador: typeof moradores[0]) => {
+  const handleEditClick = (morador: Morador) => {
     setEditingMorador(morador);
     setShowEditDialog(true);
   };
@@ -227,7 +260,11 @@ const GerenciamentoMoradoresPage = () => {
     
     setFormErrors({});
     
-    // Here you would call the API to update the morador
+    // Update in state
+    setMoradores(moradores.map(m => 
+      m.id === editingMorador.id ? editingMorador : m
+    ));
+    
     toast({
       title: "Morador atualizado",
       description: `${editingMorador.nome} foi atualizado com sucesso`,
@@ -263,64 +300,40 @@ const GerenciamentoMoradoresPage = () => {
   });
 
   // MRD-RBF-006: Export to Excel/CSV functionality
-  const handleExportExcel = async () => {
+  const handleExportExcel = () => {
     try {
-      const workbook = new ExcelJS.Workbook();
-      workbook.creator = 'SIGECO';
-      workbook.created = new Date();
-      
-      const worksheet = workbook.addWorksheet('Moradores', {
-        views: [{ state: 'frozen', xSplit: 0, ySplit: 1 }]
-      });
+      const dataToExport = moradoresFiltrados.map(morador => ({
+        'Nome': morador.nome,
+        'Email': morador.email,
+        'Telefone': morador.telefone,
+        'Unidade': morador.unidade,
+        'Documento': morador.documento,
+        'Tipo': morador.tipo,
+        'Status': morador.status,
+        'Data Cadastro': morador.dataCadastro
+      }));
 
-      // Define columns
-      worksheet.columns = [
-        { header: 'Nome', key: 'nome', width: 25 },
-        { header: 'Email', key: 'email', width: 30 },
-        { header: 'Telefone', key: 'telefone', width: 18 },
-        { header: 'Unidade', key: 'unidade', width: 12 },
-        { header: 'Documento', key: 'documento', width: 18 },
-        { header: 'Tipo', key: 'tipo', width: 15 },
-        { header: 'Status', key: 'status', width: 10 },
-        { header: 'Data Cadastro', key: 'dataCadastro', width: 15 }
+      const ws = XLSX.utils.json_to_sheet(dataToExport);
+      
+      // Set column widths
+      ws['!cols'] = [
+        { wch: 25 }, // Nome
+        { wch: 30 }, // Email
+        { wch: 18 }, // Telefone
+        { wch: 12 }, // Unidade
+        { wch: 18 }, // Documento
+        { wch: 15 }, // Tipo
+        { wch: 10 }, // Status
+        { wch: 15 }  // Data Cadastro
       ];
 
-      // Style header row
-      worksheet.getRow(1).font = { bold: true };
-      worksheet.getRow(1).fill = {
-        type: 'pattern',
-        pattern: 'solid',
-        fgColor: { argb: 'FFE0E0E0' }
-      };
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, 'Moradores');
 
-      // Add data rows
-      moradoresFiltrados.forEach(morador => {
-        worksheet.addRow({
-          nome: morador.nome,
-          email: morador.email,
-          telefone: morador.telefone,
-          unidade: morador.unidade,
-          documento: morador.documento,
-          tipo: morador.tipo,
-          status: morador.status,
-          dataCadastro: morador.dataCadastro
-        });
-      });
-
-      // Generate and download file
-      const buffer = await workbook.xlsx.writeBuffer();
-      const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      
       const timestamp = new Date().toISOString().slice(0, 10).replace(/-/g, '');
       const filename = `moradores_${timestamp}.xlsx`;
       
-      link.href = url;
-      link.download = filename;
-      link.click();
-      
-      window.URL.revokeObjectURL(url);
+      XLSX.writeFile(wb, filename);
 
       toast({
         title: "Exportação concluída",
@@ -336,31 +349,21 @@ const GerenciamentoMoradoresPage = () => {
     }
   };
 
-  const handleExportCSV = async () => {
+  const handleExportCSV = () => {
     try {
-      const workbook = new ExcelJS.Workbook();
-      const worksheet = workbook.addWorksheet('Moradores');
+      const dataToExport = moradoresFiltrados.map(morador => ({
+        'Nome': morador.nome,
+        'Email': morador.email,
+        'Telefone': morador.telefone,
+        'Unidade': morador.unidade,
+        'Documento': morador.documento,
+        'Tipo': morador.tipo,
+        'Status': morador.status,
+        'Data Cadastro': morador.dataCadastro
+      }));
 
-      // Define columns
-      worksheet.columns = [
-        { header: 'Nome', key: 'nome' },
-        { header: 'Email', key: 'email' },
-        { header: 'Telefone', key: 'telefone' },
-        { header: 'Unidade', key: 'unidade' },
-        { header: 'Documento', key: 'documento' },
-        { header: 'Tipo', key: 'tipo' },
-        { header: 'Status', key: 'status' },
-        { header: 'Data Cadastro', key: 'dataCadastro' }
-      ];
-
-      // Add data rows
-      moradoresFiltrados.forEach(morador => {
-        worksheet.addRow(morador);
-      });
-
-      // Generate CSV
-      const buffer = await workbook.csv.writeBuffer();
-      const csv = new TextDecoder().decode(buffer);
+      const ws = XLSX.utils.json_to_sheet(dataToExport);
+      const csv = XLSX.utils.sheet_to_csv(ws);
       
       const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
       const url = window.URL.createObjectURL(blob);
@@ -514,7 +517,7 @@ const GerenciamentoMoradoresPage = () => {
               </Button>
             </div>
             
-            <Dialog>
+            <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
               <DialogTrigger asChild>
                 <Button className="bg-accent hover:bg-accent-dark text-accent-foreground" data-testid="btn-novo-morador">
                   <Plus className="h-4 w-4 mr-2" />

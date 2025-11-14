@@ -1,25 +1,116 @@
-# SIGECO - Sistema de Gerenciamento de Acesso
+# SIGECO - Sistema de Gerenciamento de Acesso para Condomínios
 
-Sistema de gerenciamento de visitantes para condomínios.
+> A modern, production-ready condominium visitor management system built with React, TypeScript, and cutting-edge web technologies.
 
-## 📊 Status do Projeto
-
-[![MVP Completion](https://img.shields.io/badge/MVP%20Completion-58.6%25-orange)](./TODO.md)
+[![MVP Completion](https://img.shields.io/badge/MVP%20Completion-68%25-orange)](./TODO.md)
 [![Build](https://img.shields.io/badge/Build-Passing-success)]()
-[![Security](https://img.shields.io/badge/Security-3%20Issues-red)](#-segurança)
-[![TypeScript](https://img.shields.io/badge/TypeScript-Passing-success)]()
+[![Security](https://img.shields.io/badge/Security-3%20Issues-red)](./TODO.md#-prioridade-crítica---segurança)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.8.3-blue)]()
+[![License](https://img.shields.io/badge/License-Proprietary-red)]()
 
-**Última Atualização:** 11 de Janeiro de 2025
+---
 
-### Métricas de Qualidade
+## 🎯 Overview
 
-| Categoria | Score | Status |
+SIGECO is a comprehensive **Condominium Access Management System** designed to streamline visitor registration, access control, and administrative operations for residential complexes. The system features two main portals:
+
+- **🚪 Porteiro Dashboard (90% Complete)** - Production-ready doorman portal for visitor management
+- **⚙️ Admin Dashboard (72% Complete)** - Administrative portal for reporting, user management, and system oversight
+
+**Last Updated:** January 11, 2025  
+**Project Status:** 🟡 Active Development (68% MVP Completion)
+
+---
+
+## ✨ Key Features
+
+### Porteiro (Doorman) Portal ✅ Production Ready
+- ✅ **Visitor Entry/Exit Registration** - Complete form with validation
+- ✅ **Real-time Visitor Listing** - Live updates with intelligent sorting
+- ✅ **Advanced Search** - Search by name, document, or destination
+- ✅ **Quick Checkout System** - Fast visitor exit flow
+- ✅ **Dashboard Analytics** - Real-time metrics and statistics
+- ✅ **Data Persistence** - Smart local storage with auto-pruning
+- ✅ **WhatsApp Support Access** - Direct support integration
+
+### Administrative Portal 🟡 In Progress
+- ✅ **User & Role Management** - Complete CRUD operations
+- ✅ **Access Logs** - Comprehensive audit trail
+- 🟡 **Report Generation** - PDF/Excel exports (75% complete)
+- 🟡 **Resident Management** - CRUD for residents (70% complete)
+- 🟡 **Schedule Management** - Visit scheduling (65% complete)
+- 🔴 **Backup & Security** - System backup (50% complete)
+
+[📊 View Complete Feature Analysis](./PORTAL_COMPLETION_ANALYSIS.md)
+
+---
+
+## 🚀 Quick Start
+
+### Prerequisites
+- **Node.js** 20.x or higher
+- **npm** 10.x or higher
+- Modern web browser (Chrome, Edge, Firefox)
+
+### Installation
+
+```bash
+# Clone the repository
+git clone <YOUR_GIT_URL>
+cd sigeco-condo-access
+
+# Install dependencies
+npm install
+
+# Start development server
+npm run dev
+```
+
+The application will be available at **http://localhost:9323**
+
+📖 **For detailed setup instructions**, see [docs/SETUP.md](./docs/SETUP.md)
+
+---
+
+## 🏗️ Tech Stack
+
+### Frontend
+- **Framework:** React 18.3.1 with TypeScript 5.8.3
+- **Build Tool:** Vite 6.4.1
+- **UI Library:** shadcn-ui (Radix UI primitives)
+- **Styling:** Tailwind CSS 3.4.17
+- **Routing:** React Router DOM 6.30.1
+- **State Management:** TanStack Query 5.83.0, React Hook Form 7.61.1
+- **Validation:** Zod 3.25.76
+
+### Backend
+- **Runtime:** Node.js with Express 4.21.2
+- **Database:** Prisma ORM 5.22.0
+- **Authentication:** JWT (jsonwebtoken 9.0.2)
+- **Security:** Helmet 8.0.0, express-rate-limit 7.5.0
+- **Real-time:** Socket.IO 4.8.1
+
+### Testing & Quality
+- **Unit Tests:** Vitest 4.0.7
+- **E2E Tests:** Playwright 1.56.1, Cypress 15.6.0
+- **Linting:** ESLint 9.32.0
+- **Type Checking:** TypeScript strict mode
+
+📖 **For complete architecture details**, see [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md)
+
+---
+
+## 📊 Project Status
+
+### Quality Metrics
+
+| Category | Score | Status |
 |-----------|-------|--------|
-| **Componentes** | 55.0% | ⚠️ Atenção Necessária |
-| **Estrutura** | 90.0% | ✅ Bom |
-| **Features** | 38.0% | ❌ Precisa Melhoria |
-| **Qualidade** | 30.0% | ❌ Precisa Melhoria |
-| **Dependências** | 80.0% | ✅ Bom |
+| **Componentes** | 55.0% | ⚠️ Attention Needed |
+| **Estrutura** | 90.0% | ✅ Good |
+| **Features** | 38.0% | ❌ Needs Improvement |
+| **Qualidade** | 30.0% | ❌ Needs Improvement |
+| **Dependências** | 80.0% | ✅ Good |
 
 ### 📋 Tarefas e Progresso
 
@@ -246,325 +337,128 @@ Consulte o [ROADMAP.md](./ROADMAP.md) para o plano detalhado de 5 sprints:
 
 ---
 
-### 📚 Documentação Completa de Planejamento
+### Portal Status
 
-Para detalhes completos de cada issue e plano de ação, consulte:
+| Portal | Completion | Status | Production Ready |
+|--------|-----------|--------|------------------|
+| **Porteiro (Doorman)** | **90%** | ✅ Excellent | **YES** ✅ |
+| **Admin** | **72%** | 🟡 Good | Partial 🟡 |
+| **Overall MVP** | **68%** | 🟡 In Progress | Not Yet ❌ |
 
-- **[TODO.md](./TODO.md)** - Lista detalhada de 130 issues com priorização completa
-- **[ROADMAP.md](./ROADMAP.md)** - Plano de 5 sprints com timeline de 12 semanas
-- **[PROJECT_ANALYSIS_SUMMARY.md](./PROJECT_ANALYSIS_SUMMARY.md)** - Resumo executivo da análise
-- **[IMPROVEMENT_PLAN_INDEX.md](./IMPROVEMENT_PLAN_INDEX.md)** - Índice de toda documentação
-
----
-
-### 🎯 Como Contribuir com as Correções
-
-1. Escolha uma task do [TODO.md](./TODO.md) de acordo com a prioridade
-2. Revise o [ROADMAP.md](./ROADMAP.md) para entender o contexto do sprint
-3. Siga o [CONTRIBUTING.md](./CONTRIBUTING.md) para Definition of Done
-4. Execute `npm run validate` antes de criar PR
-5. Marque a task como completa no TODO.md
-
-**Áreas que mais precisam de ajuda agora:**
-1. 🔴 **Segurança** - Atualização de dependências vulneráveis (URGENTE)
-2. 🟠 **Access Control** - Feature crítica incompleta
-3. 🟠 **Dashboard** - Feature core do sistema
-4. 🟡 **Acessibilidade** - Melhorias de UX essenciais
+[📖 Detailed Portal Analysis](./PORTAL_COMPLETION_ANALYSIS.md) | [🚀 Roadmap](./ROADMAP.md) | [✔️ TODO List](./TODO.md)
 
 ---
 
-## Project info
+## 📚 Documentation
 
-**URL**: https://lovable.dev/projects/550ae652-c4e5-4f30-a9dd-54040128e05d
+### Core Documentation
+- **[ARCHITECTURE.md](./docs/ARCHITECTURE.md)** - Complete system architecture (folders & files)
+- **[SETUP.md](./docs/SETUP.md)** - Environment setup guide
+- **[TESTING.md](./docs/TESTING.md)** - Testing guide (Vitest, Playwright, Cypress)
+- **[DEVELOPMENT.md](./docs/DEVELOPMENT.md)** - Development workflow & scripts
+- **[API.md](./docs/API.md)** - Backend API documentation
+- **[FEATURES.md](./docs/FEATURES.md)** - Feature documentation
 
-## How can I edit this code?
+### Project Planning
+- **[TODO.md](./TODO.md)** - Complete task list (130 issues prioritized)
+- **[ROADMAP.md](./ROADMAP.md)** - 5-sprint development plan (12 weeks)
+- **[CONTRIBUTING.md](./CONTRIBUTING.md)** - Contribution guide & Definition of Done
 
-There are several ways of editing your application.
+### Status Reports
+- **[PORTAL_STATUS.md](./PORTAL_STATUS.md)** - Porteiro Portal documentation
+- **[PORTAL_COMPLETION_ANALYSIS.md](./PORTAL_COMPLETION_ANALYSIS.md)** - Complete portal analysis
+- **[PROJECT_ANALYSIS_SUMMARY.md](./PROJECT_ANALYSIS_SUMMARY.md)** - Executive summary
 
-**Use Lovable**
+---
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/550ae652-c4e5-4f30-a9dd-54040128e05d) and start prompting.
+## 🛠️ Development
 
-Changes made via Lovable will be committed automatically to this repo.
-
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
-
-**Edit a file directly in GitHub**
-
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
-
-**Use GitHub Codespaces**
-
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
-
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/550ae652-c4e5-4f30-a9dd-54040128e05d) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
-
-## 🔒 Segurança
-
-### Status de Vulnerabilidades
-
-O projeto atualmente possui **3 vulnerabilidades** identificadas:
-
-| Pacote | Severidade | CVE | Score | Status |
-|--------|-----------|-----|-------|--------|
-| xlsx | 🔴 High | GHSA-4r6h-8v6p-xvw6 | 7.8 | Pendente |
-| xlsx | 🔴 High | GHSA-5pgg-2g8v-p4x9 | 7.5 | Pendente |
-| vite | 🟠 Moderate | Multiple | 5.3 | Pendente |
-
-### Ações Recomendadas
+### Available Scripts
 
 ```bash
-# Verificar vulnerabilidades
+# Development
+npm run dev                # Start dev server (localhost:9323)
+npm run build              # Production build
+npm run preview            # Preview production build
+
+# Code Quality
+npm run validate           # Run type-check + lint + build
+npm run type-check         # TypeScript type checking
+npm run lint               # Run ESLint
+npm run lint:fix           # Auto-fix lint issues
+
+# Testing
+npm run test               # Run unit tests (Vitest)
+npm run test:e2e           # Run Playwright E2E tests
+npm run test:cypress       # Open Cypress UI
+npm run test:all           # Run all test suites
+
+# System Validation
+npm run verify:mvp         # MVP completeness check
+npm run validate:system    # Full system validation
+npm run validate:ci        # CI/CD validation (headless)
+```
+
+📖 **For complete script documentation**, see [docs/DEVELOPMENT.md](./docs/DEVELOPMENT.md)
+
+### Development Workflow
+
+1. **Create a feature branch**
+   ```bash
+   git checkout -b feature/your-feature-name
+   ```
+
+2. **Make your changes** following the [code standards](./CONTRIBUTING.md)
+
+3. **Validate your work**
+   ```bash
+   npm run validate  # Must pass before PR
+   ```
+
+4. **Test in browser** - Check console for errors (F12)
+
+5. **Create Pull Request** - See [CONTRIBUTING.md](./CONTRIBUTING.md)
+
+---
+
+## 🔒 Security
+
+### Current Vulnerabilities
+
+| Package | Severity | CVE | Score | Action Required |
+|---------|----------|-----|-------|----------------|
+| xlsx | 🔴 High | GHSA-4r6h-8v6p-xvw6 | 7.8 | Update to 0.20.2+ |
+| xlsx | 🔴 High | GHSA-5pgg-2g8v-p4x9 | 7.5 | Update to 0.20.2+ |
+| vite | 🟠 Moderate | Multiple | 5.3 | Update to 6.1.7+ |
+
+**Priority: CRITICAL** - Security fixes are tracked in [TODO.md](./TODO.md#-prioridade-crítica---segurança)
+
+```bash
+# Check vulnerabilities
 npm audit
 
-# Atualizar dependências (após testes de compatibilidade)
-npm install xlsx@latest
-npm install vite@latest
-
-# Re-verificar
-npm audit
+# Update dependencies (after testing)
+npm install xlsx@latest vite@latest
 ```
-
-Para detalhes completos, consulte [TODO.md - Seção de Segurança](./TODO.md#-prioridade-crítica---segurança).
 
 ---
 
-## Development Guidelines
+## 🧑‍💻 Contributing
 
-### Quality Assurance
+Contributions are welcome! Please follow these steps:
 
-Este projeto segue um rigoroso Definition of Done (DoD) para garantir qualidade e estabilidade.
+1. Read the [CONTRIBUTING.md](./CONTRIBUTING.md) guide
+2. Check [TODO.md](./TODO.md) for available tasks
+3. Follow the **Definition of Done** checklist
+4. Ensure `npm run validate` passes
+5. Submit a Pull Request with detailed description
 
-**Antes de criar um Pull Request:**
+### Priority Areas for Contribution
 
-1. Execute a validação automática:
-```bash
-npm run validate
-```
-
-2. Valide o console do navegador:
-```bash
-npm run dev
-# Abra http://localhost:5173 com DevTools (F12)
-# Verifique que não há erros críticos no console
-```
-
-3. Execute testes funcionais relevantes
-
-4. Verifique o MVP Verifier:
-```bash
-npm run verify:mvp
-```
-
-Para detalhes completos sobre o processo de contribuição, validação e Definition of Done, consulte [CONTRIBUTING.md](./CONTRIBUTING.md).
-
-### Scripts de Validação
-
-```bash
-npm run validate     # Executa type-check + lint + build (use antes de PR)
-npm run type-check   # Verifica tipos TypeScript
-npm run lint         # Executa ESLint
-npm run lint:fix     # Corrige problemas de lint automaticamente
-```
-
-### MVP Verifier
-
-O MVP Verifier é uma ferramenta de análise estática que examina a completude do projeto SIGECO, identificando componentes, arquivos e funcionalidades faltantes necessários para um MVP funcional.
-
-**Executar verificação:**
-
-```bash
-npm run verify:mvp
-```
-
-**Opções disponíveis:**
-
-```bash
-npm run verify:mvp -- --output-dir ./custom-output  # Diretório customizado para relatórios
-npm run verify:mvp -- --format json                 # Formato: json, markdown, ou both
-npm run verify:mvp -- --verbose                     # Saída detalhada
-npm run verify:mvp -- --fail-threshold 80           # Falha se completude < 80%
-```
-
-**Relatórios gerados:**
-
-Os relatórios são salvos em `.kiro/reports/` por padrão:
-- `mvp-verification-{timestamp}.json` - Relatório estruturado em JSON
-- `mvp-verification-{timestamp}.md` - Relatório legível em Markdown
-- `mvp-verification-latest.json` e `.md` - Symlinks para os relatórios mais recentes
-
-**O que é analisado:**
-
-- **Componentes**: Validação de props, imports, acessibilidade
-- **Estrutura**: Diretórios obrigatórios, arquivos de configuração, rotas
-- **Features**: Completude das funcionalidades core do MVP
-- **Qualidade**: Erros de tipo, convenções de nomenclatura, testes
-- **Dependências**: Pacotes faltantes ou não utilizados
-
-**Integração CI/CD:**
-
-O verifier retorna exit code 0 se a completude estiver acima do threshold (padrão 80%), caso contrário retorna exit code 1, permitindo integração em pipelines de CI/CD.
-
-### Definition of Done Checklist
-
-Toda tarefa deve atender aos seguintes critérios:
-
-- ✅ Código implementado e revisado
-- ✅ `npm run validate` passa sem erros
-- ✅ Console do navegador limpo (zero erros críticos)
-- ✅ Testes funcionais executados
-- ✅ Documentação atualizada
-- ✅ Code review aprovado
-
-**Consulte [CONTRIBUTING.md](./CONTRIBUTING.md) para o processo completo.**
-
-
-## System Validation
-
-This project includes automated system validation agents that test all modules of the SIGECO system.
-
-### Running Validations
-
-```sh
-# Run all validation agents
-npm run validate:system
-
-# Run validation for a specific module
-npm run validate:dashboard
-npm run validate:moradores
-npm run validate:agendamentos
-npm run validate:relatorios
-npm run validate:funcionarios
-npm run validate:backup
-npm run validate:suporte
-
-# Run with custom options
-npm run validate:system -- --verbose
-npm run validate:system -- --headless=false
-npm run validate:system -- --fail-fast
-npm run validate:system -- --output-dir=./custom-reports
-
-# Run in CI/CD
-npm run validate:ci
-```
-
-### CLI Options
-
-- `--module=<name>` - Run validation for specific module only
-- `--verbose, -v` - Enable verbose output
-- `--headless=<bool>` - Run browser in headless mode (default: true)
-- `--output-dir=<path>` - Directory for output files (default: .kiro/reports)
-- `--fail-fast` - Stop execution on first failure
-- `--help, -h` - Show help message
-
-### Validation Reports
-
-Reports are automatically generated in `.kiro/reports/`:
-- `system-validation-latest.json` - Latest JSON report
-- `system-validation-latest.md` - Latest Markdown report
-- `system-validation-{timestamp}.json` - Timestamped JSON reports
-- `system-validation-{timestamp}.md` - Timestamped Markdown reports
-
-### Real-time Logging
-
-The validation system includes real-time logging that displays progress and results as tests execute:
-
-- **Progress indicators** - Visual feedback for each agent
-- **Test summaries** - Immediate results after each agent completes
-- **Verbose mode** - Detailed logs with `--verbose` flag
-- **Color-coded output** - Easy-to-read status indicators
-- **Log export** - Save detailed logs to JSON for analysis
-
-### Validation Agents
-
-The system includes the following validation agents:
-
-1. **DashboardAgent** - Validates Dashboard Administrativo
-   - KPI values and percentage variations
-   - Ad Blocker compatibility
-   - Stress testing under load
-
-2. **MoradoresAgent** - Validates Moradores module
-   - CRUD operations
-   - Field validation and required fields
-
-3. **AgendamentosAgent** - Validates Agendamentos module
-   - Complete workflow from creation to status changes
-   - Status behavior and calendar display
-
-4. **RelatoriosAgent** - Validates Relatórios module (CRITICAL)
-   - PDF and Excel report generation
-   - Data coherence between summary and detailed records
-
-5. **FuncionariosAgent** - Validates Funcionários module
-   - Functional flow from creation to list display
-   - Entry/exit management for inactive employees
-
-6. **BackupAgent** - Validates Backup module (CRITICAL)
-   - Backup and restore process
-   - Security compliance and LGPD
-
-7. **SuporteAgent** - Validates Suporte module (PROJECT BLOCKER)
-   - Training material status
-   - Support quality and availability
-
-### Exit Codes
-
-- `0` - All validations passed
-- `1` - Some validations failed
-
-### Environment Variables
-
-- `BASE_URL` - Base URL of the application (default: http://localhost:5173)
-- `HEADLESS` - Run browser in headless mode (default: true)
-
-For more information, see the [Validation Agents README](src/lib/validation-agents/README.md).
+1. 🔴 **Security** - Update vulnerable dependencies (URGENT)
+2. 🟠 **Access Control** - Complete missing feature (20% → 100%)
+3. 🟠 **Dashboard** - Enhance admin dashboard (40% → 100%)
+4. 🟡 **Testing** - Increase coverage (0% → 60%+)
 
 ---
 

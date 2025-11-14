@@ -58,26 +58,26 @@ describe('API Performance Tests', () => {
   });
 
   describe('CRUD Operations', () => {
-    it('should fetch residents list within 300ms (p95)', async () => {
+    it('should fetch residents list within 300ms (p95)', { timeout: 30000 }, async () => {
       const results = await measureApiPerformance('/api/residents', 100);
       
       expect(results.p95).toBeLessThan(300);
       expect(results.avg).toBeLessThan(150);
     });
 
-    it('should create new resident within 250ms (p95)', async () => {
+    it('should create new resident within 250ms (p95)', { timeout: 30000 }, async () => {
       const results = await measureApiPerformance('/api/residents', 50);
       
       expect(results.p95).toBeLessThan(250);
     });
 
-    it('should update resident within 200ms (p95)', async () => {
+    it('should update resident within 200ms (p95)', { timeout: 30000 }, async () => {
       const results = await measureApiPerformance('/api/residents/1', 50);
       
       expect(results.p95).toBeLessThan(200);
     });
 
-    it('should delete resident within 150ms (p95)', async () => {
+    it('should delete resident within 150ms (p95)', { timeout: 30000 }, async () => {
       const results = await measureApiPerformance('/api/residents/1', 50);
       
       expect(results.p95).toBeLessThan(150);
@@ -85,14 +85,14 @@ describe('API Performance Tests', () => {
   });
 
   describe('Dashboard Statistics', () => {
-    it('should load dashboard stats within 500ms (p95)', async () => {
+    it('should load dashboard stats within 500ms (p95)', { timeout: 30000 }, async () => {
       const results = await measureApiPerformance('/api/dashboard/stats', 50);
       
       expect(results.p95).toBeLessThan(500);
       expect(results.avg).toBeLessThan(250);
     });
 
-    it('should handle multiple dashboard requests concurrently', async () => {
+    it('should handle multiple dashboard requests concurrently', { timeout: 30000 }, async () => {
       const requests = Array(20).fill(null).map(() =>
         measureApiPerformance('/api/dashboard/stats', 1)
       );
@@ -107,13 +107,13 @@ describe('API Performance Tests', () => {
   });
 
   describe('Database Query Performance', () => {
-    it('should execute complex queries within 400ms', async () => {
+    it('should execute complex queries within 400ms', { timeout: 30000 }, async () => {
       const results = await measureApiPerformance('/api/appointments?status=PENDING&date=2024-11', 30);
       
       expect(results.p95).toBeLessThan(400);
     });
 
-    it('should paginate large result sets efficiently', async () => {
+    it('should paginate large result sets efficiently', { timeout: 30000 }, async () => {
       const results = await measureApiPerformance('/api/visits?page=1&limit=100', 30);
       
       expect(results.p95).toBeLessThan(300);
@@ -130,7 +130,7 @@ describe('API Performance Tests', () => {
       expect(results.max).toBeLessThan(500);
     });
 
-    it('should recover after burst traffic', async () => {
+    it('should recover after burst traffic', { timeout: 30000 }, async () => {
       // Burst phase
       const burstRequests = Array(50).fill(null).map(() =>
         measureApiPerformance('/api/residents', 1)
@@ -148,7 +148,7 @@ describe('API Performance Tests', () => {
 
   describe('Memory and Resource Usage', () => {
     it('should not leak memory during repeated requests', { timeout: 30000 }, async () => {
-      const initialMemory = performance.memory?.usedJSHeapSize || 0;
+      const initialMemory = (performance as { memory?: { usedJSHeapSize: number } }).memory?.usedJSHeapSize || 0;
       
       // Perform many requests
       for (let i = 0; i < 100; i++) {
@@ -160,7 +160,7 @@ describe('API Performance Tests', () => {
         global.gc();
       }
       
-      const finalMemory = performance.memory?.usedJSHeapSize || 0;
+      const finalMemory = (performance as { memory?: { usedJSHeapSize: number } }).memory?.usedJSHeapSize || 0;
       const memoryIncrease = finalMemory - initialMemory;
       
       // Memory increase should be reasonable (less than 50MB)

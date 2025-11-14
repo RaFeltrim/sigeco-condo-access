@@ -1,0 +1,234 @@
+🚀 Starting Test Orchestration...
+
+
+📦 Running Unit Tests...
+
+================================================================================
+Running Unit tests...
+Command: npm run test:unit
+================================================================================
+
+> vite_react_shadcn_ts@0.0.0 test:unit
+> vitest run --coverage
+
+
+[1m[46m RUN [49m[22m [36mv4.0.7 [39m[90mC:/Users/Submarino/Desktop/Geral/Projetos/sigeco-condo-access[39m
+      [2mCoverage enabled with [22m[33mv8[39m
+
+ [31m❯[39m tests/unit/utils/date.test.ts [2m([22m[2m10 tests[22m[2m | [22m[31m3 failed[39m[2m)[22m[32m 89[2mms[22m[39m
+       [32m✓[39m should format date in Brazilian format[32m 50[2mms[22m[39m
+       [32m✓[39m should handle different date inputs[32m 1[2mms[22m[39m
+       [32m✓[39m should parse ISO date string[32m 2[2mms[22m[39m
+       [32m✓[39m should handle invalid date strings[32m 1[2mms[22m[39m
+[31m       [31m×[31m should add days correctly[39m[32m 17[2mms[22m[39m
+[31m       [31m×[31m should handle negative days[39m[32m 2[2mms[22m[39m
+[31m       [31m×[31m should handle month transitions[39m[32m 2[2mms[22m[39m
+       [32m✓[39m should calculate difference between dates[32m 1[2mms[22m[39m
+       [32m✓[39m should handle reversed dates[32m 1[2mms[22m[39m
+       [32m✓[39m should return 0 for same date[32m 1[2mms[22m[39m
+ [31m❯[39m tests/unit/hooks/useDebounce.test.ts [2m([22m[2m3 tests[22m[2m | [22m[31m2 failed[39m[2m)[22m[32m 102[2mms[22m[39m
+     [32m✓[39m returns initial value immediately[32m 43[2mms[22m[39m
+[31m     [31m×[31m debounces value changes[39m[32m 34[2mms[22m[39m
+[31m     [31m×[31m cancels previous timeout on new value[39m[32m 10[2mms[22m[39m
+ [32m✓[39m tests/unit/test-utilities.test.tsx [2m([22m[2m19 tests[22m[2m)[22m[32m 205[2mms[22m[39m
+ [31m❯[39m tests/unit/api/client.test.ts [2m([22m[2m12 tests[22m[2m | [22m[31m1 failed[39m[2m)[22m[32m 181[2mms[22m[39m
+       [32m✓[39m adds authorization header when token exists[32m 16[2mms[22m[39m
+[31m       [31m×[31m makes request without token when not authenticated[39m[32m 12[2mms[22m[39m
+       [32m✓[39m handles successful response[32m 2[2mms[22m[39m
+       [32m✓[39m handles 401 unauthorized[32m 1[2mms[22m[39m
+       [32m✓[39m handles 500 server error[32m 1[2mms[22m[39m
+       [32m✓[39m handles network error[32m 6[2mms[22m[39m
+       [32m✓[39m makes GET request[32m 2[2mms[22m[39m
+       [32m✓[39m makes POST request with body[32m 1[2mms[22m[39m
+       [32m✓[39m makes PUT request[32m 18[2mms[22m[39m
+       [32m✓[39m makes DELETE request[32m 1[2mms[22m[39m
+       [32m✓[39m parses error response[32m 1[2mms[22m[39m
+       [32m✓[39m handles timeout[32m 106[2mms[22m[39m
+ [31m❯[39m tests/unit/utils/format.test.ts [2m([22m[2m21 tests[22m[2m | [22m[31m6 failed[39m[2m)[22m[32m 178[2mms[22m[39m
+     [32m✓[39m should format valid CPF[32m 6[2mms[22m[39m
+     [32m✓[39m should handle already formatted CPF[32m 1[2mms[22m[39m
+     [32m✓[39m should return original if invalid length[32m 1[2mms[22m[39m
+     [32m✓[39m should handle empty string[32m 1[2mms[22m[39m
+     [32m✓[39m should remove non-digit characters before formatting[32m 1[2mms[22m[39m
+     [32m✓[39m should format 11-digit mobile phone[32m 1[2mms[22m[39m
+     [32m✓[39m should format 10-digit landline[32m 1[2mms[22m[39m
+     [32m✓[39m should return original if invalid length[32m 1[2mms[22m[39m
+     [32m✓[39m should handle already formatted phone[32m 1[2mms[22m[39m
+     [32m✓[39m should handle empty string[32m 1[2mms[22m[39m
+     [32m✓[39m should format valid CEP[32m 1[2mms[22m[39m
+     [32m✓[39m should handle already formatted CEP[32m 2[2mms[22m[39m
+     [32m✓[39m should return original if invalid length[32m 1[2mms[22m[39m
+     [32m✓[39m should handle empty string[32m 1[2mms[22m[39m
+[31m     [31m×[31m should format positive values[39m[32m 114[2mms[22m[39m
+[31m     [31m×[31m should format negative values[39m[32m 3[2mms[22m[39m
+[31m     [31m×[31m should format zero[39m[32m 3[2mms[22m[39m
+[31m     [31m×[31m should handle decimal values[39m[32m 3[2mms[22m[39m
+[31m     [31m×[31m should format Date object[39m[32m 20[2mms[22m[39m
+[31m     [31m×[31m should format date string[39m[32m 2[2mms[22m[39m
+     [32m✓[39m should handle current date[32m 1[2mms[22m[39m
+ [31m❯[39m tests/components/ui/SearchInput.test.tsx [2m([22m[2m3 tests[22m[2m | [22m[31m1 failed[39m[2m)[22m[32m 226[2mms[22m[39m
+     [32m✓[39m renders search input[32m 168[2mms[22m[39m
+     [32m✓[39m calls onSearch when value changes[32m 28[2mms[22m[39m
+[31m     [31m×[31m handles empty search[39m[32m 15[2mms[22m[39m
+ [31m❯[39m tests/security/auth/jwt-validation.security.test.ts [2m([22m[2m17 tests[22m[2m | [22m[31m1 failed[39m[2m)[22m[32m 70[2mms[22m[39m
+       [32m✓[39m should create valid JWT token[32m 9[2mms[22m[39m
+       [32m✓[39m should include expiration timestamp[32m 2[2mms[22m[39m
+       [32m✓[39m should not include sensitive data in payload[32m 2[2mms[22m[39m
+       [32m✓[39m should accept valid token with correct secret[32m 1[2mms[22m[39m
+[31m       [31m×[31m should reject token with invalid format[39m[32m 18[2mms[22m[39m
+       [32m✓[39m should reject expired token[32m 1[2mms[22m[39m
+       [32m✓[39m should reject token with tampered payload[32m 1[2mms[22m[39m
+       [32m✓[39m should set reasonable expiration time[32m 1[2mms[22m[39m
+       [32m✓[39m should include issued at timestamp[32m 1[2mms[22m[39m
+       [32m✓[39m should use strong secret key[32m 1[2mms[22m[39m
+       [32m✓[39m should not accept weak secrets[32m 1[2mms[22m[39m
+       [32m✓[39m should include user identifier in token[32m 1[2mms[22m[39m
+       [32m✓[39m should include role in token for RBAC[32m 2[2mms[22m[39m
+       [32m✓[39m should allow token refresh before expiration[32m 4[2mms[22m[39m
+       [32m✓[39m should rate limit token generation attempts[32m 3[2mms[22m[39m
+       [32m✓[39m should support token revocation[32m 1[2mms[22m[39m
+       [32m✓[39m should reject revoked tokens[32m 1[2mms[22m[39m
+ [32m✓[39m tests/unit/hooks/useAsync.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 230[2mms[22m[39m
+ [32m✓[39m tests/components/ui/FilterBar.test.tsx [2m([22m[2m4 tests[22m[2m)[22m[33m 916[2mms[22m[39m
+     [33m[2m✓[22m[39m renders status select [33m 617[2mms[22m[39m
+ [32m✓[39m tests/components/ui/DataTable.test.tsx [2m([22m[2m5 tests[22m[2m)[22m[33m 974[2mms[22m[39m
+     [33m[2m✓[22m[39m handles empty data [33m 575[2mms[22m[39m
+ [31m❯[39m tests/components/forms/AgendamentoForm.test.tsx [2m([22m[2m4 tests[22m[2m | [22m[31m1 failed[39m[2m)[22m[33m 1146[2mms[22m[39m
+     [33m[2m✓[22m[39m renders all fields [33m 733[2mms[22m[39m
+[31m     [31m×[31m submits form with valid data[39m[32m 189[2mms[22m[39m
+     [32m✓[39m validates required fields[32m 193[2mms[22m[39m
+     [32m✓[39m handles form reset[32m 15[2mms[22m[39m
+ [32m✓[39m tests/accessibility/admin-dashboard.a11y.test.tsx [2m([22m[2m4 tests[22m[2m)[22m[33m 1250[2mms[22m[39m
+     [33m[2m✓[22m[39m should not have accessibility violations on main dashboard [33m 1184[2mms[22m[39m
+ [32m✓[39m tests/integration/validation-system.test.ts [2m([22m[2m14 tests[22m[2m)[22m[32m 138[2mms[22m[39m
+ [32m✓[39m tests/components/forms/MoradorForm.test.tsx [2m([22m[2m8 tests[22m[2m)[22m[33m 5718[2mms[22m[39m
+       [33m[2m✓[22m[39m should render all form fields [33m 761[2mms[22m[39m
+       [33m[2m✓[22m[39m should call onSubmit with form data [33m 1399[2mms[22m[39m
+       [33m[2m✓[22m[39m should not submit with invalid email [33m 826[2mms[22m[39m
+       [33m[2m✓[22m[39m should require nome field [33m 542[2mms[22m[39m
+       [33m[2m✓[22m[39m should require email field [33m 423[2mms[22m[39m
+       [33m[2m✓[22m[39m should allow typing in all fields [33m 785[2mms[22m[39m
+       [33m[2m✓[22m[39m should clear form after successful submission [33m 951[2mms[22m[39m
+ [32m✓[39m tests/unit/mvp-verifier/ReportGenerator.test.ts [2m([22m[2m10 tests[22m[2m)[22m[32m 100[2mms[22m[39m
+ [32m✓[39m tests/unit/api/residents.service.test.ts [2m([22m[2m13 tests[22m[2m)[22m[32m 51[2mms[22m[39m
+ [32m✓[39m tests/integration/api/auth-flow.test.ts [2m([22m[2m11 tests[22m[2m)[22m[32m 47[2mms[22m[39m
+ [32m✓[39m tests/unit/hooks/useAuth.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 106[2mms[22m[39m
+ [32m✓[39m tests/unit/hooks/useLocalStorage.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 111[2mms[22m[39m
+ [32m✓[39m tests/validation-agents/RealtimeLogger.test.ts [2m([22m[2m16 tests[22m[2m)[22m[32m 131[2mms[22m[39m
+ [32m✓[39m tests/unit/utils/validation.test.ts [2m([22m[2m32 tests[22m[2m)[22m[32m 49[2mms[22m[39m
+ [32m✓[39m tests/contracts/auth/login.contract.test.ts [2m([22m[2m16 tests[22m[2m)[22m[32m 47[2mms[22m[39m
+ [32m✓[39m tests/unit/api/auth.service.test.ts [2m([22m[2m13 tests[22m[2m)[22m[32m 45[2mms[22m[39m
+ [32m✓[39m tests/unit/api/appointments.service.test.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 38[2mms[22m[39m
+ [32m✓[39m tests/unit/utils/phone.test.ts [2m([22m[2m8 tests[22m[2m)[22m[32m 28[2mms[22m[39m
+ [32m✓[39m tests/unit/services/AnalyticsService.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 39[2mms[22m[39m
+ [32m✓[39m tests/unit/api/visits.service.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 36[2mms[22m[39m
+ [32m✓[39m tests/unit/services/SavedFiltersService.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 35[2mms[22m[39m
+ [32m✓[39m tests/unit/utils/array.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 27[2mms[22m[39m
+ [32m✓[39m tests/unit/utils/string.test.ts [2m([22m[2m10 tests[22m[2m)[22m[32m 28[2mms[22m[39m
+ [32m✓[39m tests/unit/services/ReportService.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 28[2mms[22m[39m
+ [32m✓[39m tests/unit/api/dashboard.service.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 30[2mms[22m[39m
+ [32m✓[39m tests/unit/utils/object.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 23[2mms[22m[39m
+ [32m✓[39m tests/unit/utils/cpf.test.ts [2m([22m[2m8 tests[22m[2m)[22m[32m 28[2mms[22m[39m
+ [32m✓[39m tests/unit/setup.test.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 22[2mms[22m[39m
+ [32m✓[39m tests/unit/utils/storage.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 28[2mms[22m[39m
+ [32m✓[39m tests/unit/utils/http.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 22[2mms[22m[39m
+ [32m✓[39m tests/integration/api/residents-flow.test.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 23[2mms[22m[39m
+ [32m✓[39m tests/integration/api/appointments-flow.test.ts [2m([22m[2m1 test[22m[2m)[22m[32m 14[2mms[22m[39m
+ [32m✓[39m tests/unit/utils/cep.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 15[2mms[22m[39m
+ [32m✓[39m tests/validation-agents/MoradoresAgent.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 11[2mms[22m[39m
+ [32m✓[39m tests/validation-agents/AgendamentosAgent.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 6[2mms[22m[39m
+ [31m❯[39m tests/performance/api-load.perf.test.ts [2m([22m[2m14 tests[22m[2m | [22m[31m1 failed[39m[2m)[22m[33m 121611[2mms[22m[39m
+       [33m[2m✓[22m[39m should complete login within 200ms (p95) [33m 6142[2mms[22m[39m
+       [32m✓[39m should handle 100 concurrent login requests[32m 115[2mms[22m[39m
+[31m       [31m×[31m should fetch residents list within 300ms (p95)[39m[33m 5019[2mms[22m[39m
+       [33m[2m✓[22m[39m should create new resident within 250ms (p95) [33m 3080[2mms[22m[39m
+       [33m[2m✓[22m[39m should update resident within 200ms (p95) [33m 3025[2mms[22m[39m
+       [33m[2m✓[22m[39m should delete resident within 150ms (p95) [33m 2749[2mms[22m[39m
+       [33m[2m✓[22m[39m should load dashboard stats within 500ms (p95) [33m 2574[2mms[22m[39m
+       [32m✓[39m should handle multiple dashboard requests concurrently[32m 97[2mms[22m[39m
+       [33m[2m✓[22m[39m should execute complex queries within 400ms [33m 1408[2mms[22m[39m
+       [33m[2m✓[22m[39m should paginate large result sets efficiently [33m 1692[2mms[22m[39m
+       [33m[2m✓[22m[39m should maintain performance under sustained load [33m 29560[2mms[22m[39m
+       [33m[2m✓[22m[39m should recover after burst traffic [33m 1593[2mms[22m[39m
+       [33m[2m✓[22m[39m should not leak memory during repeated requests [33m 5881[2mms[22m[39m
+       [33m[2m✓[22m[39m should meet SLA requirements across all percentiles [33m 58666[2mms[22m[39m
+
+[90mstderr[2m | tests/unit/hooks/useDebounce.test.ts[2m > [22m[2museDebounce[2m > [22m[2mdebounces value changes
+[22m[39mWarning: An update to TestComponent inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at TestComponent (C:\Users\Submarino\Desktop\Geral\Projetos\sigeco-condo-access\node_modules\@testing-library\react\dist\pure.js:329:5)
+
+[90mstderr[2m | tests/unit/hooks/useDebounce.test.ts[2m > [22m[2museDebounce[2m > [22m[2mcancels previous timeout on new value
+[22m[39mWarning: An update to TestComponent inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at TestComponent (C:\Users\Submarino\Desktop\Geral\Projetos\sigeco-condo-access\node_modules\@testing-library\react\dist\pure.js:329:5)
+
+[90mstderr[2m | tests/unit/test-utilities.test.tsx[2m > [22m[2mTest Utilities[2m > [22m[2mrenderWithProviders[2m > [22m[2mrenders component with default providers
+[22m[39m⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+[90mstderr[2m | tests/accessibility/admin-dashboard.a11y.test.tsx[2m > [22m[2mAccessibility Tests - Admin Dashboard[2m > [22m[2mshould not have accessibility violations on main dashboard
+[22m[39m⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+
+[31m⎯⎯⎯⎯[39m[1m[41m Unhandled Rejection [49m[22m[31m⎯⎯⎯⎯⎯[39m
+[31m[1mError[22m: ENOENT: no such file or directory, open 'C:\Users\Submarino\Desktop\Geral\Projetos\sigeco-condo-access\coverage\.tmp\coverage-42.json'[39m
+[90m [2m❯[22m open node:internal/fs/promises:[2m639:25[22m[39m
+[90m [2m❯[22m Object.writeFile node:internal/fs/promises:[2m1213:14[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[22m[39m
+[31m[1mSerialized Error:[22m[39m [90m{ errno: -4058, code: 'ENOENT', syscall: 'open', path: 'C:\Users\Submarino\Desktop\Geral\Projetos\sigeco-condo-access\coverage\.tmp\coverage-42.json' }[39m
+
+
+
+
+
+🔗 Running Integration Tests...
+
+================================================================================
+Running Integration tests...
+Command: npm run test:integration
+================================================================================
+
+> vite_react_shadcn_ts@0.0.0 test:integration
+> vitest run tests/integration
+
+
+[1m[46m RUN [49m[22m [36mv4.0.7 [39m[90mC:/Users/Submarino/Desktop/Geral/Projetos/sigeco-condo-access[39m
+
+ [32m✓[39m tests/integration/api/auth-flow.test.ts [2m([22m[2m11 tests[22m[2m)[22m[32m 23[2mms[22m[39m
+ [32m✓[39m tests/integration/api/appointments-flow.test.ts [2m([22m[2m1 test[22m[2m)[22m[32m 10[2mms[22m[39m
+ [32m✓[39m tests/integration/api/residents-flow.test.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 13[2mms[22m[39m
+ [32m✓[39m tests/integration/validation-system.test.ts [2m([22m[2m14 tests[22m[2m)[22m[32m 36[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m4 passed[39m[22m[90m (4)[39m
+[2m      Tests [22m [1m[32m28 passed[39m[22m[90m (28)[39m
+[2m   Start at [22m 21:46:47
+[2m   Duration [22m 4.18s[2m (transform 966ms, setup 4.66s, collect 853ms, tests 81ms, environment 6.32s, prepare 117ms)[22m
+
+
+
+🌐 Running E2E Tests (Playwright)...
+
+================================================================================
+Running E2E tests...
+Command: npm run test:e2e
+================================================================================
+^C^CDeseja finalizar o arquivo em lotes (S/N)? 

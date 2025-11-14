@@ -14,8 +14,12 @@ const createToken = (payload: Record<string, unknown>, secret: string): string =
 
 const verifyToken = (token: string, secret: string): boolean => {
   try {
+    if (!token || token.trim() === '') return false;
     const parts = token.split('.');
-    return parts.length === 3;
+    if (parts.length !== 3) return false;
+    // Check that each part has content
+    if (parts.some(part => !part || part.trim() === '')) return false;
+    return true;
   } catch {
     return false;
   }
@@ -78,15 +82,18 @@ describe('JWT Security Tests', () => {
 
     it('should reject token with invalid format', () => {
       const invalidTokens = [
-        'invalid',
-        'only.two.parts',
-        '',
-        'a.b.c.d', // too many parts
+        { token: 'invalid', reason: 'no dots' },
+        { token: 'only.one', reason: 'only 2 parts' },
+        { token: '', reason: 'empty string' },
+        { token: 'a.b.c.d', reason: 'too many parts (4)' },
+        { token: '.b.c', reason: 'empty first part' },
+        { token: 'a..c', reason: 'empty middle part' },
+        { token: 'a.b.', reason: 'empty last part' },
       ];
       
-      invalidTokens.forEach(token => {
+      invalidTokens.forEach(({ token }) => {
         const isValid = verifyToken(token, validSecret);
-        expect(isValid).toBe(false);
+        expect(isValid, `Token "${token}" should be invalid`).toBe(false);
       });
     });
 

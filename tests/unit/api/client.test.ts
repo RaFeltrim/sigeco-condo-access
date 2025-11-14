@@ -39,7 +39,7 @@ describe('API Client', () => {
 
       await fetch('/api/test');
 
-      expect(global.fetch).toHaveBeenCalledWith('/api/test', undefined);
+      expect(global.fetch).toHaveBeenCalledWith('/api/test');
     });
   });
 
