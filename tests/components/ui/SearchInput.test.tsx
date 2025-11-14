@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 
 const SearchInput = ({ onSearch }: { onSearch: (value: string) => void }) => {
   return (
@@ -28,14 +28,22 @@ describe('SearchInput', () => {
     expect(handleSearch).toHaveBeenCalledWith('test query');
   });
 
-  it('handles empty search', () => {
+  it('handles empty search', async () => {
     const handleSearch = vi.fn();
     render(<SearchInput onSearch={handleSearch} />);
 
-    fireEvent.change(screen.getByPlaceholderText('Search...'), {
+    const input = screen.getByPlaceholderText('Search...');
+    
+    fireEvent.change(input, {
+      target: { value: 'test' },
+    });
+    
+    fireEvent.change(input, {
       target: { value: '' },
     });
 
-    expect(handleSearch).toHaveBeenCalledWith('');
+    await waitFor(() => {
+      expect(handleSearch).toHaveBeenLastCalledWith('');
+    });
   });
 });

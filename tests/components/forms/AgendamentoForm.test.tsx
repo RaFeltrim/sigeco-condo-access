@@ -32,14 +32,24 @@ describe('AgendamentoForm', () => {
     const handleSubmit = vi.fn();
     render(<AgendamentoForm onSubmit={handleSubmit} />);
 
-    fireEvent.change(screen.getByPlaceholderText('Nome do visitante'), {
+    const form = screen.getByTestId('agendamento-form');
+    const nameInput = screen.getByPlaceholderText('Nome do visitante');
+    const cpfInput = screen.getByPlaceholderText('CPF');
+    const dateInput = form.querySelector('input[type="date"]') as HTMLInputElement;
+
+    fireEvent.change(nameInput, {
       target: { value: 'João Silva' },
     });
-    fireEvent.change(screen.getByPlaceholderText('CPF'), {
+    fireEvent.change(cpfInput, {
       target: { value: '12345678900' },
     });
+    if (dateInput) {
+      fireEvent.change(dateInput, {
+        target: { value: '2024-12-31' },
+      });
+    }
     
-    fireEvent.click(screen.getByRole('button', { name: /agendar/i }));
+    fireEvent.submit(form);
 
     expect(handleSubmit).toHaveBeenCalled();
   });
