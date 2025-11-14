@@ -23,8 +23,18 @@ import { cn } from "@/lib/utils";
 import { ReportService, type ReportData, type ReportFilter } from "@/services/ReportService";
 import { useToast } from "@/hooks/use-toast";
 
+interface ReportMetadata {
+  periodo?: string;
+  dataInicio?: Date;
+  dataFim?: Date;
+  totalRegistros: number;
+  formato: 'pdf' | 'excel';
+  geradoPor: string;
+  dataGeracao: string;
+}
+
 interface ReportGeneratorProps {
-  onGenerate?: (report: Blob, metadata: any) => void;
+  onGenerate?: (report: Blob, metadata: ReportMetadata) => void;
   onPreview?: (data: ReportData) => void;
   className?: string;
 }
@@ -205,7 +215,7 @@ export const ReportGenerator = ({ onGenerate, onPreview, className = "" }: Repor
         {/* Report Type */}
         <div className="space-y-2">
           <Label htmlFor="report-type">Tipo de Relatório</Label>
-          <Select value={reportType} onValueChange={(value: any) => setReportType(value)}>
+          <Select value={reportType} onValueChange={(value: 'visitors' | 'access' | 'occupancy') => setReportType(value)}>
             <SelectTrigger id="report-type">
               <SelectValue placeholder="Selecione o tipo de relatório" />
             </SelectTrigger>
@@ -225,7 +235,7 @@ export const ReportGenerator = ({ onGenerate, onPreview, className = "" }: Repor
         {/* Format Selection */}
         <div className="space-y-2">
           <Label htmlFor="format">Formato de Saída</Label>
-          <Select value={format} onValueChange={(value: any) => setFormat(value)}>
+          <Select value={format} onValueChange={(value: 'pdf' | 'excel') => setFormat(value)}>
             <SelectTrigger id="format">
               <SelectValue placeholder="Selecione o formato" />
             </SelectTrigger>
@@ -239,7 +249,7 @@ export const ReportGenerator = ({ onGenerate, onPreview, className = "" }: Repor
         {/* Period Selection */}
         <div className="space-y-2">
           <Label htmlFor="period">Período</Label>
-          <Select value={period} onValueChange={(value: any) => setPeriod(value)}>
+          <Select value={period} onValueChange={(value: 'today' | 'week' | 'month' | 'custom') => setPeriod(value)}>
             <SelectTrigger id="period">
               <SelectValue placeholder="Selecione o período" />
             </SelectTrigger>
