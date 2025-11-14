@@ -1,0 +1,112 @@
+# ==============================================================================
+# Multi-Stage Dockerfile for CI/CD Pipeline
+# ==============================================================================
+# This Dockerfile provides a stable, reproducible environment for running
+# TypeScript compilation, linting, unit tests, and Cypress E2E tests in CI.
+# ==============================================================================
+
+# ------------------------------------------------------------------------------
+# Stage 1: Base Image with System Dependencies
+# ------------------------------------------------------------------------------
+FROM node:20-bookworm AS base
+
+# Install system dependencies required for Cypress and headless Chrome
+# Reference: https://docs.cypress.io/guides/continuous-integration/introduction#Dependencies
+RUN apt-get update && apt-get install -y \
+    # Cypress system dependencies
+    libgtk2.0-0 \
+    libgtk-3-0 \
+    libgbm-dev \
+    libnotify-dev \
+    libnss3 \
+    libxss1 \
+    libasound2 \
+    libxtst6 \
+    xauth \
+    xvfb \
+    # Additional dependencies for Chrome/Chromium
+    libgconf-2-4 \
+    libatk1.0-0 \
+    libatk-bridge2.0-0 \
+    libgdk-pixbuf2.0-0 \
+    libgtk-3-0 \
+    libgbm-dev \
+    libnss3-dev \
+    libxss-dev \
+    libasound2 \
+    # Utilities
+    ca-certificates \
+    fonts-liberation \
+    wget \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Set working directory
+WORKDIR /app
+
+# Configure npm to use a stable registry
+RUN npm config set registry https://registry.npmjs.org/
+
+# ------------------------------------------------------------------------------
+# Stage 2: Dependencies Installation
+# ------------------------------------------------------------------------------
+FROM base AS dependencies
+
+# Copy package files
+COPY package.json package-lock.json ./
+
+# Install dependencies using clean install for reproducibility
+# This ensures exact versions from package-lock.json are installed
+RUN npm ci --prefer-offline --no-audit
+
+# Verify Cypress binary is installed correctly
+RUN npx cypress verify || (echo "Cypress verification failed" && exit 1)
+
+# ------------------------------------------------------------------------------
+# Stage 3: Application Build & Test Environment
+# ------------------------------------------------------------------------------
+FROM dependencies AS test
+
+# Copy application source code
+COPY . .
+
+# Ensure test directories exist
+RUN mkdir -p test-results/cypress/screenshots test-results/cypress/videos
+
+# Set environment variables for CI
+ENV CI=true
+ENV NODE_ENV=test
+ENV CYPRESS_CACHE_FOLDER=/root/.cache/Cypress
+
+# Expose port for dev server (if needed)
+EXPOSE 9323
+
+# Default command (can be overridden)
+CMD ["npm", "run", "test:ci"]
+
+# ------------------------------------------------------------------------------
+# Stage 4: Validation Stage (Type Check, Lint, Build)
+# ------------------------------------------------------------------------------
+FROM test AS validate
+
+# This stage runs the validation pipeline
+# Can be invoked with: docker build --target validate
+RUN npm run type-check && \
+    npm run lint && \
+    npm run build
+
+# ------------------------------------------------------------------------------
+# Notes:
+# ------------------------------------------------------------------------------
+# Build for validation:
+#   docker build -t sigeco-ci:validate --target validate .
+#
+# Build for testing:
+#   docker build -t sigeco-ci:test --target test .
+#
+# Run validation:
+#   docker run --rm sigeco-ci:validate npm run validate
+#
+# Run Cypress tests:
+#   docker run --rm sigeco-ci:test npm run test:cypress:ci
+# ------------------------------------------------------------------------------
