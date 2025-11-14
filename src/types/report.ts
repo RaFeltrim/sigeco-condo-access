@@ -47,7 +47,7 @@ export interface ReportFilters {
   status?: string[];
   type?: string[];
   destination?: string[];
-  customFilters?: Record<string, any>;
+  customFilters?: Record<string, unknown>;
 }
 
 export interface ReportSchedule {

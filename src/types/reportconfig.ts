@@ -64,7 +64,7 @@ export interface ReportConfigFilters {
   tags?: string[];
   
   // Custom Filters
-  customFields?: Record<string, any>;
+  customFields?: Record<string, unknown>;
 }
 
 export interface ReportConfigLayout {
@@ -97,7 +97,7 @@ export interface ReportSection {
   title?: string;
   order: number;
   enabled: boolean;
-  config?: Record<string, any>;
+  config?: Record<string, unknown>;
 }
 
 export interface ReportConfigPreset {

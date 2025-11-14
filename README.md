@@ -1,393 +1,595 @@
-# 🏢 SIGECO - Sistema de Gerenciamento de Acesso para Condomínios
+# SIGECO - Sistema de Gerenciamento de Acesso para Condomínios
 
-Sistema moderno e completo para gestão de visitantes, moradores e controle de acesso em condomínios.
+> A modern, production-ready condominium visitor management system built with React, TypeScript, and cutting-edge web technologies.
 
+[![MVP Completion](https://img.shields.io/badge/MVP%20Completion-68%25-orange)](./TODO.md)
 [![Build](https://img.shields.io/badge/Build-Passing-success)]()
+[![Security](https://img.shields.io/badge/Security-3%20Issues-red)](./TODO.md#-prioridade-crítica---segurança)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.8.3-blue)]()
-[![React](https://img.shields.io/badge/React-18.3.1-blue)]()
-[![License](https://img.shields.io/badge/License-Private-red)]()
-
-**Última Atualização:** 13 de Novembro de 2025
+[![License](https://img.shields.io/badge/License-Proprietary-red)]()
 
 ---
 
-## 📋 Sobre o Projeto
+## 🎯 Overview
 
-O SIGECO é uma solução completa para gestão de acesso em condomínios, oferecendo dois portais especializados:
+SIGECO is a comprehensive **Condominium Access Management System** designed to streamline visitor registration, access control, and administrative operations for residential complexes. The system features two main portals:
 
-- **🚪 Portal do Porteiro**: Sistema completo para registro e controle de visitantes
-- **👨‍💼 Portal Administrativo**: Gestão completa do condomínio (moradores, agendamentos, relatórios, etc.)
-- **🔐 Tela de Login**: Sistema de autenticação com diferentes níveis de acesso
+- **🚪 Porteiro Dashboard (90% Complete)** - Production-ready doorman portal for visitor management
+- **⚙️ Admin Dashboard (72% Complete)** - Administrative portal for reporting, user management, and system oversight
 
----
-
-## 📊 Status de Completude dos Portais
-
-### 🔐 Tela de Login - 100% Completo ✅
-
-[![Login](https://img.shields.io/badge/Login-100%25%20Completo-success)]()
-[![Status](https://img.shields.io/badge/Status-Funcional-brightgreen)]()
-
-Sistema de autenticação completo e funcional com interface moderna.
-
-**Funcionalidades:**
-- ✅ Interface moderna e responsiva
-- ✅ Autenticação por usuário e senha
-- ✅ Redirecionamento automático baseado no tipo de usuário
-- ✅ Validação de credenciais
-- ✅ Feedback visual (loading states e mensagens)
-- ✅ Usuários de teste disponíveis (admin/porteiro)
-- ✅ Recuperação de senha (em desenvolvimento)
-
-**Usuários de Teste:**
-- **admin** → Acesso ao Portal Administrativo
-- **porteiro** → Acesso ao Portal do Porteiro
+**Last Updated:** January 11, 2025  
+**Project Status:** 🟡 Active Development (68% MVP Completion)
 
 ---
 
-### 🚪 Portal do Porteiro - 90% Completo ✅
+## ✨ Key Features
 
-[![Portal Status](https://img.shields.io/badge/Portal%20do%20Porteiro-90%25%20Completo-success)]()
-[![Production Ready](https://img.shields.io/badge/Status-PRODUÇÃO%20READY-brightgreen)]()
+### Porteiro (Doorman) Portal ✅ Production Ready
+- ✅ **Visitor Entry/Exit Registration** - Complete form with validation
+- ✅ **Real-time Visitor Listing** - Live updates with intelligent sorting
+- ✅ **Advanced Search** - Search by name, document, or destination
+- ✅ **Quick Checkout System** - Fast visitor exit flow
+- ✅ **Dashboard Analytics** - Real-time metrics and statistics
+- ✅ **Data Persistence** - Smart local storage with auto-pruning
+- ✅ **WhatsApp Support Access** - Direct support integration
 
-Portal completo e **pronto para uso em produção** com todas as funcionalidades essenciais implementadas.
+### Administrative Portal 🟡 In Progress
+- ✅ **User & Role Management** - Complete CRUD operations
+- ✅ **Access Logs** - Comprehensive audit trail
+- 🟡 **Report Generation** - PDF/Excel exports (75% complete)
+- 🟡 **Resident Management** - CRUD for residents (70% complete)
+- 🟡 **Schedule Management** - Visit scheduling (65% complete)
+- 🔴 **Backup & Security** - System backup (50% complete)
 
-**Funcionalidades por Categoria:**
-
-**Registro e Controle (100%)** ✅
-- ✅ Registro de entrada de visitantes (validações completas)
-- ✅ Registro de saída com cálculo de duração
-- ✅ Quick checkout para agilizar saídas
-- ✅ Prevenção de duplicatas automática
-
-**Visualização e Busca (100%)** ✅
-- ✅ Listagem de visitantes em tempo real
-- ✅ Busca avançada (nome, documento, destino)
-- ✅ Ordenação inteligente (ativos primeiro)
-- ✅ Histórico de visitas por visitante
-
-**Dashboard e Métricas (95%)** ✅
-- ✅ Visitantes hoje vs. dia anterior
-- ✅ Visitantes ativos no momento
-- ✅ Total da semana com comparativo
-- ✅ Cards visuais com indicadores
-
-**Gestão de Dados (100%)** ✅
-- ✅ Persistência automática (localStorage)
-- ✅ Validação e recuperação de dados
-- ✅ Limpeza automática de registros antigos
-- ✅ Sistema de pruning inteligente
-
-**Qualidade e Acessibilidade (90%)** ✅
-- ✅ Validações em tempo real
-- ✅ ARIA labels e navegação por teclado
-- ✅ Mensagens de erro claras
-- ✅ Loading states em operações
-
-**Features Extras (70%)** 🟡 *(Opcionais - não afetam funcionalidade principal)*
-- 🔲 Foto do visitante (3%)
-- 🔲 QR Code de identificação (2%)
-- 🔲 Notificações ao morador (2%)
-- 🔲 Relatórios específicos (1%)
-- 🔲 Gráficos visuais (1%)
-- 🔲 Histórico de ações/auditoria (1%)
-
-**📖 [Documentação Completa do Portal do Porteiro →](./PORTAL_STATUS.md)**
+[📊 View Complete Feature Analysis](./PORTAL_COMPLETION_ANALYSIS.md)
 
 ---
 
-### 👨‍💼 Portal Administrativo - 72% Completo 🟡
+## 🚀 Quick Start
 
-[![Portal Admin](https://img.shields.io/badge/Portal%20Administrativo-72%25%20Completo-yellow)]()
-[![Status](https://img.shields.io/badge/Status-Funcional%20Parcial-yellow)]()
+### Prerequisites
+- **Node.js** 20.x or higher
+- **npm** 10.x or higher
+- Modern web browser (Chrome, Edge, Firefox)
 
-Portal administrativo com funcionalidades principais implementadas e em evolução contínua.
-
-**Funcionalidades por Categoria:**
-
-**Controle de Acesso (100%)** ✅
-- ✅ Sistema de autenticação completo
-- ✅ Controle de permissões
-- ✅ Sessões de usuário
-- ✅ Logout seguro
-
-**Gestão de Usuários (100%)** ✅
-- ✅ CRUD completo de usuários
-- ✅ Atribuição de perfis e permissões
-- ✅ Gestão de status (ativo/inativo)
-- ✅ Validações e segurança
-
-**Sistema de Relatórios (75%)** 🟡
-- ✅ Geração de relatórios básicos
-- ✅ Exportação em PDF e Excel
-- ✅ Filtros por período
-- 🔲 Relatórios avançados (25%)
-
-**Gerenciamento de Moradores (70%)** 🟡
-- ✅ Cadastro de moradores
-- ✅ Listagem e busca
-- ✅ Edição de dados
-- 🔲 Histórico completo de ações (30%)
-
-**Agendamento de Visitas (65%)** 🟡
-- ✅ Criação de agendamentos
-- ✅ Visualização em calendário
-- ✅ Mudança de status
-- 🔲 Notificações automáticas (35%)
-
-**Dashboard Administrativo (60%)** 🟡
-- ✅ KPIs principais
-- ✅ Estatísticas básicas
-- 🔲 Integração com dados reais (40%)
-
-**Controle de Insumos (55%)** 🟡
-- ✅ Cadastro de insumos
-- ✅ Controle de estoque básico
-- 🔲 Alertas de estoque (45%)
-
-**Backup e Segurança (50%)** 🟠
-- ✅ Sistema básico de backup
-- 🔲 Restore automatizado (50%)
-- 🔲 Compliance LGPD completo
-
-**Suporte Avançado (60%)** 🟡
-- ✅ Sistema de tickets
-- ✅ Material de treinamento
-- 🔲 Base de conhecimento (40%)
-
-**📖 [Análise Completa dos Portais →](./PORTAL_COMPLETION_ANALYSIS.md)**
-
----
-
-## 📊 Resumo Geral
-
-| Componente | Completude | Status | Produção |
-|-----------|-----------|--------|----------|
-| 🔐 **Tela de Login** | **100%** | ✅ Completo | **SIM** ✅ |
-| 🚪 **Portal do Porteiro** | **90%** | ✅ Excelente | **SIM** ✅ |
-| 👨‍💼 **Portal Administrativo** | **72%** | 🟡 Bom | Parcial 🟡 |
-| 📦 **Projeto Geral (MVP)** | **68%** | 🟡 Em Progresso | Não ❌ |
-
----
-
-## 🚀 Como Usar
-
-### 🔧 Instalação e Configuração
-
-**Pré-requisitos:**
-- Node.js 18+ e npm instalados ([instalar com nvm](https://github.com/nvm-sh/nvm#installing-and-updating))
-
-**Passos para instalação:**
+### Installation
 
 ```bash
-# 1. Clone o repositório
-git clone https://github.com/RaFeltrim/sigeco-condo-access.git
-
-# 2. Entre no diretório do projeto
+# Clone the repository
+git clone <YOUR_GIT_URL>
 cd sigeco-condo-access
 
-# 3. Instale as dependências
+# Install dependencies
 npm install
 
-# 4. Inicie o servidor de desenvolvimento
+# Start development server
 npm run dev
 ```
 
-O sistema estará disponível em: `http://localhost:5173`
+The application will be available at **http://localhost:9323**
 
-### 🎯 Acessando o Sistema
-
-1. Acesse `http://localhost:5173`
-2. Faça login com um dos usuários de teste:
-   - **Usuário:** `admin` / **Senha:** qualquer → Portal Administrativo
-   - **Usuário:** `porteiro` / **Senha:** qualquer → Portal do Porteiro
-
-### 💻 Formas de Editar o Código
-
-**Opção 1: Via Lovable (Recomendado)**
-- Acesse o [Projeto Lovable](https://lovable.dev/projects/550ae652-c4e5-4f30-a9dd-54040128e05d)
-- Faça alterações através de prompts
-- Mudanças são automaticamente commitadas no repositório
-
-**Opção 2: IDE Local**
-- Clone o repositório
-- Edite com sua IDE favorita
-- Push das alterações reflete automaticamente no Lovable
-
-**Opção 3: GitHub Direto**
-- Navegue até o arquivo desejado
-- Clique no botão "Edit" (ícone de lápis)
-- Faça as alterações e commit
-
-**Opção 4: GitHub Codespaces**
-- Clique no botão "Code" (verde)
-- Selecione a aba "Codespaces"
-- Clique em "New codespace"
-- Edite diretamente no Codespace
+📖 **For detailed setup instructions**, see [docs/SETUP.md](./docs/SETUP.md)
 
 ---
 
-## 🛠️ Tecnologias Utilizadas
+## 🏗️ Tech Stack
 
-| Tecnologia | Versão | Finalidade |
-|------------|--------|------------|
-| **React** | 18.3.1 | Framework UI |
-| **TypeScript** | 5.8.3 | Tipagem estática |
-| **Vite** | 6.4.1 | Build tool |
-| **Tailwind CSS** | 3.4.17 | Estilização |
-| **shadcn/ui** | Latest | Biblioteca de componentes |
-| **React Router** | 6.30.1 | Roteamento |
-| **Vitest** | 4.0.7 | Testes unitários |
-| **Playwright** | 1.56.1 | Testes E2E |
+### Frontend
+- **Framework:** React 18.3.1 with TypeScript 5.8.3
+- **Build Tool:** Vite 6.4.1
+- **UI Library:** shadcn-ui (Radix UI primitives)
+- **Styling:** Tailwind CSS 3.4.17
+- **Routing:** React Router DOM 6.30.1
+- **State Management:** TanStack Query 5.83.0, React Hook Form 7.61.1
+- **Validation:** Zod 3.25.76
 
----
+### Backend
+- **Runtime:** Node.js with Express 4.21.2
+- **Database:** Prisma ORM 5.22.0
+- **Authentication:** JWT (jsonwebtoken 9.0.2)
+- **Security:** Helmet 8.0.0, express-rate-limit 7.5.0
+- **Real-time:** Socket.IO 4.8.1
 
-## 📦 Deploy
+### Testing & Quality
+- **Unit Tests:** Vitest 4.0.7
+- **E2E Tests:** Playwright 1.56.1, Cypress 15.6.0
+- **Linting:** ESLint 9.32.0
+- **Type Checking:** TypeScript strict mode
 
-### Deploy via Lovable (Simples)
-1. Acesse [Lovable](https://lovable.dev/projects/550ae652-c4e5-4f30-a9dd-54040128e05d)
-2. Clique em **Share → Publish**
-3. Seu projeto estará online!
-
-### Domínio Customizado
-1. Navegue para **Project > Settings > Domains**
-2. Clique em **Connect Domain**
-3. Siga as instruções
-
-📖 [Documentação: Custom Domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+📖 **For complete architecture details**, see [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md)
 
 ---
 
-## 🧪 Desenvolvimento e Testes
+## 📊 Project Status
 
-### Scripts Disponíveis
+### Quality Metrics
+
+| Category | Score | Status |
+|-----------|-------|--------|
+| **Componentes** | 55.0% | ⚠️ Attention Needed |
+| **Estrutura** | 90.0% | ✅ Good |
+| **Features** | 38.0% | ❌ Needs Improvement |
+| **Qualidade** | 30.0% | ❌ Needs Improvement |
+| **Dependências** | 80.0% | ✅ Good |
+
+### 📋 Tarefas e Progresso
+
+Para uma visão completa das tarefas pendentes, prioridades e roadmap de desenvolvimento, consulte:
+- **[TODO.md](./TODO.md)** - Lista detalhada de todas as tarefas de melhoria contínua
+- **[CONTRIBUTING.md](./CONTRIBUTING.md)** - Processo de contribuição e Definition of Done
+
+### 🎯 Próximos Passos
+
+1. **🔴 Prioridade Crítica**: Corrigir vulnerabilidades de segurança (3-5 horas)
+2. **🟠 Alta Prioridade**: Completar features core (Access Control, Dashboard, User Management)
+3. **🟡 Média Prioridade**: Melhorar qualidade de código e acessibilidade
+4. **⚪ Baixa Prioridade**: Otimizações e testes extensivos
+
+### 🐛 Problemas Conhecidos
+
+- **Segurança**: 3 vulnerabilidades em dependências (xlsx, vite, esbuild)
+- **Features Incompletas**: 4 features principais abaixo de 50% de completude
+- **Testes**: Coverage 0% - implementação de testes necessária
+- **Bundle Size**: Chunk principal com 1.3MB - otimização necessária
+
+---
+
+## 🎉 Portal do Porteiro - PRODUÇÃO READY
+
+[![Portal Status](https://img.shields.io/badge/Portal%20do%20Porteiro-90%25%20Completo-success)](./PORTAL_STATUS.md)
+[![Production Ready](https://img.shields.io/badge/Status-PRODUÇÃO%20READY-brightgreen)](./PORTAL_STATUS.md)
+
+O **Portal do Porteiro** é uma das features mais maduras do sistema SIGECO, estando **90% completo** e **100% funcional para uso em produção**.
+
+### ✅ Status de Completude
+
+| Categoria | Completude | Status |
+|-----------|-----------|--------|
+| **Funcionalidades Core** | 100% | ✅ Completo |
+| **Interface do Usuário** | 95% | ✅ Excelente |
+| **Gestão de Dados** | 100% | ✅ Completo |
+| **Validações** | 100% | ✅ Completo |
+| **Acessibilidade** | 90% | ✅ Muito Bom |
+| **Estatísticas** | 95% | ✅ Excelente |
+| **GERAL** | **90%** | **✅ PRODUÇÃO READY** |
+
+### 🚀 Funcionalidades Implementadas
+
+- ✅ **Registro de Entrada de Visitantes** - Formulário completo com validações robustas
+- ✅ **Registro de Saída de Visitantes** - Com cálculo automático de duração
+- ✅ **Listagem de Visitantes** - Visualização em tempo real com ordenação inteligente
+- ✅ **Busca de Visitantes** - Busca avançada por nome, documento ou destino
+- ✅ **Quick Checkout** - Sistema rápido de saída para agilizar o fluxo
+- ✅ **Dashboard e Estatísticas** - Métricas em tempo real com comparações inteligentes
+- ✅ **Gestão de Dados** - Persistência automática com pruning inteligente
+- ✅ **Sistema de Suporte** - Acesso direto ao suporte via WhatsApp
+
+### 🎯 Features Opcionais (10% Restante)
+
+Os **10% restantes** são features **extras** que podem ser implementadas conforme necessidade dos usuários, mas **não afetam a funcionalidade core**:
+
+1. **Foto do Visitante** (3%) - Upload e visualização de foto
+2. **QR Code de Identificação** (2%) - Checkout rápido via QR code
+3. **Notificações ao Morador** (2%) - Avisos em tempo real
+4. **Relatórios Específicos** (1%) - Análises detalhadas
+5. **Gráficos Visuais** (1%) - Visualização de tendências
+6. **Histórico de Ações** (1%) - Log de auditoria
+
+**📖 Documentação Completa:** [PORTAL_STATUS.md](./PORTAL_STATUS.md) | [Análise Técnica](./PORTAL_PORTEIRO_ANALISE.md)
+
+---
+
+## 📊 Análise Completa de Completude dos Portais
+
+[![Análise Completa](https://img.shields.io/badge/Análise%20Completa-Disponível-blue)](./PORTAL_COMPLETION_ANALYSIS.md)
+[![Gráficos Visuais](https://img.shields.io/badge/Gráficos-Disponível-blue)](./PORTAL_COMPLETION_CHART.md)
+
+Para uma **visão consolidada e detalhada** da completude dos dois principais portais do SIGECO, consulte:
+
+**[📊 PORTAL_COMPLETION_ANALYSIS.md](./PORTAL_COMPLETION_ANALYSIS.md)** - Análise completa (24KB, 791 linhas)
+
+Este documento apresenta:
+- ✅ **Comparativo completo** entre Portal do Porteiro (90%) e Portal Administrativo (72%)
+- 📈 **Métricas detalhadas** por categoria e funcionalidade
+- 🎯 **Plano de ação** para atingir 80%+ completion
+- 📅 **Timeline e projeções** de evolução
+- 🏆 **Certificações e recomendações** para produção
+
+**[📊 PORTAL_COMPLETION_CHART.md](./PORTAL_COMPLETION_CHART.md)** - Gráficos visuais (18KB, 368 linhas)
+
+Este documento complementar apresenta:
+- 📊 **Gráficos visuais ASCII** com barras de progresso
+- 🔄 **Comparações lado a lado** dos dois portais
+- 📅 **Timeline visual** de evolução do projeto
+- 🎯 **Matriz de prioridades** para desenvolvimento
+- 📖 **Guia de referência rápida** com legendas
+
+### Resumo Rápido
+
+| Portal | Completude | Status | Pronto para Produção |
+|--------|-----------|--------|---------------------|
+| **Portal do Porteiro** | **90%** | ✅ Excelente | **SIM** ✅ |
+| **Portal Administrativo** | **72%** | 🟡 Bom | Parcial 🟡 |
+| **Projeto Geral (MVP)** | **68%** | 🟡 Em Progresso | Não ❌ |
+
+---
+
+## 📋 Lista Consolidada de Correções Necessárias
+
+**Total de Issues Identificados:** 130  
+**Tempo Estimado Total:** 239-350 horas (~1.5-2 meses de trabalho)
+
+### 🔴 PRIORIDADE CRÍTICA - Segurança (3-5 horas)
+
+#### 1. Vulnerabilidades de Dependências
+- **xlsx** - Prototype Pollution e ReDoS (HIGH SEVERITY)
+  - CVEs: GHSA-4r6h-8v6p-xvw6 (7.8), GHSA-5pgg-2g8v-p4x9 (7.5)
+  - **Solução:** Atualizar de 0.18.5 para 0.20.2+
+  - **Esforço:** 1-2 horas
+  
+- **vite** - Multiple Security Issues (MODERATE)
+  - CVEs: GHSA-93m4-6634-74q7, GHSA-g4jq-h2w9-997c, GHSA-jqfw-vq24-v9c3
+  - **Solução:** Atualizar de 5.4.19 para 6.1.7+
+  - **Esforço:** 2-3 horas
+
+### 🟠 ALTA PRIORIDADE - Features Incompletas (114-166 horas)
+
+#### 2. Access Control (20% → 100%) - 29-42 horas
+- [ ] AccessLog Component (8-12h)
+- [ ] AccessControl Component (12-16h)
+- [ ] AccessService (8-12h)
+- [ ] AccessRecord Type (1-2h)
+
+#### 3. Dashboard (40% → 100%) - 15-22 horas
+- [ ] DashboardStats Component (8-12h)
+- [ ] DashboardLayout Component (6-8h)
+- [ ] DashboardData Type (1-2h)
+
+#### 4. Reports (33% → 100%) - 22-32 horas
+- [ ] ReportGenerator Component (12-16h)
+- [ ] ReportViewer Component (8-12h)
+- [ ] Report Type (1-2h)
+- [ ] ReportConfig Type (1-2h)
+
+#### 5. User Management (25% → 100%) - 36-52 horas
+- [ ] UserForm Component (8-12h)
+- [ ] UserList Component (6-8h)
+- [ ] AuthService (12-16h)
+- [ ] UserService (8-12h)
+- [ ] User Type (1-2h)
+- [ ] UserRole Type (1-2h)
+
+#### 6. Visitor Registration (71% → 100%) - 12-18 horas
+- [ ] VisitorCard Component (4-6h)
+- [ ] VisitorService (8-12h)
+
+### 🟡 MÉDIA PRIORIDADE - Qualidade de Código (42-59 horas)
+
+#### 7. Acessibilidade (11-15 horas)
+- [ ] select component (30% score) - 2-3h
+- [ ] VisitorForm (0% score) - 3-4h
+- [ ] Outros 5 componentes - 6-8h
+
+#### 8. Error Handling e Loading States (14-21 horas)
+- [ ] Error Handling em 9 páginas - 6-9h
+- [ ] Loading States em 10 páginas - 8-12h
+
+#### 9. TypeScript Props Interfaces (17-23 horas)
+- [ ] 40 UI Components - 15-20h
+- [ ] 3 Feature Components - 2-3h
+
+#### 10. Type Definitions para Services (2-3 horas)
+- [ ] 2 services sem tipos definidos
+
+### ⚪ BAIXA PRIORIDADE - Otimizações (80-120 horas)
+
+#### 11. ESLint Warnings (4-5 horas)
+- [ ] Fast Refresh warnings em 7 componentes
+- [ ] React Hooks dependencies
+- [ ] Test Utils export
+
+#### 12. Naming Conventions (2.5-3.5 horas)
+- [ ] 2 arquivos de componentes para PascalCase
+- [ ] 25 arquivos de serviços para camelCase
+
+#### 13. Dependencies Management (2.5-3.5 horas)
+- [ ] Adicionar playwright ao package.json
+- [ ] Revisar 5 dependências potencialmente não utilizadas
+
+#### 14. Build Optimization (6-9 horas)
+- [ ] Implementar Code Splitting
+- [ ] Configurar Manual Chunks
+
+#### 15. Testing Coverage (64-96 horas)
+- [ ] Setup de Testes (4-6h)
+- [ ] Testes Unitários (40-60h)
+- [ ] Testes de Integração (20-30h)
+
+#### 16. ErrorBoundary Wrapping (3-5 horas)
+- [ ] Implementar nos 10 componentes principais
+
+#### 17. Orphaned Components (2-3 horas)
+- [ ] Revisar 4 componentes órfãos
+
+---
+
+### 📈 Resumo de Esforço por Prioridade
+
+| Prioridade | Horas Estimadas | Semanas (40h/sem) |
+|------------|-----------------|-------------------|
+| 🔴 Crítica | 3-5 horas | <1 semana |
+| 🟠 Alta | 114-166 horas | 3-4 semanas |
+| 🟡 Média | 42-59 horas | 1-1.5 semanas |
+| ⚪ Baixa | 80-120 horas | 2-3 semanas |
+| **TOTAL** | **239-350 horas** | **~6-9 semanas** |
+
+---
+
+### 🗺️ Roadmap Sugerido
+
+Consulte o [ROADMAP.md](./ROADMAP.md) para o plano detalhado de 5 sprints:
+
+- **Sprint 1** (1 sem) → 65% - Segurança + Access Control
+- **Sprint 2** (2 sem) → 72% - Dashboard + User Management  
+- **Sprint 3** (2 sem) → 78% - Reports + Finalizações
+- **Sprint 4** (2 sem) → 82%+ - Qualidade de Código ✅ **MVP READY**
+- **Sprint 5** (4+ sem) → 90%+ - Otimização + Testes 🎯 **EXCELÊNCIA**
+
+---
+
+### Portal Status
+
+| Portal | Completion | Status | Production Ready |
+|--------|-----------|--------|------------------|
+| **Porteiro (Doorman)** | **90%** | ✅ Excellent | **YES** ✅ |
+| **Admin** | **72%** | 🟡 Good | Partial 🟡 |
+| **Overall MVP** | **68%** | 🟡 In Progress | Not Yet ❌ |
+
+[📖 Detailed Portal Analysis](./PORTAL_COMPLETION_ANALYSIS.md) | [🚀 Roadmap](./ROADMAP.md) | [✔️ TODO List](./TODO.md)
+
+---
+
+## 📚 Documentation
+
+### Core Documentation
+- **[ARCHITECTURE.md](./docs/ARCHITECTURE.md)** - Complete system architecture (folders & files)
+- **[SETUP.md](./docs/SETUP.md)** - Environment setup guide
+- **[TESTING.md](./docs/TESTING.md)** - Testing guide (Vitest, Playwright, Cypress)
+- **[DEVELOPMENT.md](./docs/DEVELOPMENT.md)** - Development workflow & scripts
+- **[API.md](./docs/API.md)** - Backend API documentation
+- **[FEATURES.md](./docs/FEATURES.md)** - Feature documentation
+
+### Project Planning
+- **[TODO.md](./TODO.md)** - Complete task list (130 issues prioritized)
+- **[ROADMAP.md](./ROADMAP.md)** - 5-sprint development plan (12 weeks)
+- **[CONTRIBUTING.md](./CONTRIBUTING.md)** - Contribution guide & Definition of Done
+
+### Status Reports
+- **[PORTAL_STATUS.md](./PORTAL_STATUS.md)** - Porteiro Portal documentation
+- **[PORTAL_COMPLETION_ANALYSIS.md](./PORTAL_COMPLETION_ANALYSIS.md)** - Complete portal analysis
+- **[PROJECT_ANALYSIS_SUMMARY.md](./PROJECT_ANALYSIS_SUMMARY.md)** - Executive summary
+
+---
+
+## 🛠️ Development
+
+### Available Scripts
 
 ```bash
-# Desenvolvimento
-npm run dev              # Inicia servidor de desenvolvimento
-npm run build            # Build de produção
-npm run preview          # Preview do build de produção
+# Development
+npm run dev                # Start dev server (localhost:9323)
+npm run build              # Production build
+npm run preview            # Preview production build
 
-# Qualidade de Código
-npm run validate         # Executa type-check + lint + build (use antes de PR!)
-npm run type-check       # Verifica tipos TypeScript
-npm run lint             # Executa ESLint
-npm run lint:fix         # Corrige problemas automaticamente
+# Code Quality
+npm run validate           # Run type-check + lint + build
+npm run type-check         # TypeScript type checking
+npm run lint               # Run ESLint
+npm run lint:fix           # Auto-fix lint issues
 
-# Testes
-npm run test             # Testes unitários
-npm run test:e2e         # Testes end-to-end
-npm run test:e2e:ui      # Testes E2E com interface
+# Testing
+npm run test               # Run unit tests (Vitest)
+npm run test:e2e           # Run Playwright E2E tests
+npm run test:cypress       # Open Cypress UI
+npm run test:all           # Run all test suites
 
-# Validação de Sistema
-npm run validate:system  # Valida todos os módulos
-npm run verify:mvp       # Verifica completude do MVP
+# System Validation
+npm run verify:mvp         # MVP completeness check
+npm run validate:system    # Full system validation
+npm run validate:ci        # CI/CD validation (headless)
 ```
 
-### Fluxo de Contribuição
+📖 **For complete script documentation**, see [docs/DEVELOPMENT.md](./docs/DEVELOPMENT.md)
 
-1. **Escolha uma tarefa** do [TODO.md](./TODO.md)
-2. **Crie uma branch** para sua feature
-3. **Desenvolva** seguindo os padrões do projeto
-4. **Teste localmente** com `npm run validate`
-5. **Verifique o console** do navegador (sem erros!)
-6. **Crie um Pull Request** com descrição detalhada
+### Development Workflow
 
-📖 **[Guia Completo de Contribuição →](./CONTRIBUTING.md)**
+1. **Create a feature branch**
+   ```bash
+   git checkout -b feature/your-feature-name
+   ```
+
+2. **Make your changes** following the [code standards](./CONTRIBUTING.md)
+
+3. **Validate your work**
+   ```bash
+   npm run validate  # Must pass before PR
+   ```
+
+4. **Test in browser** - Check console for errors (F12)
+
+5. **Create Pull Request** - See [CONTRIBUTING.md](./CONTRIBUTING.md)
 
 ---
 
-## 📈 Arquitetura do Projeto
+## 🔒 Security
+
+### Current Vulnerabilities
+
+| Package | Severity | CVE | Score | Action Required |
+|---------|----------|-----|-------|----------------|
+| xlsx | 🔴 High | GHSA-4r6h-8v6p-xvw6 | 7.8 | Update to 0.20.2+ |
+| xlsx | 🔴 High | GHSA-5pgg-2g8v-p4x9 | 7.5 | Update to 0.20.2+ |
+| vite | 🟠 Moderate | Multiple | 5.3 | Update to 6.1.7+ |
+
+**Priority: CRITICAL** - Security fixes are tracked in [TODO.md](./TODO.md#-prioridade-crítica---segurança)
+
+```bash
+# Check vulnerabilities
+npm audit
+
+# Update dependencies (after testing)
+npm install xlsx@latest vite@latest
+```
+
+---
+
+## 🧑‍💻 Contributing
+
+Contributions are welcome! Please follow these steps:
+
+1. Read the [CONTRIBUTING.md](./CONTRIBUTING.md) guide
+2. Check [TODO.md](./TODO.md) for available tasks
+3. Follow the **Definition of Done** checklist
+4. Ensure `npm run validate` passes
+5. Submit a Pull Request with detailed description
+
+### Priority Areas for Contribution
+
+1. 🔴 **Security** - Update vulnerable dependencies (URGENT)
+2. 🟠 **Access Control** - Complete missing feature (20% → 100%)
+3. 🟠 **Dashboard** - Enhance admin dashboard (40% → 100%)
+4. 🟡 **Testing** - Increase coverage (0% → 60%+)
+
+---
+
+## 📈 Estatísticas do Projeto
+
+### Arquitetura
 
 ```
-sigeco-condo-access/
-├── 📁 src/
-│   ├── 📦 components/      # Componentes React (63 componentes)
-│   │   ├── ui/             # Componentes base (shadcn/ui)
-│   │   ├── dashboard/      # Componentes do dashboard
-│   │   ├── visitor/        # Gestão de visitantes
-│   │   ├── user/           # Gestão de usuários
-│   │   └── ...
-│   ├── 📄 pages/           # Páginas principais (10 páginas)
-│   │   ├── Login.tsx       # Tela de login
-│   │   ├── PorteiroDashboard.tsx
-│   │   ├── AdminDashboard.tsx
-│   │   └── ...
-│   ├── 🔧 services/        # Serviços e APIs
-│   ├── 🎨 lib/             # Utilitários e helpers
-│   ├── 📝 types/           # Type definitions
-│   └── 🎭 hooks/           # Custom React hooks
-├── 📁 tests/               # Testes automatizados
-├── 📁 public/              # Assets estáticos
-└── 📄 package.json         # Dependências e scripts
+📁 src/
+├── 📦 components/     63 componentes
+├── 🔧 services/       Multiple services
+├── 📄 pages/          10 páginas
+├── 🎨 lib/            Utilities e helpers
+└── 📝 types/          Type definitions
 ```
 
----
+### Tecnologias e Versões
 
-## 📚 Documentação
+| Tecnologia | Versão | Propósito |
+|------------|--------|-----------|
+| React | 18.3.1 | UI Framework |
+| TypeScript | 5.8.3 | Type Safety |
+| Vite | 5.4.19 | Build Tool |
+| Tailwind CSS | 3.4.17 | Styling |
+| shadcn/ui | Latest | Component Library |
+| Vitest | 4.0.7 | Testing Framework |
+| Playwright | 1.56.1 | E2E Testing |
 
-### 📊 Análises e Status
-- **[PORTAL_COMPLETION_ANALYSIS.md](./PORTAL_COMPLETION_ANALYSIS.md)** - Análise completa dos dois portais
-- **[PORTAL_STATUS.md](./PORTAL_STATUS.md)** - Documentação detalhada do Portal do Porteiro
-- **[PORTAL_COMPLETION_CHART.md](./PORTAL_COMPLETION_CHART.md)** - Gráficos visuais de progresso
+### Linhas de Código (Aproximado)
 
-### 🗺️ Planejamento e Roadmap
-- **[TODO.md](./TODO.md)** - Lista de tarefas e melhorias (130 issues)
-- **[ROADMAP.md](./ROADMAP.md)** - Plano de desenvolvimento (5 sprints)
-- **[CONTRIBUTING.md](./CONTRIBUTING.md)** - Guia de contribuição e boas práticas
+- **Total**: ~50,000+ linhas
+- **TypeScript/TSX**: ~45,000 linhas
+- **Testes**: Em desenvolvimento
+- **Documentação**: 40+ arquivos markdown
 
-### 📖 Documentação Técnica
-- **[PROJECT_ANALYSIS_SUMMARY.md](./PROJECT_ANALYSIS_SUMMARY.md)** - Resumo executivo do projeto
-- **[IMPROVEMENT_PLAN_INDEX.md](./IMPROVEMENT_PLAN_INDEX.md)** - Índice completo de documentação
-- **[Backend README](./backend/README.md)** - Documentação do backend
-- **[Pasta docs/](./docs/)** - Documentação técnica detalhada
+### Features Implementadas
 
----
+✅ **Completas e Prontas para Produção (90%+)**
+- **Portal do Porteiro (90%)** - 🎉 **PRODUÇÃO READY** - [Ver Documentação](./PORTAL_STATUS.md)
+- Estrutura do Projeto (90%)
+- Sistema de Dependências (80%)
 
-## 🤝 Como Contribuir
+✅ **Completas (70%+)**
+- **Portal Administrativo (72%)** - 🟡 **BOM** - [Ver Análise Completa](./PORTAL_COMPLETION_ANALYSIS.md)
+  - Controle de Acesso (100%) ✅
+  - Gestão de Usuários (100%) ✅
+  - Sistema de Relatórios (75%) 🟡
+  - Gerenciamento de Moradores (70%) 🟡
+  - Agendamento de Visitas (65%) 🟡
+- Visitor Registration (71%) - *Integrado ao Portal do Porteiro*
+- Componentes UI (55%)
 
-Contribuições são muito bem-vindas! 
+⚠️ **Em Desenvolvimento (50-69%)**
+- Dashboard Admin (60%) - Dados mockados, precisa integração real
+- Suporte Avançado (60%)
+- Controle de Insumos (55%)
 
-**Passos para contribuir:**
-1. 📖 Leia o **[CONTRIBUTING.md](./CONTRIBUTING.md)**
-2. 🎯 Escolha uma tarefa no **[TODO.md](./TODO.md)**
-3. 🌿 Crie uma branch: `git checkout -b feature/sua-feature`
-4. ✅ Valide seu código: `npm run validate`
-5. 🚀 Abra um Pull Request
-
-**Áreas que precisam de ajuda:**
-- 🔴 Atualização de dependências vulneráveis
-- 🟡 Implementação de testes automatizados
-- 🟢 Melhorias de acessibilidade e UX
-- 📝 Documentação de componentes
-
----
-
-## 🔗 Links Importantes
-
-- 🎨 **Projeto Lovable**: [lovable.dev/projects/550ae652-c4e5-4f30-a9dd-54040128e05d](https://lovable.dev/projects/550ae652-c4e5-4f30-a9dd-54040128e05d)
-- 📊 **Relatórios MVP**: `.kiro/reports/mvp-verification-latest.md`
-- 🧪 **Relatórios de Validação**: `.kiro/reports/system-validation-latest.md`
-
----
-
-## 📞 Suporte
-
-Encontrou um problema ou tem alguma dúvida?
-- 📝 Abra uma [Issue no GitHub](../../issues)
-- 💬 Entre em contato pelo sistema de suporte integrado
-- 📖 Consulte a [documentação completa](./docs/)
+🟠 **Necessita Atenção (<50%)**
+- Backup e Segurança (50%) - **PRIORIDADE ALTA**
+- Testing Coverage (0%)
+- Qualidade de Código (30%)
 
 ---
 
-<div align="center">
+## 📚 Documentação Adicional
 
-**SIGECO** - Sistema de Gerenciamento de Acesso para Condomínios
+### Guides e READMEs
 
-Desenvolvido com ❤️ usando React, TypeScript e Tailwind CSS
+#### Análises de Completude
+- **[PORTAL_COMPLETION_ANALYSIS.md](./PORTAL_COMPLETION_ANALYSIS.md)** - 📊 **Análise consolidada: Porteiro (90%) + Admin (72%)**
+- **[PORTAL_STATUS.md](./PORTAL_STATUS.md)** - 🎉 **Status oficial e documentação completa do Portal do Porteiro**
+- [PORTAL_PORTEIRO_ANALISE.md](./PORTAL_PORTEIRO_ANALISE.md) - Análise técnica detalhada do Portal do Porteiro
+- [ADMIN_PORTAL_COMPLETION_SUMMARY.md](./ADMIN_PORTAL_COMPLETION_SUMMARY.md) - Resumo de implementação do Portal Admin
 
-**Última Atualização:** 13 de Novembro de 2025  
-**Versão:** 0.0.0 (Pre-MVP)  
+#### Projeto Geral
+- [CONTRIBUTING.md](./CONTRIBUTING.md) - Guia de contribuição e DoD
+- [TODO.md](./TODO.md) - Lista detalhada de 130 issues com priorização completa
+- [ROADMAP.md](./ROADMAP.md) - Plano de 5 sprints com timeline de 12 semanas
+- [PROJECT_ANALYSIS_SUMMARY.md](./PROJECT_ANALYSIS_SUMMARY.md) - Resumo executivo da análise completa
+- [IMPROVEMENT_PLAN_INDEX.md](./IMPROVEMENT_PLAN_INDEX.md) - Índice de toda documentação de planejamento
+- [ACTIVITY_LOGGER_GUIDE.md](./ACTIVITY_LOGGER_GUIDE.md) - Sistema de logging
+- [Backend README](./backend/README.md) - Documentação do backend
+- [Testing Guide](./backend/TESTING.md) - Guia de testes
+
+### Documentação Técnica
+
+Consulte a pasta [docs/](./docs/) para documentação detalhada:
+- Plano de Ação e Status
+- Implementação de Features
+- Acessibilidade (WCAG 2.1)
+- Compliance LGPD
+- Deployment Guide
+- Troubleshooting
+
+---
+
+## 🤝 Contribuindo
+
+Contribuições são bem-vindas! Por favor:
+
+1. Leia o [CONTRIBUTING.md](./CONTRIBUTING.md)
+2. Revise o [TODO.md](./TODO.md) para tarefas disponíveis
+3. Crie uma branch para sua feature: `git checkout -b feature/nome-feature`
+4. Execute `npm run validate` antes de commitar
+5. Abra um Pull Request com descrição detalhada
+
+### Prioridades Atuais
+
+Se você deseja contribuir, estas são as áreas que mais precisam de ajuda:
+
+1. 🔴 **Segurança**: Atualização de dependências vulneráveis
+2. 🟠 **Features**: Completar Access Control e Dashboard
+3. 🟡 **Testes**: Aumentar coverage de 0% para 60%+
+4. 🟢 **Docs**: Melhorar documentação de componentes
+
+---
+
+## 📄 Licença
+
+Este projeto está licenciado sob os termos definidos pelo proprietário do repositório.
+
+---
+
+## 🔗 Links Úteis
+
+- **Projeto Lovable**: https://lovable.dev/projects/550ae652-c4e5-4f30-a9dd-54040128e05d
+- **Relatórios MVP**: `.kiro/reports/mvp-verification-latest.md`
+- **Validation Reports**: `.kiro/reports/system-validation-latest.md`
+
+---
+
+**Última Atualização do README:** 11 de Janeiro de 2025  
+**Versão do Projeto:** 0.0.0 (Pre-MVP)  
 **Status:** 🟡 Em Desenvolvimento Ativo
-
-</div>

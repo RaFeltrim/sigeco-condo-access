@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { renderHook } from '@testing-library/react';
+import { renderHook, act } from '@testing-library/react';
 import { useState, useEffect } from 'react';
 
 function useDebounce<T>(value: T, delay: number): T {
@@ -38,10 +38,14 @@ describe('useDebounce', () => {
       { initialProps: { value: 'initial', delay: 500 } }
     );
 
-    rerender({ value: 'updated', delay: 500 });
+    act(() => {
+      rerender({ value: 'updated', delay: 500 });
+    });
     expect(result.current).toBe('initial');
 
-    vi.advanceTimersByTime(500);
+    act(() => {
+      vi.advanceTimersByTime(500);
+    });
     expect(result.current).toBe('updated');
   });
 
@@ -51,11 +55,25 @@ describe('useDebounce', () => {
       { initialProps: { value: 'first', delay: 500 } }
     );
 
-    rerender({ value: 'second', delay: 500 });
-    vi.advanceTimersByTime(300);
-
-    rerender({ value: 'third', delay: 500 });
-    vi.advanceTimersByTime(500);
+    // First rerender to 'second'
+    act(() => {
+      rerender({ value: 'second', delay: 500 });
+    });
+    
+    // Advance time but not enough to update
+    act(() => {
+      vi.advanceTimersByTime(300);
+    });
+    
+    // Second rerender to 'third' before 'second' can debounce
+    act(() => {
+      rerender({ value: 'third', delay: 500 });
+    });
+    
+    // Now advance time enough for 'third' to debounce
+    act(() => {
+      vi.advanceTimersByTime(500);
+    });
 
     expect(result.current).toBe('third');
   });
