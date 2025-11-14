@@ -48,12 +48,13 @@ before(() => {
 
 // Custom commands for coverage
 declare global {
+  // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace Cypress {
     interface Chainable {
       login(username: string, password: string): Chainable<void>;
       logout(): Chainable<void>;
-      getBySel(selector: string, ...args: any[]): Chainable<JQuery<HTMLElement>>;
-      getBySelLike(selector: string, ...args: any[]): Chainable<JQuery<HTMLElement>>;
+      getBySel(selector: string, ...args: unknown[]): Chainable<JQuery<HTMLElement>>;
+      getBySelLike(selector: string, ...args: unknown[]): Chainable<JQuery<HTMLElement>>;
       visitWithCoverage(url: string): Chainable<void>;
     }
   }
