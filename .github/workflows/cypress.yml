@@ -18,36 +18,30 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
       
-      - name: Install dependencies
-        run: npm ci
-      
-      - name: Cypress run
-        # Uses the official Cypress GitHub action https://github.com/cypress-io/github-action
-        uses: cypress-io/github-action@v6
+      - name: Build CI Docker image
+        uses: docker/build-push-action@v5
         with:
-          # Starts web server for E2E tests - replace with your own server invocation
-          # https://docs.cypress.io/guides/continuous-integration/introduction#Boot-your-server
-          start: npm run dev
-          wait-on: 'http://localhost:9323' # Waits for Vite dev server (matches cypress.config.ts baseUrl)
-          wait-on-timeout: 120
-          browser: chrome
-          # Records to Cypress Cloud - only if CYPRESS_RECORD_KEY is set
-          # https://docs.cypress.io/guides/cloud/projects#Set-up-a-project-to-record
-          record: ${{ secrets.CYPRESS_RECORD_KEY != '' }}
-          parallel: ${{ secrets.CYPRESS_RECORD_KEY != '' }} # Only run parallel if recording
-          config-file: cypress.config.ts
-        env:
-          # For recording and parallelization to work you must set your CYPRESS_RECORD_KEY
-          # in GitHub repo → Settings → Secrets → Actions
-          CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
-          # Creating a token https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          context: .
+          file: ./Dockerfile.ci
+          target: test
+          tags: sigeco-ci:cypress-${{ matrix.containers }}
+          load: true
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+      
+      - name: Run Cypress tests inside Docker container
+        run: |
+          docker run --rm \
+            -e CI=true \
+            -e CYPRESS_RECORD_KEY="${{ secrets.CYPRESS_RECORD_KEY }}" \
+            -e GITHUB_TOKEN="${{ secrets.GITHUB_TOKEN }}" \
+            -v ${{ github.workspace }}/test-results:/app/test-results:rw \
+            --network host \
+            sigeco-ci:cypress-${{ matrix.containers }} \
+            sh -c "npm run dev & sleep 10 && npx wait-on http://localhost:9323 --timeout 120000 && npm run test:cypress:ci"
       
       - name: Upload screenshots on failure
         uses: actions/upload-artifact@v4
