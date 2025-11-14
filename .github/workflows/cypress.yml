@@ -34,13 +34,13 @@ jobs:
           # Starts web server for E2E tests - replace with your own server invocation
           # https://docs.cypress.io/guides/continuous-integration/introduction#Boot-your-server
           start: npm run dev
-          wait-on: 'http://localhost:5173' # Waits for above
+          wait-on: 'http://localhost:9323' # Waits for Vite dev server (matches cypress.config.ts baseUrl)
           wait-on-timeout: 120
           browser: chrome
-          # Records to Cypress Cloud 
+          # Records to Cypress Cloud - only if CYPRESS_RECORD_KEY is set
           # https://docs.cypress.io/guides/cloud/projects#Set-up-a-project-to-record
-          record: true
-          parallel: true # Runs test in parallel using settings above
+          record: ${{ secrets.CYPRESS_RECORD_KEY != '' }}
+          parallel: ${{ secrets.CYPRESS_RECORD_KEY != '' }} # Only run parallel if recording
           config-file: cypress.config.ts
         env:
           # For recording and parallelization to work you must set your CYPRESS_RECORD_KEY
