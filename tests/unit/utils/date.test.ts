@@ -64,19 +64,21 @@ describe('Date Utilities', () => {
 
   describe('addDays', () => {
     it('should add days correctly', () => {
-      const date = new Date('2024-11-10');
+      const date = new Date(2024, 10, 10); // Nov 10, 2024 (month is 0-indexed)
       const result = addDays(date, 5);
       expect(result.getDate()).toBe(15);
+      expect(result.getMonth()).toBe(10);
     });
 
     it('should handle negative days', () => {
-      const date = new Date('2024-11-10');
+      const date = new Date(2024, 10, 10); // Nov 10, 2024
       const result = addDays(date, -5);
       expect(result.getDate()).toBe(5);
+      expect(result.getMonth()).toBe(10);
     });
 
     it('should handle month transitions', () => {
-      const date = new Date('2024-11-28');
+      const date = new Date(2024, 10, 28); // Nov 28, 2024
       const result = addDays(date, 5);
       expect(result.getMonth()).toBe(11); // December
       expect(result.getDate()).toBe(3);

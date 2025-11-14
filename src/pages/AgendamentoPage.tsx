@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,12 +17,20 @@ import {
   AlertCircle,
   X,
   MapPin,
-  Phone,
-  Loader2
+  Phone
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { StatsSkeleton, TableSkeleton } from "@/components/ui/loading-skeleton";
-import { ErrorDisplay } from "@/components/ui/error-display";
+import {
+  type Agendamento,
+  createAgendamento,
+  addAgendamento,
+  updateAgendamentoStatus,
+  checkConflict as checkAgendamentoConflict,
+  getAgendamentosHoje,
+  getProximosAgendamentos,
+  countByStatus,
+  getAgendamentosEstaSemana
+} from "@/lib/agendamentos-crud";
 
 const AgendamentoPage = () => {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
@@ -30,30 +38,12 @@ const AgendamentoPage = () => {
     visitante: "", documento: "", destino: "", motivo: "", 
     data: "", horario: "", telefone: "", observacoes: ""
   });
-  const [isLoading, setIsLoading] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [showAddDialog, setShowAddDialog] = useState(false);
   
   const { toast } = useToast();
 
-  // Simulate loading data
-  useEffect(() => {
-    const loadData = async () => {
-      setIsLoading(true);
-      setError(null);
-      try {
-        // Simulate API call
-        await new Promise(resolve => setTimeout(resolve, 500));
-        setIsLoading(false);
-      } catch (err) {
-        setError('Falha ao carregar agendamentos');
-        setIsLoading(false);
-      }
-    };
-    loadData();
-  }, []);
-
-  const agendamentos = [
+  // State management for agendamentos
+  const [agendamentos, setAgendamentos] = useState<Agendamento[]>([
     {
       id: 1,
       visitante: "Dr. Carlos Mendes",
@@ -106,35 +96,22 @@ const AgendamentoPage = () => {
       morador: "Ana Costa",
       observacoes: "Cancelado pelo morador"
     }
-  ];
+  ]);
 
+  // Dynamic statistics
+  const agendamentosHoje = getAgendamentosHoje(agendamentos);
+  const confirmados = countByStatus(agendamentos, "Confirmado");
+  const pendentes = countByStatus(agendamentos, "Pendente");
+  const estaSemana = getAgendamentosEstaSemana(agendamentos).length;
+  
   const estatisticas = [
-    { titulo: "Agendamentos Hoje", valor: "2", icon: CalendarIcon, cor: "text-primary" },
-    { titulo: "Confirmados", valor: "5", icon: CheckCircle, cor: "text-success" },
-    { titulo: "Pendentes", valor: "3", icon: AlertCircle, cor: "text-warning" },
-    { titulo: "Esta Semana", valor: "12", icon: Clock, cor: "text-accent" },
+    { titulo: "Agendamentos Hoje", valor: String(agendamentosHoje.length), icon: CalendarIcon, cor: "text-primary" },
+    { titulo: "Confirmados", valor: String(confirmados), icon: CheckCircle, cor: "text-success" },
+    { titulo: "Pendentes", valor: String(pendentes), icon: AlertCircle, cor: "text-warning" },
+    { titulo: "Esta Semana", valor: String(estaSemana), icon: Clock, cor: "text-accent" },
   ];
 
-  const checkConflict = (data: string, horario: string, destino: string): boolean => {
-    // Check if there's already an appointment for the same destination at the same time
-    return agendamentos.some(ag => {
-      if (ag.status === "Cancelado") return false;
-      
-      const agDateTime = new Date(`${ag.data}T${ag.horario}`);
-      const newDateTime = new Date(`${data}T${horario}`);
-      
-      // Check if same destination and within 1 hour
-      if (ag.destino === destino) {
-        const timeDiff = Math.abs(agDateTime.getTime() - newDateTime.getTime());
-        const hoursDiff = timeDiff / (1000 * 60 * 60);
-        return hoursDiff < 1;
-      }
-      
-      return false;
-    });
-  };
-
-  const handleNovoAgendamento = async (e: React.FormEvent) => {
+  const handleNovoAgendamento = (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!novoAgendamento.visitante || !novoAgendamento.destino || !novoAgendamento.data || !novoAgendamento.horario) {
@@ -146,8 +123,14 @@ const AgendamentoPage = () => {
       return;
     }
 
-    // Check for scheduling conflicts
-    const hasConflict = checkConflict(novoAgendamento.data, novoAgendamento.horario, novoAgendamento.destino);
+    // Check for scheduling conflicts using extracted logic
+    const hasConflict = checkAgendamentoConflict(
+      agendamentos,
+      novoAgendamento.data,
+      novoAgendamento.horario,
+      novoAgendamento.destino
+    );
+    
     if (hasConflict) {
       toast({
         title: "Conflito de agendamento",
@@ -169,44 +152,46 @@ const AgendamentoPage = () => {
       return;
     }
 
-    setIsSaving(true);
-    try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      toast({
-        title: "Agendamento criado com sucesso",
-        description: `Visita de ${novoAgendamento.visitante} agendada para ${new Date(novoAgendamento.data).toLocaleDateString('pt-BR')} às ${novoAgendamento.horario}`,
-      });
-      setNovoAgendamento({
-        visitante: "", documento: "", destino: "", motivo: "", 
-        data: "", horario: "", telefone: "", observacoes: ""
-      });
-    } catch (err) {
-      toast({
-        title: "Erro ao criar agendamento",
-        description: "Tente novamente mais tarde",
-        variant: "destructive",
-      });
-    } finally {
-      setIsSaving(false);
-    }
+    // Create and add new agendamento using extracted logic
+    const newAgendamento = createAgendamento(agendamentos, {
+      visitante: novoAgendamento.visitante,
+      documento: novoAgendamento.documento,
+      destino: novoAgendamento.destino,
+      motivo: novoAgendamento.motivo,
+      data: novoAgendamento.data,
+      horario: novoAgendamento.horario,
+      telefone: novoAgendamento.telefone,
+      observacoes: novoAgendamento.observacoes
+    });
+    
+    setAgendamentos(addAgendamento(agendamentos, newAgendamento));
+
+    toast({
+      title: "Agendamento criado com sucesso",
+      description: `Visita de ${novoAgendamento.visitante} agendada para ${new Date(novoAgendamento.data).toLocaleDateString('pt-BR')} às ${novoAgendamento.horario}`,
+    });
+    
+    setNovoAgendamento({
+      visitante: "", documento: "", destino: "", motivo: "", 
+      data: "", horario: "", telefone: "", observacoes: ""
+    });
+    
+    setShowAddDialog(false);
   };
 
-  const handleStatusChange = (id: number, novoStatus: string) => {
+  const handleStatusChange = (id: number, novoStatus: "Confirmado" | "Pendente" | "Cancelado") => {
     const agendamento = agendamentos.find(a => a.id === id);
     if (!agendamento) return;
     
-    // In a real application, this would update the backend
-    // For now, we'll just show a toast notification
-    const statusText = novoStatus === "Confirmado" ? "confirmado" : "cancelado";
+    // Update status using extracted logic
+    setAgendamentos(updateAgendamentoStatus(agendamentos, id, novoStatus));
+    
+    const statusText = novoStatus === "Confirmado" ? "confirmado" : 
+                       novoStatus === "Cancelado" ? "cancelado" : "pendente";
     toast({
       title: "Status atualizado",
       description: `Agendamento de ${agendamento.visitante} foi ${statusText}`,
     });
-    
-    // Here you would call an API to update the status
-    // Example: AgendamentoService.updateStatus(id, novoStatus);
   };
 
   const getStatusColor = (status: string) => {
@@ -221,27 +206,7 @@ const AgendamentoPage = () => {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   
-  const agendamentosHoje = agendamentos.filter(a => {
-    const agDate = new Date(a.data);
-    agDate.setHours(0, 0, 0, 0);
-    return agDate.getTime() === today.getTime();
-  });
-  
-  const proximosAgendamentos = agendamentos.filter(a => {
-    const agDate = new Date(a.data);
-    return agDate > today && a.status !== "Cancelado";
-  }).sort((a, b) => new Date(a.data).getTime() - new Date(b.data).getTime());
-
-  if (error) {
-    return (
-      <div className="p-6 space-y-6 max-w-7xl mx-auto">
-        <ErrorDisplay 
-          message={error} 
-          onRetry={() => window.location.reload()}
-        />
-      </div>
-    );
-  }
+  const proximosAgendamentos = getProximosAgendamentos(agendamentos);
 
   return (
     <div className="p-6 space-y-6 max-w-7xl mx-auto">
@@ -251,7 +216,7 @@ const AgendamentoPage = () => {
           <p className="text-muted-foreground">Gerencie visitas agendadas antecipadamente</p>
         </div>
         
-        <Dialog>
+        <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
           <DialogTrigger asChild>
             <Button className="bg-accent hover:bg-accent-dark text-accent-foreground">
               <Plus className="h-4 w-4 mr-2" />
@@ -289,45 +254,12 @@ const AgendamentoPage = () => {
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>Destino da Visita *</Label>
-                  <Select
+                  <Input
+                    placeholder="Ex: Apto 101"
                     value={novoAgendamento.destino}
-                    onValueChange={(value) => setNovoAgendamento({...novoAgendamento, destino: value})}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Selecione o destino" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="none" disabled>Selecione o destino</SelectItem>
-                      
-                      {/* Apartamentos */}
-                      <SelectItem value="Apto 101">Apto 101</SelectItem>
-                      <SelectItem value="Apto 102">Apto 102</SelectItem>
-                      <SelectItem value="Apto 103">Apto 103</SelectItem>
-                      <SelectItem value="Apto 104">Apto 104</SelectItem>
-                      <SelectItem value="Apto 201">Apto 201</SelectItem>
-                      <SelectItem value="Apto 202">Apto 202</SelectItem>
-                      <SelectItem value="Apto 203">Apto 203</SelectItem>
-                      <SelectItem value="Apto 204">Apto 204</SelectItem>
-                      <SelectItem value="Apto 205">Apto 205</SelectItem>
-                      <SelectItem value="Apto 301">Apto 301</SelectItem>
-                      <SelectItem value="Apto 302">Apto 302</SelectItem>
-                      <SelectItem value="Apto 303">Apto 303</SelectItem>
-                      <SelectItem value="Apto 304">Apto 304</SelectItem>
-                      
-                      {/* Áreas Comuns */}
-                      <SelectItem value="Salão de Festas">Salão de Festas</SelectItem>
-                      <SelectItem value="Academia">Academia</SelectItem>
-                      <SelectItem value="Piscina">Piscina</SelectItem>
-                      <SelectItem value="Churrasqueira">Churrasqueira</SelectItem>
-                      <SelectItem value="Playground">Playground</SelectItem>
-                      <SelectItem value="Quadra Esportiva">Quadra Esportiva</SelectItem>
-                      
-                      {/* Administração */}
-                      <SelectItem value="Administração">Administração</SelectItem>
-                      <SelectItem value="Síndico">Síndico</SelectItem>
-                      <SelectItem value="Zelador">Zelador</SelectItem>
-                    </SelectContent>
-                  </Select>
+                    onChange={(e) => setNovoAgendamento({...novoAgendamento, destino: e.target.value})}
+                    required
+                  />
                 </div>
                 <div className="space-y-2">
                   <Label>Telefone</Label>
@@ -388,15 +320,8 @@ const AgendamentoPage = () => {
                 />
               </div>
 
-              <Button type="submit" className="w-full bg-success hover:bg-success/90" disabled={isSaving}>
-                {isSaving ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Agendando...
-                  </>
-                ) : (
-                  'Agendar Visita'
-                )}
+              <Button type="submit" className="w-full bg-success hover:bg-success/90">
+                Agendar Visita
               </Button>
             </form>
           </DialogContent>
@@ -404,30 +329,26 @@ const AgendamentoPage = () => {
       </div>
 
       {/* Estatísticas */}
-      {isLoading ? (
-        <StatsSkeleton count={4} />
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {estatisticas.map((stat, index) => {
-            const Icon = stat.icon;
-            return (
-              <Card key={index} className="shadow-lg border-0 bg-card/95 backdrop-blur">
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm text-muted-foreground mb-1">{stat.titulo}</p>
-                      <p className="text-3xl font-bold text-primary">{stat.valor}</p>
-                    </div>
-                    <div className="bg-primary/10 p-3 rounded-xl">
-                      <Icon className={`h-6 w-6 ${stat.cor}`} />
-                    </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {estatisticas.map((stat, index) => {
+          const Icon = stat.icon;
+          return (
+            <Card key={index} className="shadow-lg border-0 bg-card/95 backdrop-blur">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-muted-foreground mb-1">{stat.titulo}</p>
+                    <p className="text-3xl font-bold text-primary">{stat.valor}</p>
                   </div>
-                </CardContent>
-              </Card>
-            );
-          })}
-        </div>
-      )}
+                  <div className="bg-primary/10 p-3 rounded-xl">
+                    <Icon className={`h-6 w-6 ${stat.cor}`} />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          );
+        })}
+      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Calendário */}
@@ -459,14 +380,9 @@ const AgendamentoPage = () => {
             <CardDescription>Visitas programadas para hoje</CardDescription>
           </CardHeader>
           <CardContent className="p-0">
-            {isLoading ? (
-              <div className="p-4">
-                <TableSkeleton rows={3} />
-              </div>
-            ) : (
-              <div className="space-y-1">
-                {agendamentosHoje.length > 0 ? (
-                  agendamentosHoje.map((agendamento) => (
+            <div className="space-y-1">
+              {agendamentosHoje.length > 0 ? (
+                agendamentosHoje.map((agendamento) => (
                   <div
                     key={agendamento.id}
                     className="flex items-center justify-between p-4 hover:bg-muted/50 border-b border-border last:border-0"
@@ -489,13 +405,12 @@ const AgendamentoPage = () => {
                   </div>
                 ))
               ) : (
-                  <div className="p-8 text-center text-muted-foreground">
-                    <CalendarIcon className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                    <p>Nenhum agendamento para hoje</p>
-                  </div>
-                )}
-              </div>
-            )}
+                <div className="p-8 text-center text-muted-foreground">
+                  <CalendarIcon className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                  <p>Nenhum agendamento para hoje</p>
+                </div>
+              )}
+            </div>
           </CardContent>
         </Card>
 

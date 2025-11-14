@@ -1,0 +1,37 @@
+{
+  "all": true,
+  "include": [
+    "src/**/*.{js,jsx,ts,tsx}"
+  ],
+  "exclude": [
+    "**/*.d.ts",
+    "**/*.config.{js,ts}",
+    "**/*.test.{js,ts,jsx,tsx}",
+    "**/*.spec.{js,ts,jsx,tsx}",
+    "**/tests/**",
+    "**/test-results/**",
+    "**/coverage/**",
+    "**/dist/**",
+    "**/node_modules/**",
+    "src/main.tsx",
+    "src/vite-env.d.ts"
+  ],
+  "reporter": [
+    "html",
+    "json",
+    "text",
+    "lcov",
+    "json-summary"
+  ],
+  "report-dir": "coverage/merged",
+  "temp-dir": "coverage/.nyc_output",
+  "check-coverage": true,
+  "lines": 90,
+  "statements": 90,
+  "functions": 90,
+  "branches": 90,
+  "per-file": true,
+  "skip-full": false,
+  "clean": true,
+  "cache": false
+}
