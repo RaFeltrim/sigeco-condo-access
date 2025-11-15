@@ -13,9 +13,10 @@ jobs:
   validate:
     runs-on: ubuntu-latest
     
+    # Only run on Node 20.x (matches Dockerfile.ci)
     strategy:
       matrix:
-        node-version: [18.x, 20.x]
+        node-version: [20.x]
     
     steps:
     - name: Checkout code
@@ -29,25 +30,32 @@ jobs:
       with:
         context: .
         file: ./Dockerfile.ci
-        target: test
-        tags: sigeco-ci:${{ matrix.node-version }}
+        target: validate
+        tags: sigeco-ci:validate
         load: true
-        cache-from: type=gha
-        cache-to: type=gha,mode=max
+        cache-from: type=gha,scope=validation
+        cache-to: type=gha,mode=max,scope=validation
     
     - name: Run validation inside Docker container
       run: |
         docker run --rm \
           -e CI=true \
-          sigeco-ci:${{ matrix.node-version }} \
+          sigeco-ci:validate \
           npm run validate
     
-    - name: Check build size
+    - name: Extract and check build artifacts
       run: |
-        docker run --rm \
-          -v ${{ github.workspace }}/dist:/app/dist:rw \
-          sigeco-ci:${{ matrix.node-version }} \
-          sh -c "echo 'Build completed successfully' && du -sh dist/ && echo 'Build artifacts:' && ls -lh dist/"
+        # Create a temporary container to copy build artifacts
+        docker create --name temp-build sigeco-ci:validate
+        docker cp temp-build:/app/dist ./dist
+        docker rm temp-build
+        
+        echo "✓ Build completed successfully"
+        echo "Build size:"
+        du -sh dist/
+        echo ""
+        echo "Build artifacts:"
+        ls -lh dist/
     
   console-validation-reminder:
     runs-on: ubuntu-latest
