@@ -27,21 +27,41 @@ jobs:
           context: .
           file: ./Dockerfile.ci
           target: test
-          tags: sigeco-ci:cypress-${{ matrix.containers }}
+          tags: sigeco-ci:latest
           load: true
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-from: type=gha,scope=cypress
+          cache-to: type=gha,mode=max,scope=cypress
       
-      - name: Run Cypress tests inside Docker container
+      - name: Start Vite dev server in background
+        run: |
+          docker run -d \
+            --name vite-server-${{ matrix.containers }} \
+            -p 9323:9323 \
+            -e CI=true \
+            sigeco-ci:latest \
+            npm run dev
+      
+      - name: Wait for dev server to be ready
         run: |
           docker run --rm \
+            --network host \
+            sigeco-ci:latest \
+            npx wait-on http://localhost:9323 --timeout 120000
+      
+      - name: Run Cypress tests
+        run: |
+          docker run --rm \
+            --network host \
             -e CI=true \
             -e CYPRESS_RECORD_KEY="${{ secrets.CYPRESS_RECORD_KEY }}" \
             -e GITHUB_TOKEN="${{ secrets.GITHUB_TOKEN }}" \
             -v ${{ github.workspace }}/test-results:/app/test-results:rw \
-            --network host \
-            sigeco-ci:cypress-${{ matrix.containers }} \
-            sh -c "npm run dev & sleep 10 && npx wait-on http://localhost:9323 --timeout 120000 && npm run test:cypress:ci"
+            sigeco-ci:latest \
+            npm run test:cypress:ci
+      
+      - name: Stop Vite dev server
+        if: always()
+        run: docker stop vite-server-${{ matrix.containers }} || true
       
       - name: Upload screenshots on failure
         uses: actions/upload-artifact@v4
