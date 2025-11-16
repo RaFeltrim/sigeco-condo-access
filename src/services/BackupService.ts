@@ -3,7 +3,7 @@
  * Handles automatic and manual backups, restore operations, and data integrity
  */
 
-import { LoggingService } from '@/lib/logging';
+import { LoggingService } from '@/utils/logging';
 
 export interface BackupMetadata {
   id: string;

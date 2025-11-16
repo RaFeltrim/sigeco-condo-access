@@ -68,23 +68,23 @@ test.describe('Admin Dashboard - Overview Functionality', () => {
 
   test('Overview - Verify week flow chart displays all 7 days', async ({ page }) => {
     // Verify chart title
-    await expect(page.getByText('Fluxo de Visitas - Última Semana')).toBeVisible();
+    await expect(page.getByText('Fluxo de Visitas - Última Semana')).toBeVisible({ timeout: 5000 });
     
     // Verify all 7 days are displayed
     const dias = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado', 'Domingo'];
     for (const dia of dias) {
-      await expect(page.getByText(dia).first()).toBeVisible();
+      await expect(page.getByText(dia).first()).toBeVisible({ timeout: 5000 });
     }
   });
 
   test('Overview - Verify recent activity section displays visitor entries', async ({ page }) => {
     // Verify section title
-    await expect(page.getByText('Atividade Recente')).toBeVisible();
-    await expect(page.getByText('Últimas entradas registradas')).toBeVisible();
+    await expect(page.getByText('Atividade Recente')).toBeVisible({ timeout: 5000 });
+    await expect(page.getByText('Últimas entradas registradas')).toBeVisible({ timeout: 5000 });
     
     // Verify at least one activity item is visible
     const activityItems = page.locator('.hover\\:bg-muted\\/50');
-    await expect(activityItems.first()).toBeVisible();
+    await expect(activityItems.first()).toBeVisible({ timeout: 5000 });
     
     // Verify activity items have visitor names (from the mock data)
     const hasVisitorData = await page.getByText('João Silva').isVisible() || 

@@ -12,7 +12,7 @@ import { VisitorSearch } from "@/components/visitor/VisitorSearch";
 import { VisitorForm, type VisitorFormData } from "@/components/visitor/VisitorForm";
 import { VisitorList } from "@/components/visitor/VisitorList";
 import { QuickCheckout } from "@/components/visitor/QuickCheckout";
-import { calculateDuration, formatDuration } from "@/lib/utils/duration";
+import { calculateDuration, formatDuration } from "@/utils/duration";
 import { useVisitorStorage } from "@/hooks/useVisitorStorage";
 
 // WhatsApp support configuration

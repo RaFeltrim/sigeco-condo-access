@@ -20,7 +20,7 @@ import {
   AlertCircle 
 } from 'lucide-react';
 import type { Visitor } from '@/types/visitor';
-import { cn } from '@/lib/utils';
+import { cn } from '@/utils/cn';
 
 export interface QuickCheckoutProps {
   visitors: Visitor[];

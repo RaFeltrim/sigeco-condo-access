@@ -19,7 +19,7 @@ import {
   Filter,
   Settings
 } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn } from "@/utils/cn";
 import { ReportService, type ReportData, type ReportFilter } from "@/services/ReportService";
 import { useToast } from "@/hooks/use-toast";
 

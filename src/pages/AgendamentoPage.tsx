@@ -30,7 +30,7 @@ import {
   getProximosAgendamentos,
   countByStatus,
   getAgendamentosEstaSemana
-} from "@/lib/agendamentos-crud";
+} from "@/business-logic/agendamentos";
 
 const AgendamentoPage = () => {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());

@@ -39,19 +39,19 @@ export const DashboardStats = ({ stats, className = "" }: DashboardStatsProps) =
   };
 
   return (
-    <div className={`grid gap-4 md:grid-cols-2 lg:grid-cols-4 ${className}`}>
+    <div className={`grid gap-4 md:grid-cols-2 lg:grid-cols-4 ${className}`} data-testid="stats-cards-container">
       {stats.map((stat, index) => {
         const Icon = stat.icon;
         return (
-          <Card key={index} className="hover:shadow-lg transition-shadow">
+          <Card key={index} className="hover:shadow-lg transition-shadow" data-testid={`stat-card-${index}`}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
+              <CardTitle className="text-sm font-medium" data-testid={`stat-title-${index}`}>
                 {stat.title}
               </CardTitle>
               <Icon className={`h-4 w-4 ${stat.color || 'text-muted-foreground'}`} />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stat.value}</div>
+              <div className="text-2xl font-bold" data-testid={`stat-value-${index}`}>{stat.value}</div>
               {stat.description && (
                 <CardDescription className="text-xs mt-1">
                   {stat.description}

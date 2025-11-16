@@ -28,34 +28,40 @@ describe('Admin Dashboard - Complete E2E Coverage', () => {
   describe('Overview Section', () => {
     beforeEach(() => {
       cy.login('admin', 'senha123');
+      // Wait for dashboard to fully load
+      cy.contains('Dashboard Administrativo', { timeout: 10000 }).should('be.visible');
     });
 
     it('should display all statistics cards', () => {
-      cy.getBySel('stats-cards-container').should('be.visible');
-      cy.getBySel('stat-card-0').should('exist');
-      cy.getBySel('stat-card-1').should('exist');
-      cy.getBySel('stat-card-2').should('exist');
-      cy.getBySel('stat-card-3').should('exist');
+      cy.getBySel('stats-cards-container', { timeout: 10000 }).should('be.visible');
+      cy.getBySel('stat-card-0', { timeout: 5000 }).should('be.visible');
+      cy.getBySel('stat-card-1', { timeout: 5000 }).should('be.visible');
+      cy.getBySel('stat-card-2', { timeout: 5000 }).should('be.visible');
+      cy.getBySel('stat-card-3', { timeout: 5000 }).should('be.visible');
     });
 
     it('should show correct stat titles', () => {
-      cy.getBySel('stat-title-0').should('contain', 'Acessos Hoje');
-      cy.getBySel('stat-title-1').should('contain', 'Visitantes Ativos');
-      cy.getBySel('stat-title-2').should('contain', 'Total Semanal');
-      cy.getBySel('stat-title-3').should('contain', 'Sistema Online');
+      cy.getBySel('stat-title-0', { timeout: 10000 }).should('contain', 'Acessos Hoje');
+      cy.getBySel('stat-title-1', { timeout: 5000 }).should('contain', 'Visitantes Ativos');
+      cy.getBySel('stat-title-2', { timeout: 5000 }).should('contain', 'Total Semanal');
+      cy.getBySel('stat-title-3', { timeout: 5000 }).should('contain', 'Sistema Online');
     });
 
     it('should display numeric values in stats', () => {
-      cy.getBySel('stat-value-0').should('exist').invoke('text').should('match', /^\d+$/);
-      cy.getBySel('stat-value-1').should('exist').invoke('text').should('match', /^\d+$/);
-      cy.getBySel('stat-value-2').should('exist').invoke('text').should('match', /^\d+$/);
+      cy.getBySel('stat-value-0', { timeout: 10000 }).should('be.visible').invoke('text').should('match', /^\d+$/);
+      cy.getBySel('stat-value-1', { timeout: 5000 }).should('be.visible').invoke('text').should('match', /^\d+$/);
+      cy.getBySel('stat-value-2', { timeout: 5000 }).should('be.visible').invoke('text').should('match', /^\d+$/);
     });
 
     it('should show weekly flow chart', () => {
-      cy.contains('Fluxo de Visitas - Última Semana').should('be.visible');
-      cy.contains('Domingo').should('be.visible');
-      cy.contains('Segunda').should('be.visible');
-      cy.contains('Sábado').should('be.visible');
+      cy.getBySel('chart-title', { timeout: 10000 }).should('contain', 'Fluxo de Visitas - Última Semana');
+      cy.getBySel('chart-content', { timeout: 5000 }).should('be.visible');
+      // Verify chart days are rendered
+      cy.getBySel('chart-content').within(() => {
+        cy.contains('Dom', { timeout: 5000 }).should('be.visible');
+        cy.contains('Seg').should('be.visible');
+        cy.contains('Sáb').should('be.visible');
+      });
     });
 
     it('should display recent activity section', () => {
@@ -122,23 +128,28 @@ describe('Admin Dashboard - Complete E2E Coverage', () => {
     });
 
     it('should have add resident form', () => {
-      cy.get('#nome').should('exist');
-      cy.get('#email').should('exist');
-      cy.get('#telefone').should('exist');
+      // Wait for page to fully load
+      cy.contains('Total de Moradores', { timeout: 10000 }).should('be.visible');
+      // Check form fields exist
+      cy.get('#nome', { timeout: 5000 }).should('be.visible');
+      cy.get('#email', { timeout: 5000 }).should('be.visible');
+      cy.get('#telefone', { timeout: 5000 }).should('be.visible');
     });
 
     it('should validate required fields', () => {
-      cy.get('button[type="submit"]').click();
-      cy.contains('Campos obrigatórios faltando').should('be.visible');
+      cy.contains('Total de Moradores', { timeout: 10000 }).should('be.visible');
+      cy.get('button[type="submit"]', { timeout: 5000 }).click();
+      cy.contains('Campos obrigatórios faltando', { timeout: 5000 }).should('be.visible');
     });
 
     it('should validate phone format', () => {
-      cy.get('#nome').type('Test User');
+      cy.contains('Total de Moradores', { timeout: 10000 }).should('be.visible');
+      cy.get('#nome', { timeout: 5000 }).type('Test User');
       cy.get('#email').type('test@test.com');
       cy.get('#telefone').type('123');
       cy.get('#documento').type('12345678901');
       cy.get('button[type="submit"]').click();
-      cy.contains('Telefone inválido').should('be.visible');
+      cy.contains('Telefone inválido', { timeout: 5000 }).should('be.visible');
     });
 
     it('should access from quick action button', () => {
@@ -171,20 +182,26 @@ describe('Admin Dashboard - Complete E2E Coverage', () => {
     });
 
     it('should have new appointment form', () => {
-      cy.get('#visitante').should('exist');
-      cy.get('#destino-agendamento').should('exist');
+      // Wait for page to fully load
+      cy.contains('Agendamentos Hoje', { timeout: 10000 }).should('be.visible');
+      // Check form fields exist
+      cy.get('#visitante', { timeout: 5000 }).should('be.visible');
+      cy.get('#destino-agendamento', { timeout: 5000 }).should('be.visible');
     });
 
     it('should validate required fields', () => {
-      cy.get('button').contains('Agendar Visita').click();
-      cy.contains('Campos obrigatórios faltando').should('be.visible');
+      cy.contains('Agendamentos Hoje', { timeout: 10000 }).should('be.visible');
+      cy.get('button', { timeout: 5000 }).contains('Agendar Visita').click();
+      cy.contains('Campos obrigatórios faltando', { timeout: 5000 }).should('be.visible');
     });
 
     it('should detect scheduling conflicts', () => {
+      // Wait for page to fully load
+      cy.contains('Agendamentos Hoje', { timeout: 10000 }).should('be.visible');
       // Try to schedule at the same time/place as existing appointment
-      cy.get('#visitante').type('Test Visitor');
+      cy.get('#visitante', { timeout: 5000 }).type('Test Visitor');
       cy.get('#destino-agendamento').click();
-      cy.contains('Apto 205').click({ force: true });
+      cy.contains('Apto 205', { timeout: 5000 }).click({ force: true });
       // Set date and time that conflicts
       cy.get('button').contains('Agendar Visita').click();
       // Should show conflict or success based on implementation
@@ -279,12 +296,18 @@ describe('Admin Dashboard - Complete E2E Coverage', () => {
   describe('Responsive Design', () => {
     beforeEach(() => {
       cy.login('admin', 'senha123');
+      cy.contains('Dashboard Administrativo', { timeout: 10000 }).should('be.visible');
     });
 
     it('should work on desktop viewport', () => {
       cy.viewport(1920, 1080);
       cy.contains('Dashboard Administrativo').should('be.visible');
-      cy.getBySel('stats-cards-container').should('be.visible');
+      cy.getBySel('stats-cards-container', { timeout: 10000 }).should('be.visible');
+      // Verify all 4 cards are visible
+      cy.getBySel('stat-card-0').should('be.visible');
+      cy.getBySel('stat-card-1').should('be.visible');
+      cy.getBySel('stat-card-2').should('be.visible');
+      cy.getBySel('stat-card-3').should('be.visible');
     });
 
     it('should work on tablet viewport', () => {
@@ -295,23 +318,27 @@ describe('Admin Dashboard - Complete E2E Coverage', () => {
 
     it('should adapt stats layout on smaller screens', () => {
       cy.viewport(768, 1024);
-      cy.getBySel('stats-cards-container').should('be.visible');
+      cy.getBySel('stats-cards-container', { timeout: 10000 }).should('be.visible');
+      // Stats cards should still be visible, just stacked differently
+      cy.getBySel('stat-card-0').should('be.visible');
     });
   });
 
   describe('Real-time Data Updates', () => {
     beforeEach(() => {
       cy.login('admin', 'senha123');
+      cy.contains('Dashboard Administrativo', { timeout: 10000 }).should('be.visible');
     });
 
     it('should display initial stats values', () => {
-      cy.getBySel('stat-value-0').should('exist');
-      cy.getBySel('stat-value-1').should('exist');
+      cy.getBySel('stat-value-0', { timeout: 10000 }).should('be.visible');
+      cy.getBySel('stat-value-1', { timeout: 5000 }).should('be.visible');
+      cy.getBySel('stat-value-2', { timeout: 5000 }).should('be.visible');
     });
 
     it('should show activity status', () => {
-      cy.getBySel('stat-title-3').should('contain', 'Sistema Online');
-      cy.getBySel('stat-value-3').should('contain', '99.9%');
+      cy.getBySel('stat-title-3', { timeout: 10000 }).should('contain', 'Sistema Online');
+      cy.getBySel('stat-value-3', { timeout: 5000 }).should('contain', '99.9%');
     });
   });
 

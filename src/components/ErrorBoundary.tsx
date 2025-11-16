@@ -6,7 +6,7 @@
  */
 
 import React, { Component, ReactNode } from 'react';
-import { LoggingService } from '@/lib/logging';
+import { LoggingService } from '@/utils/logging';
 import { ErrorFallback } from './ErrorFallback';
 
 interface ErrorBoundaryProps {
