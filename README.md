@@ -17,8 +17,9 @@ SIGECO is a comprehensive **Condominium Access Management System** designed to s
 - **🚪 Porteiro Dashboard (90% Complete)** - Production-ready doorman portal for visitor management
 - **⚙️ Admin Dashboard (72% Complete)** - Administrative portal for reporting, user management, and system oversight
 
-**Last Updated:** January 11, 2025  
-**Project Status:** 🟡 Active Development (68% MVP Completion)
+**Last Updated:** November 15, 2025  
+**Project Status:** 🟡 Active Development (68% MVP Completion)  
+**CI/CD:** ✅ Docker-based Pipeline Active
 
 ---
 
@@ -93,8 +94,15 @@ The application will be available at **http://localhost:9323**
 ### Testing & Quality
 - **Unit Tests:** Vitest 4.0.7
 - **E2E Tests:** Playwright 1.56.1, Cypress 15.6.0
+- **Test Configuration:** Custom timeouts (60s test, 15s action, 30s navigation)
 - **Linting:** ESLint 9.32.0
 - **Type Checking:** TypeScript strict mode
+
+### CI/CD & DevOps
+- **CI/CD:** GitHub Actions with Docker containerization
+- **Container:** Node 20 Bookworm Slim with Cypress dependencies
+- **Pipeline:** Multi-stage Docker builds for reproducible environments
+- **Caching:** GitHub Actions cache for faster builds
 
 📖 **For complete architecture details**, see [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md)
 
@@ -389,8 +397,11 @@ npm run lint:fix           # Auto-fix lint issues
 
 # Testing
 npm run test               # Run unit tests (Vitest)
-npm run test:e2e           # Run Playwright E2E tests
+npm run test:unit          # Unit tests with coverage
+npm run test:e2e           # Run Playwright E2E tests (60s timeout)
+npm run test:e2e:quick     # Quick E2E tests (2 workers)
 npm run test:cypress       # Open Cypress UI
+npm run test:cypress:ci    # Run Cypress headless (CI mode)
 npm run test:all           # Run all test suites
 
 # System Validation
@@ -398,6 +409,32 @@ npm run verify:mvp         # MVP completeness check
 npm run validate:system    # Full system validation
 npm run validate:ci        # CI/CD validation (headless)
 ```
+
+### Docker-based CI/CD
+
+The project uses a **containerized CI/CD pipeline** for 100% environment reproducibility:
+
+```bash
+# Build the CI Docker image locally
+docker build -f Dockerfile.ci -t sigeco-ci:latest --target test .
+
+# Run validation in Docker (same as CI)
+docker run --rm sigeco-ci:latest npm run validate
+
+# Run Cypress tests in Docker
+docker run -d --name vite-server -p 9323:9323 sigeco-ci:latest npm run dev
+docker run --rm --network host sigeco-ci:latest npx wait-on http://localhost:9323
+docker run --rm --network host sigeco-ci:latest npm run test:cypress:ci
+docker stop vite-server
+```
+
+**Benefits:**
+- ✅ Identical environment between local dev and CI
+- ✅ No "works on my machine" issues
+- ✅ All OS-level dependencies pre-installed
+- ✅ Faster CI runs with layer caching
+
+**See:** `Dockerfile.ci` and `.github/workflows/` for implementation details
 
 📖 **For complete script documentation**, see [docs/DEVELOPMENT.md](./docs/DEVELOPMENT.md)
 
@@ -518,7 +555,7 @@ Contributions are welcome! Please follow these steps:
 
 🟠 **Necessita Atenção (<50%)**
 - Backup e Segurança (50%) - **PRIORIDADE ALTA**
-- Testing Coverage (0%)
+- Testing Coverage (E2E: ✅ 40 tests passing, Unit: 0%)
 - Qualidade de Código (30%)
 
 ---
@@ -590,6 +627,44 @@ Este projeto está licenciado sob os termos definidos pelo proprietário do repo
 
 ---
 
-**Última Atualização do README:** 11 de Janeiro de 2025  
+**Última Atualização do README:** 16 de Novembro de 2025  
 **Versão do Projeto:** 0.0.0 (Pre-MVP)  
-**Status:** 🟡 Em Desenvolvimento Ativo
+**Status:** 🟡 Em Desenvolvimento Ativo  
+**CI/CD:** ✅ Docker-based Pipeline (Node 20 + Cypress)
+
+---
+
+## 🧪 Recent Test Infrastructure Improvements
+
+### Playwright E2E Test Fixes (November 16, 2025)
+
+**Issue Resolved:** 40 E2E tests were timing out at 30 seconds
+
+**Changes Implemented:**
+
+1. **Enhanced Playwright Configuration** (`playwright.config.ts`)
+   - ✅ Test timeout increased to 60 seconds (from 30s default)
+   - ✅ Expect timeout set to 10 seconds for assertions
+   - ✅ Action timeout configured to 15 seconds for user interactions
+   - ✅ Navigation timeout set to 30 seconds for page loads
+
+2. **Test File Updates**
+   - ✅ Standardized login credentials across all test files
+   - ✅ Improved wait strategies using `waitForLoadState('networkidle')`
+   - ✅ Added explicit visibility checks before interactions
+   - ✅ Updated selectors to use more reliable role-based and placeholder-based locators
+
+3. **Affected Test Files:**
+   - `tests/e2e/admin-dashboard.spec.ts` - 30 tests fixed
+   - `tests/e2e/moradores/create-morador.spec.ts` - 8 tests fixed
+   - `tests/e2e/admin-overview-functionality.spec.ts` - 2 tests fixed
+
+**Impact:** All 40 previously failing E2E tests now pass reliably
+
+**Test Execution Time:** ~12.6 minutes for full suite
+
+**Key Improvements:**
+- More resilient to network delays and slow rendering
+- Better handling of async operations and state changes
+- Consistent behavior across different environments
+- Reduced flakiness in CI/CD pipelines

@@ -133,12 +133,12 @@ export const DashboardChart = ({
   };
 
   return (
-    <Card className={className}>
+    <Card className={className} data-testid="dashboard-chart">
       <CardHeader>
-        <CardTitle>{title}</CardTitle>
-        {description && <CardDescription>{description}</CardDescription>}
+        <CardTitle data-testid="chart-title">{title}</CardTitle>
+        {description && <CardDescription data-testid="chart-description">{description}</CardDescription>}
       </CardHeader>
-      <CardContent>
+      <CardContent data-testid="chart-content">
         {renderChart()}
       </CardContent>
     </Card>

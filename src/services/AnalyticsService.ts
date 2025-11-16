@@ -6,7 +6,7 @@
  * todos os providers falham.
  */
 
-import { LoggingService } from '@/lib/logging';
+import { LoggingService } from '@/utils/logging';
 
 // Types and Interfaces
 export interface AnalyticsEvent {

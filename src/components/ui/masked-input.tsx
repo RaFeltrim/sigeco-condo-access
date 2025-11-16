@@ -5,8 +5,8 @@
 
 import * as React from "react";
 import { Input } from "@/components/ui/input";
-import { cn } from "@/lib/utils";
-import { formatPhone, formatCPF, formatDocument } from "@/lib/utils/validation";
+import { cn } from "@/utils/cn";
+import { formatPhone, formatCPF, formatDocument } from "@/utils/validation";
 
 export interface MaskedInputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange'> {
   mask: 'phone' | 'cpf' | 'document';

@@ -1,0 +1,229 @@
+Listagem de caminhos de pasta
+O número de série do volume é 3A87-04E9
+C:.
+|   App.css
+|   App.tsx
+|   index.css
+|   main.tsx
+|   structure.txt
+|   vite-env.d.ts
+|   
++---business-logic
+|       agendamentos.ts
+|       moradores.ts
+|       
++---components
+|   |   ActivityLoggerIndicator.tsx
+|   |   ErrorBoundary.tsx
+|   |   ErrorFallback.tsx
+|   |   Logo.tsx
+|   |   NotificationSystem.tsx
+|   |   PageWrapper.tsx
+|   |   
+|   +---access
+|   |       AccessControl.tsx
+|   |       AccessLog.tsx
+|   |       
+|   +---dashboard
+|   |       DashboardChart.tsx
+|   |       DashboardLayout.tsx
+|   |       DashboardStats.tsx
+|   |       index.ts
+|   |       
+|   +---reports
+|   |       index.ts
+|   |       ReportGenerator.tsx
+|   |       ReportTemplateSelector.tsx
+|   |       ReportViewer.tsx
+|   |       SavedFiltersManager.tsx
+|   |       
+|   +---ui
+|   |       accordion.tsx
+|   |       alert-dialog.tsx
+|   |       alert.tsx
+|   |       aspect-ratio.tsx
+|   |       avatar.tsx
+|   |       badge.tsx
+|   |       breadcrumb.tsx
+|   |       button.tsx
+|   |       calendar.tsx
+|   |       card.tsx
+|   |       carousel.tsx
+|   |       chart.tsx
+|   |       checkbox.tsx
+|   |       collapsible.tsx
+|   |       command.tsx
+|   |       context-menu.tsx
+|   |       date-range-picker.tsx
+|   |       dialog.tsx
+|   |       drawer.tsx
+|   |       dropdown-menu.tsx
+|   |       error-display.tsx
+|   |       form.tsx
+|   |       hover-card.tsx
+|   |       input-otp.tsx
+|   |       input.tsx
+|   |       label.tsx
+|   |       loading-skeleton.tsx
+|   |       loading-spinner.tsx
+|   |       masked-input.tsx
+|   |       menubar.tsx
+|   |       navigation-menu.tsx
+|   |       pagination.tsx
+|   |       popover.tsx
+|   |       progress.tsx
+|   |       radio-group.tsx
+|   |       resizable.tsx
+|   |       scroll-area.tsx
+|   |       select.tsx
+|   |       separator.tsx
+|   |       sheet.tsx
+|   |       sidebar.tsx
+|   |       skeleton.tsx
+|   |       slider.tsx
+|   |       sonner.tsx
+|   |       switch.tsx
+|   |       table.tsx
+|   |       tabs.tsx
+|   |       textarea.tsx
+|   |       toast.tsx
+|   |       toaster.tsx
+|   |       toggle-group.tsx
+|   |       toggle.tsx
+|   |       tooltip.tsx
+|   |       unit-combobox.tsx
+|   |       use-toast.ts
+|   |       
+|   +---user
+|   |       UserForm.tsx
+|   |       UserList.tsx
+|   |       
+|   +---visitor
+|   |       DocumentInput.example.tsx
+|   |       QuickCheckout.tsx
+|   |       VisitorCard.tsx
+|   |       VisitorForm.tsx
+|   |       VisitorList.tsx
+|   |       VisitorSearch.example.tsx
+|   |       VisitorSearch.tsx
+|   |       
+|   \---__tests__
++---hooks
+|       use-mobile.tsx
+|       use-toast.ts
+|       useDocumentInput.ts
+|       useNameInput.ts
+|       usePhoneInput.ts
+|       useReportGeneration.ts
+|       useUserActivityLogger.ts
+|       useVisitorSearch.ts
+|       useVisitorStorage.ts
+|       
++---lib
+|   |   logging.test-manual.ts
+|   |   
+|   +---constants
+|   |       errorMessages.ts
+|   |       
+|   +---mvp-verifier
+|   |   |   index.ts
+|   |   |   ReportGenerator.ts
+|   |   |   VerificationEngine.ts
+|   |   |   
+|   |   \---analyzers
+|   |           ComponentAnalyzer.ts
+|   |           DependencyAnalyzer.ts
+|   |           FeatureAnalyzer.ts
+|   |           index.ts
+|   |           QualityAnalyzer.ts
+|   |           StructureAnalyzer.ts
+|   |           
+|   +---storage
+|   |       visitorStorage.ts
+|   |       __test-storage__.ts
+|   |       
+|   \---validation-agents
+|           AgendamentosAgent.ts
+|           BackupAgent.ts
+|           DashboardAgent.ts
+|           FuncionariosAgent.ts
+|           MoradoresAgent.ts
+|           RealtimeLogger.ts
+|           RelatoriosAgent.ts
+|           ReportAggregator.ts
+|           SuporteAgent.ts
+|           ValidationOrchestrator.ts
+|           
++---pages
+|       AdminDashboard.tsx
+|       AgendamentoPage.tsx
+|       ControleInsumosPage.tsx
+|       GerenciamentoMoradoresPage.tsx
+|       Index.tsx
+|       Login.tsx
+|       NotFound.tsx
+|       PorteiroDashboard.tsx
+|       RelatoriosPage.tsx
+|       SegurancaPage.tsx
+|       SuporteAvancadoPage.tsx
+|       
++---services
+|   |   AccessService.ts
+|   |   AnalyticsService.ts
+|   |   AuthService.ts
+|   |   BackupService.ts
+|   |   ReportService.ts
+|   |   ReportTemplateService.ts
+|   |   SavedFiltersService.ts
+|   |   UserActivityLogger.ts
+|   |   UserService.ts
+|   |   VisitorService.ts
+|   |   __example_analytics_usage__.ts
+|   |   __example_usage__.ts
+|   |   
+|   \---api
+|           appointments.service.ts
+|           auth.service.ts
+|           client.ts
+|           dashboard.service.ts
+|           index.ts
+|           residents.service.ts
+|           visits.service.ts
+|           
++---types
+|       access.ts
+|       common.ts
+|       dashboarddata.ts
+|       index.ts
+|       mvp-verifier.ts
+|       report.ts
+|       reportconfig.ts
+|       user.ts
+|       validation-agents.ts
+|       visitor.ts
+|       
++---utils
+|   |   cn.ts
+|   |   domHelpers.ts
+|   |   duration.ts
+|   |   globalErrorHandlers.ts
+|   |   logging.ts
+|   |   validation.ts
+|   |   
+|   +---formatters
+|   |   |   documentFormatter.ts
+|   |   |   
+|   |   \---__tests__
+|   |           documentFormatter.test.ts
+|   |           
+|   \---__tests__
+|           duration.test.ts
+|           
+\---validators
+    |   documentValidator.ts
+    |   nameValidator.ts
+    |   __manual-test__.ts
+    |   
+    \---__tests__
+            documentValidator.test.ts
+            

@@ -29,7 +29,7 @@ import {
   FileSpreadsheet
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { validatePhone, validateDocument } from "@/lib/utils/validation";
+import { validatePhone, validateDocument } from "@/utils/validation";
 import * as XLSX from 'xlsx';
 import { 
   type Morador,
@@ -37,7 +37,7 @@ import {
   calculateTotalMoradores,
   calculateMoradoresAtivos,
   calculateCadastrosEsteMes
-} from "@/lib/moradores-crud";
+} from "@/business-logic/moradores";
 
 
 const GerenciamentoMoradoresPage = () => {

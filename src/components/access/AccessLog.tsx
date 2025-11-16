@@ -41,14 +41,6 @@ export const AccessLog = ({ maxRecords = 50, showFilters = true }: AccessLogProp
     }
   };
 
-  useEffect(() => {
-    loadRecords();
-  }, []);
-
-  useEffect(() => {
-    applyFilters(records, filter, searchTerm);
-  }, [filter, searchTerm, records]);
-
   const applyFilters = (
     recordsToFilter: AccessRecord[],
     currentFilter: AccessFilter,
@@ -71,6 +63,18 @@ export const AccessLog = ({ maxRecords = 50, showFilters = true }: AccessLogProp
     // Limit number of records
     setFilteredRecords(filtered.slice(0, maxRecords));
   };
+
+  useEffect(() => {
+    loadRecords();
+    // loadRecords is defined above and doesn't change
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    applyFilters(records, filter, searchTerm);
+    // applyFilters is defined above and doesn't change
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filter, searchTerm, records]);
 
   const handleExport = () => {
     try {

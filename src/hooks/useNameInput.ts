@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { validateName, filterNameInput, capitalizeName, normalizeName } from '@/lib/validators/nameValidator';
+import { validateName, filterNameInput, capitalizeName, normalizeName } from '@/validators/nameValidator';
 
 export interface UseNameInputReturn {
   value: string;

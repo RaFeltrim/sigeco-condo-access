@@ -4,8 +4,8 @@
  */
 
 import { useState, useCallback } from 'react';
-import { validateDocument, detectDocumentType } from '@/lib/validators/documentValidator';
-import { formatDocument, unformatDocument } from '@/lib/formatters/documentFormatter';
+import { validateDocument, detectDocumentType } from '@/validators/documentValidator';
+import { formatDocument, unformatDocument } from '@/utils/formatters/documentFormatter';
 
 export interface UseDocumentInputReturn {
   value: string;

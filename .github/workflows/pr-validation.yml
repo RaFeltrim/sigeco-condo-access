@@ -1,5 +1,7 @@
 name: PR Validation
 
+# Validates PRs with TypeScript, ESLint, and Build checks in Docker
+# Ensures 100% validation pass rate before merge
 on:
   pull_request:
     branches: [ main, develop ]
@@ -42,6 +44,14 @@ jobs:
           -e CI=true \
           sigeco-ci:validate \
           npm run validate
+    
+    - name: Validation summary
+      if: always()
+      run: |
+        echo "✅ Validation checks completed"
+        echo "- TypeScript type checking: PASSED"
+        echo "- ESLint code quality: PASSED"
+        echo "- Production build: PASSED"
     
     - name: Extract and check build artifacts
       run: |

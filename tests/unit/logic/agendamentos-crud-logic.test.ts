@@ -14,7 +14,7 @@ import {
   getProximosAgendamentos,
   countByStatus,
   getAgendamentosEstaSemana
-} from '@/lib/agendamentos-crud';
+} from '@/business-logic/agendamentos';
 
 describe('Agendamentos CRUD Logic', () => {
   const mockAgendamentos: Agendamento[] = [

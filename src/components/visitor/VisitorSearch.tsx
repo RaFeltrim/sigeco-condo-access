@@ -11,7 +11,7 @@ import { Badge } from '@/components/ui/badge';
 import { Search, User, FileText, Clock, MapPin, X, ChevronRight } from 'lucide-react';
 import { useVisitorSearch } from '@/hooks/useVisitorSearch';
 import type { Visitor } from '@/types/visitor';
-import { cn } from '@/lib/utils';
+import { cn } from '@/utils/cn';
 
 export interface VisitorSearchProps {
   visitors: Visitor[];

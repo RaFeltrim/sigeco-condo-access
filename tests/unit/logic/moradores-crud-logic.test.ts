@@ -15,7 +15,7 @@ import {
   calculateTotalMoradores,
   calculateMoradoresAtivos,
   calculateCadastrosEsteMes
-} from '@/lib/moradores-crud';
+} from '@/business-logic/moradores';
 
 // Test Suite
 describe('Moradores CRUD Logic', () => {
