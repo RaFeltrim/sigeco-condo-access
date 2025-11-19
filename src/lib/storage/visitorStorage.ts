@@ -10,6 +10,13 @@ const STORAGE_KEY = 'sigeco_visitors';
 const MAX_RECORDS = 100;
 
 /**
+ * Checks if a value is a valid Date object
+ */
+function isValidDate(date: unknown): date is Date {
+  return date instanceof Date && !isNaN(date.getTime());
+}
+
+/**
  * Storage error types for better error handling
  */
 export class StorageError extends Error {
@@ -26,8 +33,19 @@ export class StorageError extends Error {
 /**
  * Serializes visitor data for storage
  * Converts Date objects to ISO strings
+ * Throws error if Date objects are invalid
  */
 function serializeVisitor(visitor: Visitor): string {
+  // Validate entrada date
+  if (!isValidDate(visitor.entrada)) {
+    throw new Error(`Invalid entrada date for visitor ${visitor.id}: ${visitor.entrada}`);
+  }
+  
+  // Validate saida date if present
+  if (visitor.saida !== undefined && !isValidDate(visitor.saida)) {
+    throw new Error(`Invalid saida date for visitor ${visitor.id}: ${visitor.saida}`);
+  }
+  
   const serialized = {
     ...visitor,
     entrada: visitor.entrada.toISOString(),
@@ -39,14 +57,37 @@ function serializeVisitor(visitor: Visitor): string {
 /**
  * Deserializes visitor data from storage
  * Converts ISO strings back to Date objects
+ * Returns null if deserialization fails or dates are invalid
  */
-function deserializeVisitor(data: string): Visitor {
-  const parsed = JSON.parse(data);
-  return {
-    ...parsed,
-    entrada: new Date(parsed.entrada),
-    saida: parsed.saida ? new Date(parsed.saida) : undefined,
-  };
+function deserializeVisitor(data: string): Visitor | null {
+  try {
+    const parsed = JSON.parse(data);
+    
+    // Create Date objects
+    const entrada = new Date(parsed.entrada);
+    const saida = parsed.saida ? new Date(parsed.saida) : undefined;
+    
+    // Validate entrada date (required)
+    if (!isValidDate(entrada)) {
+      console.warn('Invalid entrada date during deserialization:', parsed.entrada);
+      return null;
+    }
+    
+    // Validate saida date if present
+    if (saida !== undefined && !isValidDate(saida)) {
+      console.warn('Invalid saida date during deserialization:', parsed.saida);
+      return null;
+    }
+    
+    return {
+      ...parsed,
+      entrada,
+      saida,
+    };
+  } catch (error) {
+    console.warn('Failed to deserialize visitor:', error);
+    return null;
+  }
 }
 
 /**
@@ -132,13 +173,11 @@ export function loadVisitors(): Visitor[] {
     // Validate and deserialize each visitor
     const visitors: Visitor[] = [];
     for (const item of parsed) {
-      try {
-        const visitor = deserializeVisitor(JSON.stringify(item));
+      const visitor = deserializeVisitor(JSON.stringify(item));
+      if (visitor !== null) {
         visitors.push(visitor);
-      } catch (deserializeError) {
-        console.warn('Failed to deserialize visitor:', item, deserializeError);
-        // Skip corrupted individual records but continue loading others
       }
+      // If visitor is null, it was already logged by deserializeVisitor
     }
     
     return visitors;
